@@ -1,0 +1,27 @@
+# Datos de pacientes: NUNCA se versionan
+data/raw/
+data/images/**/*.png
+data/images/**/*.jpg
+*.hdf5
+*.h5
+*.dat
+*.hea
+*.zip
+
+# Modelos exportados de Teachable Machine
+model/
+*.tflite
+*.h5keras
+keras_model.h5
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# SO / editor
+.DS_Store
+.vscode/
+.idea/

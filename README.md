@@ -1,0 +1,88 @@
+# Chagas ECG · Teachable Machine
+
+Proyecto para **identificar patologías cardíacas asociadas a la enfermedad de Chagas** a
+partir de electrocardiogramas (ECG), usando [Google Teachable Machine](https://teachablemachine.withgoogle.com/)
+como clasificador de imágenes.
+
+La enfermedad de Chagas (infección por *Trypanosoma cruzi*) produce una miocardiopatía cuyo
+sello electrocardiográfico son ciertas alteraciones de la conducción y del ritmo. La idea del
+proyecto es reunir ECG etiquetados, convertir cada trazado en una **imagen**, y entrenar un
+modelo de clasificación de imágenes en Teachable Machine.
+
+> ⚠️ **Aviso médico.** Este proyecto es educativo / de investigación. No es un dispositivo
+> médico y no debe usarse para diagnóstico clínico.
+
+---
+
+## ¿Por qué imágenes?
+
+Teachable Machine (modo *Image Project*) clasifica **imágenes**, no señales crudas. Por eso el
+flujo de trabajo es:
+
+```
+Señal ECG (WFDB/CSV)  ──►  Imagen del trazado (PNG)  ──►  Teachable Machine  ──►  modelo
+```
+
+Cada clase del modelo se corresponde con una carpeta dentro de `data/images/`.
+
+## Clases (patologías chagásicas típicas en ECG)
+
+| Carpeta                 | Clase                                             | Relevancia en Chagas |
+|-------------------------|---------------------------------------------------|----------------------|
+| `data/images/normal`    | ECG normal                                        | Control negativo |
+| `data/images/rbbb`      | Bloqueo completo de rama derecha (BRD / RBBB)     | Hallazgo más frecuente |
+| `data/images/lafb`      | Hemibloqueo anterior izquierdo (HBAI / LAFB)      | Muy frecuente |
+| `data/images/rbbb_lafb` | BRD + HBAI (patrón chagásico "clásico")           | Alta especificidad para Chagas |
+| `data/images/av_block`  | Bloqueo aurículo-ventricular (BAV)                | Marcador de progresión |
+| `data/images/pvc`       | Extrasístoles / arritmia ventricular              | Riesgo de muerte súbita |
+
+Puedes añadir o quitar clases creando/eliminando subcarpetas en `data/images/`.
+
+---
+
+## Datasets
+
+El catálogo completo de datasets públicos, con enlaces, licencias y notas, está en
+[`docs/datasets.md`](docs/datasets.md). Los principales:
+
+- **SaMi-Trop** — cohorte brasileña de pacientes con Chagas (el dataset de referencia).
+- **CODE-15%** — 345.779 ECG de Brasil con etiquetas de anomalías de conducción.
+- **PTB-XL** — 21.837 ECG clínicos con diagnósticos SCP-ECG (control / comparación).
+- **PhysioNet Challenge 2025** — reto oficial de *detección de Chagas por ECG*.
+
+## Estructura del repositorio
+
+```
+.
+├── README.md
+├── docs/
+│   └── datasets.md          # catálogo de datasets con enlaces y licencias
+├── scripts/
+│   ├── download_data.py     # descarga los datasets desde Zenodo / PhysioNet
+│   └── wfdb_to_images.py    # convierte señales ECG en imágenes PNG por clase
+├── data/
+│   ├── raw/                 # datasets descargados (ignorado por git)
+│   └── images/              # imágenes listas para Teachable Machine, una carpeta por clase
+├── notebooks/
+├── requirements.txt
+└── .gitignore
+```
+
+## Puesta en marcha
+
+```bash
+# 1. Dependencias
+pip install -r requirements.txt
+
+# 2. Descargar datasets (ver docs/datasets.md para credenciales/PhysioNet)
+python scripts/download_data.py --dataset samitrop --dest data/raw
+
+# 3. Convertir señales a imágenes por clase
+python scripts/wfdb_to_images.py --input data/raw/samitrop --out data/images
+
+# 4. Subir data/images/ a https://teachablemachine.withgoogle.com/ (Image Project)
+#    y entrenar arrastrando cada carpeta como una clase.
+```
+
+Consulta [`docs/datasets.md`](docs/datasets.md) antes de descargar: SaMi-Trop y la mayoría de
+datos de PhysioNet requieren registro y aceptar los términos de uso.

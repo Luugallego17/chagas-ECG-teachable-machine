@@ -1,0 +1,9 @@
+# Núcleo para leer señales ECG y generar imágenes
+wfdb>=4.1.2          # lectura de registros WFDB (.dat/.hea) de PhysioNet
+numpy>=1.24
+pandas>=2.0
+matplotlib>=3.7      # render de los trazados ECG a PNG
+h5py>=3.9            # datasets en HDF5 (CODE-15%, SaMi-Trop)
+scipy>=1.11          # filtrado de señal (baseline / ruido)
+requests>=2.31       # descargas desde Zenodo
+tqdm>=4.66           # barras de progreso
