@@ -59,7 +59,10 @@ El catálogo completo de datasets públicos, con enlaces, licencias y notas, est
 │   └── datasets.md          # catálogo de datasets con enlaces y licencias
 ├── scripts/
 │   ├── download_data.py     # descarga los datasets desde Zenodo / PhysioNet
-│   └── wfdb_to_images.py    # convierte señales ECG en imágenes PNG por clase
+│   ├── wfdb_to_images.py    # convierte señales ECG en imágenes PNG por clase
+│   ├── scp_class_map.py     # mapeo etiquetas (PTB-XL SCP / CODE-15%) -> clases
+│   └── synthesize_ecg.py    # ECG sintéticos por clase (validación del pipeline, sin datos)
+├── samples/                 # SVGs sintéticos de ejemplo, uno por clase
 ├── data/
 │   ├── raw/                 # datasets descargados (ignorado por git)
 │   └── images/              # imágenes listas para Teachable Machine, una carpeta por clase
@@ -86,3 +89,23 @@ python scripts/wfdb_to_images.py --input data/raw/samitrop --out data/images
 
 Consulta [`docs/datasets.md`](docs/datasets.md) antes de descargar: SaMi-Trop y la mayoría de
 datos de PhysioNet requieren registro y aceptar los términos de uso.
+
+### Validar el pipeline sin descargar datos
+
+Antes de tocar datos reales puedes comprobar la taxonomía y el render con ECG **sintéticos**
+(solo librería estándar, no instala nada):
+
+```bash
+python scripts/synthesize_ecg.py --out samples
+```
+
+Genera un trazado ilustrativo por clase en `samples/` (ver `samples/todas_las_clases.svg`).
+Son solo para validación visual — **no deben usarse para entrenar**.
+
+El mapeo de etiquetas de cada dataset a las clases del proyecto vive en
+[`scripts/scp_class_map.py`](scripts/scp_class_map.py) (detalles de PTB-XL en
+[`docs/ptbxl_scp_mapping.md`](docs/ptbxl_scp_mapping.md)); trae autocomprobación:
+
+```bash
+python scripts/scp_class_map.py
+```

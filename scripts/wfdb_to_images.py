@@ -35,18 +35,10 @@ matplotlib.use("Agg")  # backend sin ventana, para servidores
 import matplotlib.pyplot as plt
 import numpy as np
 
+from scp_class_map import map_labels  # fuente única del mapeo etiqueta -> clase
+
 # Derivaciones estándar de 12 canales, en orden WFDB habitual.
 LEADS = ["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"]
-
-# Mapa: etiqueta cruda del dataset -> carpeta de clase del proyecto.
-# Ajusta según las etiquetas reales de tu dataset (ver docs/datasets.md).
-LABEL_TO_CLASS = {
-    "NORM": "normal",
-    "CRBBB": "rbbb", "IRBBB": "rbbb", "RBBB": "rbbb",
-    "LAFB": "lafb",
-    "1AVB": "av_block", "2AVB": "av_block", "3AVB": "av_block", "1dAVb": "av_block",
-    "PVC": "pvc", "VPB": "pvc",
-}
 
 
 def bandpass(sig: np.ndarray, fs: float, lo: float = 0.5, hi: float = 40.0) -> np.ndarray:
@@ -84,15 +76,6 @@ def plot_ecg(signal: np.ndarray, fs: float, out_path: Path, seconds: float = 5.0
     out_path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(out_path, dpi=96)
     plt.close(fig)
-
-
-def classes_for_labels(raw_label: str) -> list[str]:
-    """Devuelve las clases de proyecto que corresponden a una cadena de etiquetas cruda."""
-    found = {cls for key, cls in LABEL_TO_CLASS.items() if key in str(raw_label)}
-    # Patrón chagásico clásico: RBBB + LAFB simultáneos.
-    if "rbbb" in found and "lafb" in found:
-        found = {"rbbb_lafb"}
-    return sorted(found) if found else ["normal"]
 
 
 def iter_wfdb(input_dir: Path):
@@ -150,7 +133,7 @@ def main() -> int:
     n = 0
     for rec_id, signal, fs in iterator:
         raw_label = labels.get(str(rec_id), "")
-        classes = classes_for_labels(raw_label)
+        classes = map_labels(raw_label)
         if not args.no_filter:
             try:
                 signal = bandpass(signal, fs)
