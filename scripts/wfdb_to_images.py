@@ -111,6 +111,8 @@ def main() -> int:
     p.add_argument("--out", default="data/images", help="carpeta de salida (una subcarpeta por clase)")
     p.add_argument("--format", choices=["wfdb", "hdf5"], default="wfdb")
     p.add_argument("--labels", help="CSV con las etiquetas por registro")
+    p.add_argument("--manifest", help="CSV (record_id,class) de plan_balanced_set.py: "
+                                      "renderiza SOLO esos registros con esa clase")
     p.add_argument("--id-col", default="exam_id", help="columna de identificador en el CSV")
     p.add_argument("--label-col", default="scp_codes", help="columna de etiquetas en el CSV")
     p.add_argument("--limit", type=int, default=0, help="máximo de registros (0 = todos)")
@@ -120,8 +122,20 @@ def main() -> int:
     input_dir = Path(args.input)
     out_dir = Path(args.out)
 
+    # manifiesto balanceado (tiene prioridad sobre --labels): record_id -> {clases}
+    manifest: dict[str, set[str]] = {}
+    if args.manifest:
+        import csv
+
+        with open(args.manifest, newline="", encoding="utf-8") as fh:
+            for row in csv.DictReader(fh):
+                rid, cls = row["record_id"], row["class"]
+                for key in (rid, Path(rid).name):  # casa id completo o nombre base
+                    manifest.setdefault(key, set()).add(cls)
+        print(f"[manifest] {len(manifest)} identificadores cargados de {args.manifest}")
+
     labels = {}
-    if args.labels:
+    if args.labels and not manifest:
         import pandas as pd
 
         df = pd.read_csv(args.labels)
@@ -132,8 +146,12 @@ def main() -> int:
 
     n = 0
     for rec_id, signal, fs in iterator:
-        raw_label = labels.get(str(rec_id), "")
-        classes = map_labels(raw_label)
+        if manifest:
+            classes = sorted(manifest.get(str(rec_id)) or manifest.get(Path(str(rec_id)).name) or [])
+            if not classes:
+                continue  # registro fuera del set balanceado
+        else:
+            classes = map_labels(labels.get(str(rec_id), ""))
         if not args.no_filter:
             try:
                 signal = bandpass(signal, fs)

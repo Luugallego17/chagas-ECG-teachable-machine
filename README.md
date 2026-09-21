@@ -61,8 +61,11 @@ El catálogo completo de datasets públicos, con enlaces, licencias y notas, est
 │   ├── download_data.py     # descarga los datasets desde Zenodo / PhysioNet
 │   ├── wfdb_to_images.py    # convierte señales ECG en imágenes PNG por clase
 │   ├── scp_class_map.py     # mapeo etiquetas (PTB-XL SCP / CODE-15%) -> clases
+│   ├── plan_balanced_set.py # distribución de clases + manifiesto balanceado
 │   └── synthesize_ecg.py    # ECG sintéticos por clase (validación del pipeline, sin datos)
 ├── samples/                 # SVGs sintéticos de ejemplo, uno por clase
+├── notebooks/
+│   └── 01_explorar_datos.ipynb  # flujo explorar -> balancear -> renderizar
 ├── data/
 │   ├── raw/                 # datasets descargados (ignorado por git)
 │   └── images/              # imágenes listas para Teachable Machine, una carpeta por clase
@@ -80,11 +83,20 @@ pip install -r requirements.txt
 # 2. Descargar datasets (ver docs/datasets.md para credenciales/PhysioNet)
 python scripts/download_data.py --dataset samitrop --dest data/raw
 
-# 3. Convertir señales a imágenes por clase
-python scripts/wfdb_to_images.py --input data/raw/samitrop --out data/images
+# 3. Ver distribución de clases y generar un manifiesto balanceado
+python scripts/plan_balanced_set.py \
+    --labels data/raw/ptbxl/ptbxl_database.csv \
+    --id-col filename_hr --label-col scp_codes \
+    --out data/manifest.csv --per-class 300
 
-# 4. Subir data/images/ a https://teachablemachine.withgoogle.com/ (Image Project)
+# 4. Convertir a imágenes por clase (solo los registros del manifiesto balanceado)
+python scripts/wfdb_to_images.py --input data/raw/ptbxl \
+    --manifest data/manifest.csv --out data/images
+
+# 5. Subir data/images/ a https://teachablemachine.withgoogle.com/ (Image Project)
 #    y entrenar arrastrando cada carpeta como una clase.
+#
+# Alternativa guiada: notebooks/01_explorar_datos.ipynb hace los pasos 3-4 con gráficas.
 ```
 
 Consulta [`docs/datasets.md`](docs/datasets.md) antes de descargar: SaMi-Trop y la mayoría de
