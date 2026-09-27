@@ -8,6 +8,16 @@ data/images/**/*.jpg
 *.hea
 *.zip
 
+# Fotos de ECG (crudas y anonimizadas): PHI, nunca al repositorio.
+# Guarda tus fotos en estas carpetas (ignoradas) para no subirlas por accidente.
+fotos/
+fotos_raw/
+fotos_anon/
+anon/
+previews/
+mis_ecg/
+*_ecg_privado*
+
 # Modelos exportados de Teachable Machine
 model/
 *.tflite
