@@ -1,224 +1,273 @@
 <title>Chagas IA · Presentación</title>
 <meta name="description" content="Presentación del proyecto: detección de patrones chagásicos en el ECG con inteligencia artificial">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
-/* Keynote tech (oscuro, por diseño): azul marino + cian, encabezado fijo con franja de ECG vivo,
-   diapositivas a todo el ancho en rejillas de tarjetas, transición horizontal. */
+/* Keynote tech (oscuro, por diseño). Todo se mide en em sobre --u, que escala con la pantalla:
+   las diapositivas llenan el espacio en 1280×720, 1366×768, 1920×1080 y más. */
 :root{
-  --bg:#06121f; --bg2:#0a2236; --card:rgba(13,38,62,.66); --line:rgba(0,188,235,.24);
-  --ink:#f2f8fc; --dim:#a9c2d3; --faint:#6f8ba0;
+  --bg:#06121f; --bg2:#0a2236; --card:rgba(13,38,62,.68); --line:rgba(0,188,235,.26);
+  --ink:#f2f8fc; --dim:#b3c9d8; --faint:#7894a8;
   --cyan:#00bceb; --blue:#2f7bff; --teal:#2fe0b0; --crimson:#ff5a6a; --amber:#ffc24d; --violet:#a98bff; --orange:#ff9254;
-  --hh:56px; --strip:clamp(46px,8vh,74px); --navh:58px;
+  --u:clamp(12.5px,min(1.05vw,1.9vh),26px);
+  --hh:clamp(46px,5.6vh,66px); --strip:clamp(40px,7vh,80px); --navh:clamp(46px,5.4vh,62px);
   --head:"Sora",system-ui,sans-serif; --sans:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased;--p:0}
 
-/* fondo */
+/* ───── fondo vivo ───── */
 .bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
   background:radial-gradient(110% 80% at 85% -10%,#0d3a5c 0%,transparent 55%),radial-gradient(90% 70% at -10% 110%,#0b3b4a 0%,transparent 55%),var(--bg)}
-.bg::after{content:"";position:absolute;inset:0;
-  background:radial-gradient(rgba(0,188,235,.16) 1px,transparent 1.2px) 0 0/28px 28px;opacity:.5;
-  mask-image:radial-gradient(90% 80% at 50% 40%,#000 30%,transparent 85%);-webkit-mask-image:radial-gradient(90% 80% at 50% 40%,#000 30%,transparent 85%)}
-.glow{position:absolute;border-radius:50%;filter:blur(90px);opacity:.28;mix-blend-mode:screen}
-.glow-a{width:46vw;height:46vw;right:-10vw;top:-14vw;background:radial-gradient(circle,#00bceb,transparent 62%);animation:d1 22s ease-in-out infinite alternate}
-.glow-b{width:40vw;height:40vw;left:-12vw;bottom:-14vw;background:radial-gradient(circle,#2f7bff,transparent 62%);animation:d2 26s ease-in-out infinite alternate}
-@keyframes d1{to{transform:translate(-8vw,8vh) scale(1.12)}} @keyframes d2{to{transform:translate(8vw,-6vh) scale(1.15)}}
+.bgl{position:absolute;inset:0;transform:translate3d(calc(var(--p)*-9vw),calc(var(--p)*7vh),0);transition:transform 1.2s cubic-bezier(.19,1,.22,1)}
+.glow{position:absolute;border-radius:50%;filter:blur(90px);opacity:.3;mix-blend-mode:screen}
+.glow-a{width:46vw;height:46vw;right:-10vw;top:-14vw;background:radial-gradient(circle,#00bceb,transparent 62%);animation:d1 18s ease-in-out infinite alternate}
+.glow-b{width:40vw;height:40vw;left:-12vw;bottom:-14vw;background:radial-gradient(circle,#2f7bff,transparent 62%);animation:d2 22s ease-in-out infinite alternate}
+.glow-c{width:30vw;height:30vw;left:38vw;top:30vh;background:radial-gradient(circle,#2fe0b0,transparent 64%);opacity:.14;animation:d1 26s ease-in-out infinite alternate-reverse}
+@keyframes d1{to{transform:translate(-8vw,8vh) scale(1.15)}} @keyframes d2{to{transform:translate(8vw,-6vh) scale(1.2)}}
+#net{position:absolute;inset:0;width:100%;height:100%;opacity:.75}
 
-/* encabezado + franja ECG */
+/* ───── encabezado + franja ECG ───── */
 .topbar{position:fixed;z-index:6;top:0;left:0;right:0;height:var(--hh);display:flex;align-items:center;justify-content:space-between;gap:14px;
-  padding:0 clamp(16px,4vw,48px);background:rgba(6,18,31,.78);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-.brand{display:flex;align-items:center;gap:11px;font-family:var(--head);font-weight:700;letter-spacing:.02em;font-size:.95rem}
-.brand svg{width:30px;height:30px;color:var(--cyan)}
+  padding:0 clamp(16px,3.4vw,72px);background:rgba(6,18,31,.8);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:11px;font-family:var(--head);font-weight:700;letter-spacing:.02em;font-size:clamp(.8rem,1.15vh + .3vw,1.05rem)}
+.brand svg{width:clamp(26px,3.6vh,36px);height:clamp(26px,3.6vh,36px);color:var(--cyan)}
 .brand small{display:block;font-family:var(--mono);font-weight:400;font-size:.62rem;letter-spacing:.16em;color:var(--faint);text-transform:uppercase;margin-top:1px}
-.seclabel{font-family:var(--mono);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--cyan)}
-.hud{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.74rem;color:var(--dim)}
+.seclabel{font-family:var(--mono);font-size:.74rem;letter-spacing:.2em;text-transform:uppercase;color:var(--cyan);transition:opacity .3s}
+.hud{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.76rem;color:var(--dim)}
 .hud .hb{display:inline-block;color:var(--teal);transition:transform .45s cubic-bezier(.19,1,.22,1),color .45s}
-body.beat .hud .hb{transform:scale(1.4);color:var(--crimson);transition-duration:.07s}
+body.beat .hud .hb{transform:scale(1.5);color:var(--crimson);transition-duration:.07s}
 .strip{position:fixed;z-index:5;top:var(--hh);left:0;right:0;height:var(--strip);overflow:hidden;border-bottom:1px solid var(--line);
-  background:linear-gradient(rgba(0,188,235,.05) 1px,transparent 1px) 0 0/16px 16px,linear-gradient(90deg,rgba(0,188,235,.05) 1px,transparent 1px) 0 0/16px 16px,rgba(5,15,26,.7);
+  background:linear-gradient(rgba(0,188,235,.05) 1px,transparent 1px) 0 0/16px 16px,linear-gradient(90deg,rgba(0,188,235,.05) 1px,transparent 1px) 0 0/16px 16px,rgba(5,15,26,.72);
   transition:box-shadow .2s}
-body.beat .strip{box-shadow:inset 0 0 40px rgba(47,224,176,.18)}
+body.beat .strip{box-shadow:inset 0 0 44px rgba(47,224,176,.2)}
 .strip canvas{position:absolute;inset:0;width:100%;height:100%}
-.strip .lab{position:absolute;left:clamp(16px,4vw,48px);bottom:4px;z-index:2;font-family:var(--mono);font-size:.58rem;letter-spacing:.14em;color:var(--faint)}
-.progress{position:fixed;top:0;left:0;height:3px;z-index:8;background:linear-gradient(90deg,var(--cyan),var(--teal));width:0;transition:width .6s cubic-bezier(.19,1,.22,1);box-shadow:0 0 12px var(--cyan)}
-body.beat .progress{box-shadow:0 0 24px var(--teal)}
+.strip .lab{position:absolute;left:clamp(16px,3.4vw,72px);bottom:4px;z-index:2;font-family:var(--mono);font-size:.58rem;letter-spacing:.14em;color:var(--faint)}
+.progress{position:fixed;top:0;left:0;height:3px;z-index:8;background:linear-gradient(90deg,var(--cyan),var(--teal));width:0;transition:width .7s cubic-bezier(.19,1,.22,1);box-shadow:0 0 12px var(--cyan)}
+body.beat .progress{box-shadow:0 0 26px var(--teal)}
 
-/* diapositivas */
-.deck{position:relative;z-index:2;height:100%;width:100%}
-.slide{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;display:grid;place-items:center;
-  padding:calc(var(--hh) + var(--strip) + 22px) clamp(20px,4vw,64px) calc(var(--navh) + 16px);
-  opacity:0;visibility:hidden;transform:translateX(70px) scale(.985);filter:blur(5px);
-  transition:opacity .55s ease,transform .7s cubic-bezier(.19,1,.22,1),filter .5s ease,visibility 0s linear .7s}
-.slide.active{opacity:1;visibility:visible;transform:none;filter:none;transition-delay:0s}
-.slide.prev{transform:translateX(-70px) scale(.985)}
-.inner{width:100%;max-width:1240px;position:relative;margin:auto}
-.wm{position:absolute;right:-6px;top:-34px;font-family:var(--head);font-weight:800;font-size:clamp(6rem,17vw,14rem);line-height:1;
-  color:rgba(0,188,235,.07);pointer-events:none;user-select:none}
+/* ───── diapositivas con perspectiva ───── */
+.deck{position:relative;z-index:2;height:100%;width:100%;perspective:1700px;perspective-origin:50% 40%}
+.slide{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;font-size:var(--u);
+  padding:calc(var(--hh) + var(--strip) + 1.05em) clamp(20px,3.4vw,72px) calc(var(--navh) + .85em);
+  opacity:0;visibility:hidden;transform:translate3d(9%,0,-260px) rotateY(-11deg) scale(.9);transform-origin:50% 50%;filter:blur(7px);
+  transition:opacity .6s ease,transform .85s cubic-bezier(.19,1,.22,1),filter .55s ease,visibility 0s linear .85s}
+.slide.before{transform:translate3d(-9%,0,-260px) rotateY(11deg) scale(.9)}
+.slide.active{opacity:1;visibility:visible;transform:none;filter:none;transition-delay:0s;z-index:2}
+.inner{flex:1 0 auto;display:flex;flex-direction:column;width:100%;position:relative}
+.wm{position:absolute;right:-.2em;top:-.3em;font-family:var(--head);font-weight:800;font-size:10em;line-height:1;
+  color:rgba(0,188,235,.06);pointer-events:none;user-select:none;transition:transform 1.4s cubic-bezier(.19,1,.22,1) .1s;transform:translateX(30%)}
+.slide.active .wm{transform:none}
+.head{position:relative;z-index:1}
+.body{flex:1;display:grid;gap:1em;margin-top:1.05em;align-content:stretch;position:relative;z-index:1;min-height:0}
+.body>*{min-width:0}
 
-.kicker{font-family:var(--mono);font-size:clamp(.64rem,1.3vw,.78rem);letter-spacing:.24em;text-transform:uppercase;color:var(--cyan)}
-.kicker::after{content:"";display:inline-block;width:38px;height:1px;background:linear-gradient(90deg,var(--cyan),transparent);margin-left:12px;vertical-align:middle}
-h1{font-family:var(--head);font-weight:800;letter-spacing:-.025em;line-height:1.04;margin:.3em 0 0;font-size:clamp(2rem,5.2vw,4rem)}
-h2{font-family:var(--head);font-weight:700;letter-spacing:-.02em;line-height:1.08;margin:.22em 0 0;font-size:clamp(1.55rem,3.6vw,2.6rem)}
-.lead{color:var(--dim);font-size:clamp(.98rem,1.7vw,1.2rem);line-height:1.55;margin:.7em 0 0;max-width:62ch}
+.kicker{font-family:var(--mono);font-size:.78em;letter-spacing:.24em;text-transform:uppercase;color:var(--cyan)}
+.kicker::after{content:"";display:inline-block;width:3em;height:1px;background:linear-gradient(90deg,var(--cyan),transparent);margin-left:12px;vertical-align:middle}
+h1,h2{text-wrap:balance}
+h1{font-family:var(--head);font-weight:800;letter-spacing:-.025em;line-height:1.04;margin:.28em 0 0;font-size:3.5em}
+h2{font-family:var(--head);font-weight:700;letter-spacing:-.02em;line-height:1.08;margin:.2em 0 0;font-size:2.4em}
+.lead{color:var(--dim);font-size:1.12em;line-height:1.5;margin:.55em 0 0;max-width:78ch}
 .grad{background:linear-gradient(100deg,var(--cyan),var(--blue) 55%,var(--teal));-webkit-background-clip:text;background-clip:text;color:transparent}
 b{color:#fff;font-weight:600}
 
-[data-rv]{opacity:0;transform:translateY(22px);transition:opacity .55s ease,transform .65s cubic-bezier(.19,1,.22,1)}
-.slide.active [data-rv]{opacity:1;transform:none;transition-delay:calc(var(--i,0)*80ms + 130ms)}
+/* revelado direccional */
+[data-rv]{opacity:0;transform:translateY(1.4em);transition:opacity .6s ease,transform .8s cubic-bezier(.19,1,.22,1)}
+[data-rv="l"]{transform:translateX(-3.2em)} [data-rv="r"]{transform:translateX(3.2em)} [data-rv="z"]{transform:scale(.86)}
+.slide.active [data-rv]{opacity:1;transform:none;transition-delay:calc(var(--i,0)*85ms + 160ms)}
 
-/* rejillas */
-.g2{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:clamp(18px,3vw,44px);align-items:center}
-.g2>*{min-width:0}
-.ttl{font-size:clamp(1.9rem,4.1vw,3.3rem)}
-.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-.g2b{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-.mt{margin-top:clamp(18px,3vh,30px)}
-@media (max-width:980px){.g2,.g2b{grid-template-columns:1fr}.g3{grid-template-columns:1fr}.g4{grid-template-columns:1fr 1fr}}
-@media (max-width:560px){.g4{grid-template-columns:1fr}.seclabel{display:none}}
+/* destello de barrido entre diapositivas */
+.sweep{position:fixed;inset:0;z-index:4;pointer-events:none;opacity:0;
+  background:linear-gradient(100deg,transparent 38%,rgba(0,188,235,.22) 47%,rgba(47,224,176,.34) 50%,rgba(0,188,235,.22) 53%,transparent 62%);transform:translateX(-110%)}
+.sweep.go{animation:sw .9s cubic-bezier(.4,0,.2,1)}
+.sweep.go.rev{animation-name:swr}
+@keyframes sw{0%{opacity:1;transform:translateX(-110%)}100%{opacity:1;transform:translateX(110%)}}
+@keyframes swr{0%{opacity:1;transform:translateX(110%)}100%{opacity:1;transform:translateX(-110%)}}
 
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;backdrop-filter:blur(8px);position:relative;overflow:hidden}
-.card .t{font-family:var(--head);font-weight:700;font-size:1.08rem}
-.card .d{color:var(--dim);font-size:.9rem;line-height:1.5;margin-top:6px}
-.tag{font-family:var(--mono);font-size:.66rem;letter-spacing:.14em;color:var(--cyan);text-transform:uppercase}
+/* tarjetas */
+.card{background:var(--card);border:1px solid var(--line);border-radius:1em;padding:1.15em 1.25em;backdrop-filter:blur(8px);position:relative;overflow:hidden;
+  display:flex;flex-direction:column;justify-content:center;transition:border-color .3s,box-shadow .3s}
+.card::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 40%,rgba(0,188,235,.13) 50%,transparent 60%);transform:translateX(-120%)}
+.slide.active .card::after{animation:shine 1.5s ease .5s 1 both}
+@keyframes shine{to{transform:translateX(120%)}}
+.card:hover{border-color:var(--cyan);box-shadow:0 0 34px rgba(0,188,235,.18)}
+.card .t{font-family:var(--head);font-weight:700;font-size:1.45em;line-height:1.2}
+.card .d{color:var(--dim);font-size:1.1em;line-height:1.5;margin-top:.45em}
+.tag{font-family:var(--mono);font-size:.72em;letter-spacing:.14em;color:var(--cyan);text-transform:uppercase}
+.card .tag+.t,.card .tag+.d{margin-top:.5em}
 .num{font-variant-numeric:tabular-nums}
 
-.hintnav{margin-top:2em;display:inline-flex;gap:10px;align-items:center;flex-wrap:wrap;color:var(--faint);font-family:var(--mono);font-size:.78rem}
-.key{border:1px solid var(--line);border-radius:6px;padding:2px 9px;color:var(--dim);background:rgba(13,38,62,.6)}
+/* rejillas */
+.c2{grid-template-columns:repeat(2,minmax(0,1fr))} .c3{grid-template-columns:repeat(3,minmax(0,1fr))} .c4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.c12{grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr)}
+.rows2{grid-template-rows:1fr 1fr} .rows21{grid-template-rows:1.5fr 1fr} .rows12{grid-template-rows:1fr 1.5fr}
+@media (max-width:980px){.c2,.c3,.c12{grid-template-columns:1fr}.c4{grid-template-columns:1fr 1fr}.rows2,.rows21,.rows12{grid-template-rows:none}}
+@media (max-width:560px){.c4{grid-template-columns:1fr}.seclabel{display:none}}
 
 /* portada */
-.author .nm{font-weight:600;font-size:1.12rem;margin-top:1.6em;display:block}
-.author .sub{color:var(--dim);font-size:.92rem;display:block;margin-top:3px}
-.monitor{background:linear-gradient(180deg,rgba(7,22,38,.9),rgba(7,22,38,.6));border:1px solid var(--line);border-radius:18px;padding:16px;
+.hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:3em;align-items:center;flex:1}
+.author .nm{font-weight:600;font-size:1.2em;margin-top:1.5em;display:block}
+.author .sub{color:var(--dim);font-size:1em;display:block;margin-top:.3em;line-height:1.5}
+.hintnav{margin-top:1.8em;display:inline-flex;gap:10px;align-items:center;flex-wrap:wrap;color:var(--faint);font-family:var(--mono);font-size:.8em}
+.key{border:1px solid var(--line);border-radius:6px;padding:2px 9px;color:var(--dim);background:rgba(13,38,62,.6)}
+.monitor{background:linear-gradient(180deg,rgba(7,22,38,.92),rgba(7,22,38,.62));border:1px solid var(--line);border-radius:1.2em;padding:1.1em;position:relative;z-index:1;
   box-shadow:0 24px 70px rgba(0,0,0,.45),0 0 0 1px rgba(0,188,235,.06) inset}
-.monitor .mh{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;color:var(--faint);margin-bottom:10px}
-.monitor .mh .on{color:var(--teal)}
-.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-.chip{font-family:var(--mono);font-size:.7rem;border:1px solid var(--line);border-radius:999px;padding:5px 11px;color:var(--dim);background:rgba(13,38,62,.5)}
-canvas.mini{display:block;width:100%;height:auto;border-radius:10px;background:rgba(3,12,22,.55);
-  clip-path:inset(0 100% 0 0);transition:clip-path 1.3s cubic-bezier(.4,0,.2,1) .35s}
-.slide.active canvas.mini{clip-path:inset(0 0 0 0)}
+.monitor .mh{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.72em;letter-spacing:.12em;color:var(--faint);margin-bottom:.8em}
+.monitor .mh .on{color:var(--teal);animation:blink 1.4s steps(2) infinite}
+@keyframes blink{50%{opacity:.35}}
+.rings{position:absolute;right:6%;top:50%;width:46em;height:46em;margin-top:-23em;pointer-events:none;z-index:0}
+.rings i{position:absolute;inset:0;border:1px solid rgba(0,188,235,.4);border-radius:50%;animation:ring 5s ease-out infinite;opacity:0}
+.rings i:nth-child(2){animation-delay:1.6s}.rings i:nth-child(3){animation-delay:3.2s}
+@keyframes ring{0%{transform:scale(.25);opacity:.8}100%{transform:scale(1);opacity:0}}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:.7em;margin-top:.9em}
+.tile{border:1px solid var(--line);border-radius:.8em;padding:.7em .5em;text-align:center;background:rgba(13,38,62,.5)}
+.tile b{display:block;font-family:var(--head);font-size:1.5em;color:var(--cyan)}
+.tile span{font-size:.78em;color:var(--dim)}
+canvas.live{display:block;width:100%;height:auto;border-radius:.7em;background:rgba(3,12,22,.55)}
 
-/* agenda */
-.ag{display:flex;gap:16px;align-items:flex-start}
-.ag .n{font-family:var(--head);font-weight:800;font-size:2rem;color:var(--cyan);line-height:1;min-width:2.2ch}
+/* contenido */
+.ag{flex-direction:row;align-items:center;gap:1.1em}
+.ag .n{font-family:var(--head);font-weight:800;font-size:3.2em;line-height:1;min-width:1.8ch;
+  background:linear-gradient(160deg,var(--cyan),var(--teal));-webkit-background-clip:text;background-clip:text;color:transparent}
+.ag .t{font-size:1.4em}.ag .d{font-size:1.02em}
 
-/* ciclo / timeline */
-.tl{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative;margin-top:26px}
-.tl::before{content:"";position:absolute;left:6%;right:6%;top:19px;height:2px;background:linear-gradient(90deg,var(--cyan),var(--teal),var(--amber),var(--crimson));opacity:.55}
-.tl .st{position:relative;padding:0 10px;text-align:center}
-.tl .dotn{width:40px;height:40px;border-radius:50%;margin:0 auto;display:grid;place-items:center;font-family:var(--head);font-weight:700;
-  background:var(--bg2);border:2px solid var(--cyan);color:var(--cyan);position:relative;z-index:1}
-.tl .st:nth-child(2) .dotn{border-color:var(--teal);color:var(--teal)}
-.tl .st:nth-child(3) .dotn{border-color:var(--amber);color:var(--amber)}
-.tl .st:nth-child(4) .dotn{border-color:var(--crimson);color:var(--crimson)}
-.tl .st .t{font-weight:600;margin-top:12px;font-size:.98rem}
-.tl .st .d{color:var(--dim);font-size:.84rem;margin-top:4px;line-height:1.45}
-@media (max-width:760px){.tl{grid-template-columns:1fr;gap:18px}.tl::before{display:none}.tl .st{text-align:left;display:flex;gap:14px}.tl .dotn{margin:0;flex:none}.tl .st .t{margin-top:0}}
+/* ciclo de la enfermedad */
+.tl{display:grid;grid-template-columns:repeat(4,1fr);gap:1em;position:relative;padding-top:2.2em}
+.tl::before{content:"";position:absolute;left:6%;right:6%;top:1.1em;height:2px;background:linear-gradient(90deg,var(--cyan),var(--teal),var(--amber),var(--crimson));opacity:.55}
+.tl::after{content:"";position:absolute;top:calc(1.1em - 5px);left:6%;width:12px;height:12px;border-radius:50%;background:#fff;box-shadow:0 0 16px 4px var(--cyan);opacity:0}
+.slide.active .tl::after{animation:travel 6.4s linear 1s infinite}
+@keyframes travel{0%{left:6%;opacity:1}100%{left:94%;opacity:1}}
+.tl .st{text-align:center;position:relative}
+.tl .dotn{position:absolute;left:50%;top:-2.2em;margin-left:-1.05em;width:2.1em;height:2.1em;border-radius:50%;display:grid;place-items:center;font-family:var(--head);font-weight:700;
+  background:var(--bg2);border:2px solid var(--cyan);color:var(--cyan);z-index:1}
+.tl .st:nth-child(2) .dotn{border-color:var(--teal);color:var(--teal)}.tl .st:nth-child(3) .dotn{border-color:var(--amber);color:var(--amber)}.tl .st:nth-child(4) .dotn{border-color:var(--crimson);color:var(--crimson)}
+.tl .card{height:100%;padding-top:1.6em;align-items:center;text-align:center}
+.slide.active .tl .card{animation:lit 6.4s ease-in-out infinite;animation-delay:calc(var(--k)*1.6s + 1s)}
+@keyframes lit{0%{border-color:var(--line);box-shadow:none}5%,20%{border-color:var(--cyan);box-shadow:0 0 36px rgba(0,188,235,.3);transform:translateY(-.35em)}25%,100%{border-color:var(--line);box-shadow:none;transform:none}}
+.pop{display:grid;grid-template-columns:repeat(50,1fr);gap:.3em;margin-top:.9em}
+.pop i{aspect-ratio:1;border-radius:50%;background:rgba(0,188,235,.22);transform:scale(0)}
+.slide.active .pop i{animation:dotin .5s cubic-bezier(.34,1.56,.64,1) both;animation-delay:calc(var(--d)*14ms + 1.1s)}
+.pop i.a{background:var(--crimson);box-shadow:0 0 10px rgba(255,90,106,.7)}.pop i.b{background:var(--amber);opacity:.85}
+@keyframes dotin{from{transform:scale(0)}to{transform:scale(1)}}
+.legend{display:flex;gap:1.6em;flex-wrap:wrap;margin-top:.7em;font-size:.88em;color:var(--dim)}
+.legend span::before{content:"";display:inline-block;width:.8em;height:.8em;border-radius:50%;margin-right:.5em;vertical-align:-.05em;background:var(--c)}
 
-/* stats */
-.stat .v{font-family:var(--head);font-weight:800;font-size:clamp(2.2rem,5vw,3.3rem);line-height:1;color:var(--cyan)}
-.stat .v.cr{color:var(--crimson)} .stat .v.am{color:var(--amber)}
-.stat .l{color:var(--dim);font-size:.9rem;margin-top:10px;line-height:1.45}
-.regions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
-.reg{font-family:var(--mono);font-size:.72rem;padding:6px 12px;border-radius:999px;border:1px solid rgba(255,90,106,.4);color:#ffc0c6;background:rgba(255,90,106,.08)}
+/* estadísticas */
+.stat{align-items:flex-start}
+.stat .v{font-family:var(--head);font-weight:800;font-size:4.6em;line-height:1;color:var(--cyan)}
+.stat .v.cr{color:var(--crimson)}.stat .v.am{color:var(--amber)}
+.stat .l{color:var(--dim);font-size:1.12em;margin-top:.6em;line-height:1.45}
+.stat.rg{flex-direction:row;align-items:center;gap:1.1em}
+.ring{width:6.4em;height:6.4em;flex:none;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:9}.ring .rt{stroke:rgba(255,255,255,.08)}
+.ring .rf{stroke:var(--crimson);stroke-linecap:round;stroke-dasharray:326.7;stroke-dashoffset:326.7;transition:stroke-dashoffset 1.6s cubic-bezier(.19,1,.22,1) .5s;filter:drop-shadow(0 0 6px rgba(255,90,106,.7))}
+.slide.active .ring .rf{stroke-dashoffset:calc(326.7*(1 - var(--p)))}
+.regions{display:flex;gap:.5em;flex-wrap:wrap;margin-top:.8em}
+.reg{font-family:var(--mono);font-size:.78em;padding:.35em .8em;border-radius:999px;border:1px solid rgba(255,90,106,.4);color:#ffc0c6;background:rgba(255,90,106,.08)}
+.solflow{display:flex;align-items:stretch;gap:.5em;margin:1em 0 .8em}
+.solflow .sx{flex:1;border:1px solid var(--line);border-radius:.8em;padding:.75em .85em;background:rgba(0,188,235,.07)}
+.solflow .sx b{display:block;font-family:var(--head);font-size:1.12em}.solflow .sx span{font-size:.95em;color:var(--dim);line-height:1.4;display:block;margin-top:.2em}
+.solflow .ar{align-self:center;color:var(--cyan);font-size:1.5em;animation:nudge 1.6s ease-in-out infinite}
+@keyframes nudge{50%{transform:translateX(.3em);opacity:.55}}
+.card.hl{border-color:var(--cyan);box-shadow:0 0 30px rgba(0,188,235,.16)}
 
 /* patologías */
-.pcard{padding:0}
-.pcard .ph{padding:16px 18px 0}
-.pcard .pname{font-family:var(--head);font-weight:700;font-size:1.3rem;display:flex;align-items:center;gap:10px}
-.pcard .pname i{width:10px;height:10px;border-radius:50%;display:inline-block;box-shadow:0 0 12px currentColor}
-.pcard .full{color:var(--dim);font-size:.82rem;margin-top:2px}
-.pcard .pv{padding:12px 18px 0}
-.pcard .pb{padding:12px 18px 18px;display:flex;flex-direction:column;gap:10px}
-.pcard .row{font-size:.86rem;line-height:1.5;color:var(--dim)}
-.pcard .row b{display:block;font-family:var(--mono);font-weight:600;font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);margin-bottom:1px}
+.pcard{padding:0;justify-content:flex-start}
+.pcard .ph{padding:1em 1.2em 0}
+.pcard .pname{font-family:var(--head);font-weight:700;font-size:1.5em;display:flex;align-items:center;gap:.5em}
+.pcard .pname i{width:.55em;height:.55em;border-radius:50%;display:inline-block;box-shadow:0 0 12px currentColor}
+.pcard .full{color:var(--dim);font-size:.92em;margin-top:.1em}
+.pcard .pv{padding:.7em 1.2em 0}
+.pcard .pb{padding:.8em 1.2em 1.1em;display:flex;flex-direction:column;gap:.65em;flex:1;justify-content:space-evenly}
+.pcard .row{font-size:.94em;line-height:1.5;color:var(--dim)}
+.pcard .row b{display:block;font-family:var(--mono);font-weight:600;font-size:.7em;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);margin-bottom:.1em}
+.note{line-height:1.5;color:var(--faint);font-size:.95em;border-left:2px solid var(--amber);padding-left:.9em;max-width:78ch}
 
 /* pipeline */
-.pipe{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;position:relative}
-.pipe::before{content:"";position:absolute;left:8%;right:8%;top:25px;height:2px;
-  background:linear-gradient(90deg,transparent,var(--cyan),transparent);background-size:200% 100%;animation:run 3s linear infinite;opacity:.7}
-@keyframes run{to{background-position:-200% 0}}
-.pstep{text-align:center;position:relative}
-.pstep .bub{width:52px;height:52px;border-radius:50%;margin:0 auto;display:grid;place-items:center;font-family:var(--head);font-weight:800;font-size:1.15rem;
-  background:var(--bg2);border:2px solid var(--cyan);color:var(--cyan);position:relative;z-index:1;box-shadow:0 0 22px rgba(0,188,235,.25)}
-.pstep .card{margin-top:14px;text-align:left;padding:14px}
-@media (max-width:980px){.pipe{grid-template-columns:1fr}.pipe::before{display:none}.pstep{display:flex;gap:14px;text-align:left;align-items:flex-start}.pstep .bub{margin:0;flex:none}.pstep .card{margin-top:0;flex:1}}
+.pipe{display:grid;grid-template-columns:repeat(5,1fr);gap:1em;position:relative;padding-top:2.7em}
+.pipe::before{content:"";position:absolute;left:8%;right:8%;top:1.3em;height:2px;background:linear-gradient(90deg,rgba(0,188,235,.2),var(--cyan),rgba(0,188,235,.2));opacity:.7}
+.pipe::after{content:"";position:absolute;top:calc(1.3em - 5px);left:8%;width:12px;height:12px;border-radius:50%;background:#fff;box-shadow:0 0 18px 5px var(--teal);opacity:0}
+.slide.active .pipe::after{animation:travel2 3.2s linear .8s infinite}
+@keyframes travel2{0%{left:8%;opacity:1}100%{left:92%;opacity:1}}
+.pstep{position:relative}
+.pstep .bub{position:absolute;left:50%;top:-2.7em;margin-left:1.3em;margin-left:-1.3em;width:2.6em;height:2.6em;border-radius:50%;display:grid;place-items:center;font-family:var(--head);font-weight:800;font-size:1.15em;
+  background:var(--bg2);border:2px solid var(--cyan);color:var(--cyan);z-index:1;box-shadow:0 0 22px rgba(0,188,235,.28)}
+.pstep .card{height:100%;padding-top:1.5em;text-align:center;align-items:center;gap:.4em}
+.pstep .more{margin-top:.9em;font-size:.92em;line-height:1.45;color:var(--faint)}
+.pstep .out{margin-top:.9em;font-family:var(--mono);font-size:.88em;padding:.4em .8em;border-radius:.6em;background:rgba(0,188,235,.1);border:1px solid var(--line);color:#bfeaf7}
+@media (max-width:980px){.pipe{grid-template-columns:1fr}.pipe::before,.pipe::after{display:none}.pstep .bub{position:static;margin:0 0 .6em}.pipe{padding-top:0}}
 
-/* listas con check */
-.chk{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:11px}
-.chk li{display:flex;gap:12px;align-items:flex-start;font-size:.98rem;line-height:1.5;color:var(--dim)}
-.chk li::before{content:"✓";flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:.72rem;font-weight:700;
-  color:#04202a;background:var(--cyan);margin-top:1px}
+/* listas */
+.chk{list-style:none;margin:.7em 0 0;padding:0;display:flex;flex-direction:column;gap:.7em}
+.chk li{display:flex;gap:.8em;align-items:flex-start;font-size:1.08em;line-height:1.5;color:var(--dim)}
+.chk li::before{content:"✓";flex:none;width:1.55em;height:1.55em;border-radius:50%;display:grid;place-items:center;font-size:.78em;font-weight:700;color:#04202a;background:var(--cyan);margin-top:.12em}
 .chk.warn li::before{content:"!";background:var(--amber)}
+.steps{display:flex;flex-direction:column;gap:.7em;justify-content:center}
+.steps .card{flex:1;flex-direction:row;align-items:center;gap:1em;transition:border-color .35s,box-shadow .35s,transform .35s}
+.steps .card .sn{font-family:var(--head);font-weight:800;font-size:1.9em;color:var(--cyan);min-width:1.2ch}
+.steps .card.on{border-color:var(--cyan);box-shadow:0 0 34px rgba(0,188,235,.3);transform:translateX(.25em)}
+.partlist li{transition:color .3s,transform .3s}.partlist li.on{color:#fff;transform:translateX(.4em)}
+.partlist li.on::before{box-shadow:0 0 14px var(--cyan)}
 
-/* barras balanceo / predicción */
-.bars{display:flex;flex-direction:column;gap:11px;margin-top:14px}
-.brow .bl{display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:4px;color:var(--dim)}
-.brow .bl span:last-child{font-family:var(--mono)}
-.btrack{height:9px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden}
+/* barras */
+.bars{display:flex;flex-direction:column;gap:.75em;margin-top:.8em;flex:1;justify-content:space-evenly}
+.brow .bl{display:flex;justify-content:space-between;font-size:.9em;margin-bottom:.3em;color:var(--dim)}
+.brow .bl span:last-child{font-family:var(--mono)}.brow.top .bl{color:#fff;font-weight:600}
+.btrack{height:.7em;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden}
 .bfill{height:100%;width:0;border-radius:999px;transition:width 1s cubic-bezier(.19,1,.22,1) .45s}
 .slide.active .bfill{width:var(--w)}
+.bars.dyn .bfill{width:var(--w);transition:width .9s cubic-bezier(.19,1,.22,1)}
+.verdict{font-family:var(--head);font-weight:800;font-size:1.7em;line-height:1.1;margin:.5em 0 0;transition:color .4s}
+.verdict small{display:block;font-family:var(--mono);font-weight:500;font-size:.4em;letter-spacing:.14em;color:var(--faint);margin-top:.5em;text-transform:uppercase}
 
-/* diagrama */
-.flowd{display:flex;align-items:stretch;gap:0;flex-wrap:wrap}
-.fbox{flex:1 1 170px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;min-width:150px}
-.fbox .t{font-family:var(--head);font-weight:700;font-size:1rem}
-.fbox .d{color:var(--dim);font-size:.82rem;margin-top:5px;line-height:1.45}
-.fbox.hl{border-color:var(--cyan);box-shadow:0 0 28px rgba(0,188,235,.18)}
-.farrow{align-self:center;color:var(--cyan);font-size:1.5rem;padding:0 8px;animation:nudge 1.6s ease-in-out infinite}
-@keyframes nudge{50%{transform:translateX(5px);opacity:.55}}
+/* diagramas */
+.flowd{display:flex;align-items:stretch;gap:0}
+.fbox{flex:1 1 0;background:var(--card);border:1px solid var(--line);border-radius:1em;padding:1.1em;min-width:0;display:flex;flex-direction:column;justify-content:center}
+.fbox .t{font-family:var(--head);font-weight:700;font-size:1.45em}
+.fbox .d{color:var(--dim);font-size:1.05em;margin-top:.4em;line-height:1.45}
+.fbox.hl{border-color:var(--cyan);box-shadow:0 0 32px rgba(0,188,235,.2)}
+.farrow{align-self:center;color:var(--cyan);font-size:1.8em;padding:0 .3em;animation:nudge 1.6s ease-in-out infinite}
 @media (max-width:760px){.farrow{transform:rotate(90deg);animation:none;padding:4px 0}.flowd{flex-direction:column}}
-.files{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-.file{font-family:var(--mono);font-size:.74rem;padding:6px 11px;border-radius:8px;background:rgba(0,188,235,.1);border:1px solid var(--line);color:#bfeaf7}
+.files{display:flex;gap:.5em;flex-wrap:wrap;margin-top:.8em}
+.file{font-family:var(--mono);font-size:.92em;padding:.5em .9em;border-radius:.5em;background:rgba(0,188,235,.1);border:1px solid var(--line);color:#bfeaf7}
+.hp{display:grid;grid-template-columns:repeat(4,1fr);gap:.8em}
+.hp .tile{padding:.9em .5em}.hp .tile b{font-size:2.6em}.hp .tile span{font-size:.88em}
 
-.cta{display:inline-flex;align-items:center;gap:10px;margin-top:22px;background:linear-gradient(100deg,var(--cyan),var(--blue));color:#02131f;
-  font-weight:700;border-radius:999px;padding:13px 24px;text-decoration:none;font-size:1rem;animation:glw 2.4s ease-in-out infinite}
+.cta{display:inline-flex;align-items:center;gap:.6em;background:linear-gradient(100deg,var(--cyan),var(--blue));color:#02131f;font-weight:700;border-radius:999px;padding:.75em 1.6em;text-decoration:none;font-size:1.1em;animation:glw 2.4s ease-in-out infinite}
 @keyframes glw{0%,100%{box-shadow:0 0 0 0 rgba(0,188,235,.5)}50%{box-shadow:0 0 30px 2px rgba(0,188,235,.4)}}
-.note{margin-top:18px;color:var(--faint);font-size:.84rem;border-left:2px solid var(--amber);padding-left:12px;max-width:64ch}
+.quote{font-family:var(--head);font-weight:600;font-size:1.5em;line-height:1.3;text-align:center;padding:.3em 1em}
+
+/* cierre */
+.fin{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative}
+.fin h1{font-size:6.5em;margin:0}
+.fin .lead{margin-left:auto;margin-right:auto;text-align:center}
 
 /* navegación */
 .nav{position:fixed;z-index:7;left:0;right:0;bottom:0;height:var(--navh);display:flex;align-items:center;gap:14px;
-  padding:0 clamp(16px,4vw,48px);padding-bottom:env(safe-area-inset-bottom,0px);background:rgba(6,18,31,.78);backdrop-filter:blur(10px);border-top:1px solid var(--line)}
+  padding:0 clamp(16px,3.4vw,72px);padding-bottom:env(safe-area-inset-bottom,0px);background:rgba(6,18,31,.8);backdrop-filter:blur(10px);border-top:1px solid var(--line)}
 .dots{display:flex;gap:6px;flex:1;flex-wrap:wrap}
-.dots button{width:8px;height:8px;border-radius:50%;border:0;background:rgba(0,188,235,.25);cursor:pointer;padding:0;transition:transform .2s}
-.dots button.on{background:var(--cyan);box-shadow:0 0 10px var(--cyan);transform:scale(1.35)}
+.dots button{width:8px;height:8px;border-radius:50%;border:0;background:rgba(0,188,235,.25);cursor:pointer;padding:0;transition:transform .2s,background .2s}
+.dots button.on{background:var(--cyan);box-shadow:0 0 10px var(--cyan);transform:scale(1.5)}
 .ctrls{display:flex;align-items:center;gap:8px}
-.ctrls button{background:var(--card);border:1px solid var(--line);color:var(--ink);border-radius:10px;width:40px;height:36px;font-size:1rem;cursor:pointer}
+.ctrls button{background:var(--card);border:1px solid var(--line);color:var(--ink);border-radius:10px;width:40px;height:34px;font-size:1rem;cursor:pointer}
 .ctrls button:hover{border-color:var(--cyan)}
-.counter{font-family:var(--mono);font-size:.8rem;color:var(--dim);min-width:56px;text-align:center}
+.counter{font-family:var(--mono);font-size:.82rem;color:var(--dim);min-width:56px;text-align:center}
 
-/* pantallas bajas (portátiles 1366×768, proyectores 1280×720): compacta para evitar scroll */
-@media (max-height:820px){
-  :root{--hh:50px;--strip:44px;--navh:52px}
-  .slide{padding-top:calc(var(--hh) + var(--strip) + 12px);padding-bottom:calc(var(--navh) + 10px)}
-  h2{font-size:clamp(1.4rem,2.8vw,2.1rem)}
-  .lead{margin-top:.5em;font-size:clamp(.92rem,1.5vw,1.05rem)}
-  .card:not(.pcard){padding:14px}
-  .mt{margin-top:14px}
-  .chk{gap:8px;margin-top:10px}
-  .chk li{font-size:.92rem}
-  .wm{display:none}
-  .pcard .pb{gap:7px;padding:8px 16px 12px}
-  .pcard .pv{padding-top:8px}
-  .tl{margin-top:16px}
-  .bars{margin-top:8px;gap:8px}
-  #anat{width:auto!important;max-width:100%;max-height:190px;margin:0 auto;display:block}
-  .note{margin-top:10px}
-}
+@media (max-width:980px){.hero{grid-template-columns:1fr}.rings{display:none}.tl{grid-template-columns:1fr 1fr}.tl::before,.tl::after{display:none}.tl .dotn{position:static;margin:0 0 .5em}.tl{padding-top:0}.solflow{flex-direction:column}.solflow .ar{transform:rotate(90deg)}.flowd{flex-direction:column}.farrow{transform:rotate(90deg);animation:none}.hp{grid-template-columns:1fr 1fr}}
 @media (prefers-reduced-motion:reduce){
-  .slide{transition:opacity .25s}.slide,[data-rv]{transform:none;filter:none}[data-rv]{transition:opacity .25s}
-  .glow,.pipe::before,.farrow,.cta{animation:none} canvas.mini{clip-path:none;transition:none} .bfill{transition:none}
+  .slide{transition:opacity .25s}.slide,.slide.before,[data-rv]{transform:none;filter:none}[data-rv]{transition:opacity .25s}
+  .glow,.farrow,.cta,.rings i,.sweep,.tl::after,.pipe::after,.slide.active .tl .card,.card::after,.solflow .ar{animation:none!important}
+  .bfill,.ring .rf{transition:none}.pop i{transform:none;animation:none!important}.wm{transform:none}
 }
 </style>
 
-<div class="bg" aria-hidden="true"><div class="glow glow-a"></div><div class="glow glow-b"></div></div>
+<div class="bg" aria-hidden="true"><div class="bgl"><div class="glow glow-a"></div><div class="glow glow-b"></div><div class="glow glow-c"></div></div><canvas id="net"></canvas></div>
+<div class="sweep" id="sweep" aria-hidden="true"></div>
 <div class="progress" id="progress"></div>
 
 <header class="topbar">
@@ -235,108 +284,119 @@ canvas.mini{display:block;width:100%;height:auto;border-radius:10px;background:r
 
   <!-- 1 Portada -->
   <section class="slide active" data-sec="Portada"><div class="inner">
-    <div class="g2">
+    <div class="rings" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="hero">
       <div>
-        <span class="kicker" data-rv style="--i:0">Defensa de proyecto · Inteligencia Artificial</span>
-        <h1 class="ttl" data-rv style="--i:1">Detección de patrones <span class="grad">chagásicos</span> en el electrocardiograma con IA</h1>
-        <div class="author" data-rv style="--i:2"><span class="nm">Luna Saleth Gallego Martínez</span><span class="sub">Carrera de Ingeniería en Inteligencia Artificial<br>Universidad Católica Boliviana «San Pablo»</span></div>
-        <div class="hintnav" data-rv style="--i:3"><span class="key">←</span><span class="key">→</span> navegar · <span class="key">P</span> auto · <span class="key">F</span> pantalla completa</div>
+        <span class="kicker" data-rv="l" style="--i:0">Defensa de proyecto · Inteligencia Artificial</span>
+        <h1 data-rv="l" style="--i:1">Detección de patrones <span class="grad">chagásicos</span> en el electrocardiograma con IA</h1>
+        <div class="author" data-rv="l" style="--i:2"><span class="nm">Luna Saleth Gallego Martínez</span><span class="sub">Carrera de Ingeniería en Inteligencia Artificial<br>Universidad Católica Boliviana «San Pablo»</span></div>
+        <div class="hintnav" data-rv style="--i:3"><span class="key">←</span><span class="key">→</span> navegar · <span class="key">P</span> automático · <span class="key">F</span> pantalla completa</div>
       </div>
-      <div class="monitor" data-rv style="--i:2">
+      <div class="monitor" data-rv="r" style="--i:2">
         <div class="mh"><span>DII · BRD + HBAI</span><span class="on">● ANALIZANDO</span></div>
-        <canvas class="mini" data-kind="rbbb_lafb" data-color="#ff5a6a" width="560" height="200"></canvas>
-        <div class="chips"><span class="chip">6 patrones</span><span class="chip">224 × 224 px</span><span class="chip">100 % en el navegador</span><span class="chip">Teachable Machine</span></div>
+        <canvas class="live" data-kind="rbbb_lafb" data-color="#ff5a6a" width="760" height="340"></canvas>
+        <div class="tiles"><div class="tile"><b>6</b><span>patrones</span></div><div class="tile"><b>224²</b><span>píxeles</span></div><div class="tile"><b>100 %</b><span>en el navegador</span></div></div>
       </div>
     </div>
   </div></section>
 
   <!-- 2 Agenda -->
   <section class="slide" data-sec="Contenido"><div class="inner">
-    <span class="kicker" data-rv>Contenido</span>
-    <h2 data-rv style="--i:1">Lo que vamos a recorrer</h2>
-    <div class="g3 mt">
-      <div class="card ag" data-rv style="--i:2"><span class="n">01</span><div><div class="t">El problema</div><div class="d">Qué es el Chagas y por qué importa en Bolivia.</div></div></div>
-      <div class="card ag" data-rv style="--i:3"><span class="n">02</span><div><div class="t">Fundamento clínico</div><div class="d">Cómo es un latido y qué patrones altera el Chagas.</div></div></div>
-      <div class="card ag" data-rv style="--i:4"><span class="n">03</span><div><div class="t">Las patologías</div><div class="d">Seis clases que el modelo reconoce, explicadas.</div></div></div>
-      <div class="card ag" data-rv style="--i:5"><span class="n">04</span><div><div class="t">Metodología</div><div class="d">Los cinco pasos: de los datos a la herramienta.</div></div></div>
-      <div class="card ag" data-rv style="--i:6"><span class="n">05</span><div><div class="t">Resultados</div><div class="d">Qué se construyó y cómo clasifica una imagen.</div></div></div>
-      <div class="card ag" data-rv style="--i:7"><span class="n">06</span><div><div class="t">Cierre</div><div class="d">Limitaciones, conclusiones y trabajo futuro.</div></div></div>
+    <div class="head"><span class="kicker" data-rv>Contenido</span><h2 data-rv style="--i:1">Lo que vamos a recorrer</h2></div>
+    <div class="body c3 rows2">
+      <div class="card ag" data-rv="l" style="--i:2"><span class="n">01</span><div><div class="t">El problema</div><div class="d">Qué es el Chagas y por qué importa en Bolivia.</div></div></div>
+      <div class="card ag" data-rv="z" style="--i:3"><span class="n">02</span><div><div class="t">Fundamento clínico</div><div class="d">Cómo es un latido y qué patrones altera el Chagas.</div></div></div>
+      <div class="card ag" data-rv="r" style="--i:4"><span class="n">03</span><div><div class="t">Las patologías</div><div class="d">Seis clases que el modelo reconoce, explicadas.</div></div></div>
+      <div class="card ag" data-rv="l" style="--i:5"><span class="n">04</span><div><div class="t">Metodología</div><div class="d">Los cinco pasos: de los datos a la herramienta.</div></div></div>
+      <div class="card ag" data-rv="z" style="--i:6"><span class="n">05</span><div><div class="t">Resultados</div><div class="d">Qué se construyó y cómo clasifica una imagen.</div></div></div>
+      <div class="card ag" data-rv="r" style="--i:7"><span class="n">06</span><div><div class="t">Cierre</div><div class="d">Limitaciones, conclusiones y trabajo futuro.</div></div></div>
     </div>
   </div></section>
 
-  <!-- 3 Contexto -->
+  <!-- 3 Problema -->
   <section class="slide" data-sec="01 · El problema"><div class="inner"><span class="wm">01</span>
-    <span class="kicker" data-rv>01 · El problema</span>
+    <div class="head"><span class="kicker" data-rv>01 · El problema</span>
     <h2 data-rv style="--i:1">Una infección <span class="grad">silenciosa</span> que llega al corazón</h2>
-    <p class="lead" data-rv style="--i:2">La enfermedad de Chagas la causa el parásito <b>Trypanosoma cruzi</b>, que transmite la vinchuca (<i>Triatoma infestans</i>). Puede pasar años sin dar síntomas.</p>
-    <div class="tl" data-rv style="--i:3">
-      <div class="st"><div class="dotn">1</div><div class="t">Picadura y contagio</div><div class="d">El parásito entra por la piel o mucosas con las heces de la vinchuca.</div></div>
-      <div class="st"><div class="dotn">2</div><div class="t">Fase aguda</div><div class="d">Semanas; casi siempre sin síntomas claros, por eso pasa desapercibida.</div></div>
-      <div class="st"><div class="dotn">3</div><div class="t">Fase crónica indeterminada</div><div class="d">Años o décadas sin síntomas; el ECG puede verse normal.</div></div>
-      <div class="st"><div class="dotn">4</div><div class="t">Forma cardíaca</div><div class="d">Entre el 20 y 30 % desarrolla daño cardíaco visible en el ECG.</div></div>
+    <p class="lead" data-rv style="--i:2">La enfermedad de Chagas la causa el parásito <b>Trypanosoma cruzi</b>, que transmite la vinchuca (<i>Triatoma infestans</i>). Puede pasar años sin dar síntomas.</p></div>
+    <div class="body" style="grid-template-rows:1.15fr auto">
+      <div class="tl" data-rv style="--i:3">
+        <div class="st" style="--k:0"><div class="dotn">1</div><div class="card"><div class="t">Picadura y contagio</div><div class="d">El parásito entra por la piel o las mucosas con las heces de la vinchuca.</div></div></div>
+        <div class="st" style="--k:1"><div class="dotn">2</div><div class="card"><div class="t">Fase aguda</div><div class="d">Dura semanas; casi siempre sin síntomas claros, por eso pasa desapercibida.</div></div></div>
+        <div class="st" style="--k:2"><div class="dotn">3</div><div class="card"><div class="t">Crónica indeterminada</div><div class="d">Años o décadas sin síntomas; el ECG puede verse normal.</div></div></div>
+        <div class="st" style="--k:3"><div class="dotn">4</div><div class="card"><div class="t">Forma cardíaca</div><div class="d">Aparece daño cardíaco, visible en el ECG.</div></div></div>
+      </div>
+      <div class="card hl" data-rv="z" style="--i:5"><div class="tag">De cada 100 personas infectadas</div>
+        <div class="pop" id="pop"></div>
+        <div class="legend"><span style="--c:var(--crimson)">20 desarrollan cardiopatía</span><span style="--c:var(--amber)">hasta 30 (rango de 20 a 30 %)</span><span style="--c:rgba(0,188,235,.5)">el resto, sin daño cardíaco manifiesto</span></div></div>
     </div>
   </div></section>
 
   <!-- 4 Bolivia -->
   <section class="slide" data-sec="01 · Por qué Bolivia"><div class="inner"><span class="wm">01</span>
-    <span class="kicker" data-rv>01 · Justificación</span>
-    <h2 data-rv style="--i:1">Por qué elegí el Chagas en <span class="grad">Bolivia</span></h2>
-    <div class="g3 mt">
-      <div class="card stat" data-rv style="--i:2"><div class="v cr"><span data-count="6" data-suffix="%">0</span></div><div class="l">de la población estaría infectada: la <b>mayor prevalencia del mundo</b> (OPS).</div></div>
-      <div class="card stat" data-rv style="--i:3"><div class="v">#<span data-count="1">0</span></div><div class="l">en el mundo por carga de la enfermedad; es endémica en gran parte del territorio.</div></div>
-      <div class="card stat" data-rv style="--i:4"><div class="v am"><span data-count="4">0</span></div><div class="l">regiones con mayor afectación.<div class="regions"><span class="reg">Cochabamba</span><span class="reg">Santa Cruz</span><span class="reg">Tarija</span><span class="reg">Chuquisaca</span></div></div></div>
-    </div>
-    <div class="g2b mt">
-      <div class="card" data-rv style="--i:5"><div class="tag">Brecha</div><div class="d" style="margin-top:8px;font-size:.98rem">En zonas rurales hay <b>pocos cardiólogos</b> que interpreten un electrocardiograma. Una persona infectada puede tener alteraciones del ECG sin que nadie las reconozca.</div></div>
-      <div class="card" data-rv style="--i:6"><div class="tag">Oportunidad</div><div class="d" style="margin-top:8px;font-size:.98rem">Una herramienta <b>accesible y gratuita</b> de apoyo a la lectura del ECG puede servir a la docencia y al tamizaje donde más se necesita.</div></div>
+    <div class="head"><span class="kicker" data-rv>01 · Justificación</span>
+    <h2 data-rv style="--i:1">Por qué elegí el Chagas en <span class="grad">Bolivia</span></h2></div>
+    <div class="body" style="grid-template-rows:auto 1fr">
+      <div class="c3 body" style="margin-top:0;display:grid">
+        <div class="card stat rg" data-rv="l" style="--i:2"><svg class="ring" viewBox="0 0 120 120" style="--p:.06"><circle class="rt" cx="60" cy="60" r="52"/><circle class="rf" cx="60" cy="60" r="52"/></svg><div><div class="v cr"><span data-count="6" data-suffix="%">0</span></div><div class="l">de la población estaría infectada: la <b>mayor prevalencia del mundo</b> (OPS).</div></div></div>
+        <div class="card stat" data-rv="z" style="--i:3"><div class="v">#<span data-count="1">0</span></div><div class="l">en el mundo por carga de la enfermedad; es endémica en gran parte del territorio.</div></div>
+        <div class="card stat" data-rv="r" style="--i:4"><div class="v am"><span data-count="4">0</span></div><div class="l">regiones con mayor afectación.<div class="regions"><span class="reg">Cochabamba</span><span class="reg">Santa Cruz</span><span class="reg">Tarija</span><span class="reg">Chuquisaca</span></div></div></div>
+      </div>
+      <div class="body" style="margin-top:0;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr)">
+        <div class="card" data-rv="l" style="--i:5"><div class="tag">El reto del médico</div><div class="d" style="font-size:1.18em;line-height:1.5">Reconocer un <b>bloqueo de rama</b> o un <b>hemibloqueo</b> exige experiencia y tiempo. En la consulta, estos hallazgos del Chagas pueden <b>pasar inadvertidos</b>, sobre todo cuando el paciente no tiene síntomas.</div><canvas class="live" data-kind="rbbb_lafb" data-color="#ff5a6a" width="760" height="150" style="margin-top:.9em"></canvas></div>
+        <div class="card hl" data-rv="r" style="--i:6"><div class="tag">La solución para el médico</div>
+          <div class="solflow">
+            <div class="sx"><b>1 · Sube la imagen</b><span>Una foto o captura del ECG.</span></div><div class="ar">→</div>
+            <div class="sx"><b>2 · Lectura automática</b><span>El modelo la analiza en el navegador, en segundos.</span></div><div class="ar">→</div>
+            <div class="sx"><b>3 · Orientación</b><span>Patrón probable, confianza y explicación clínica.</span></div>
+          </div>
+          <div class="d" style="margin-top:.2em;font-size:1.12em">Gratuita, sin instalar nada y como <b>apoyo</b>: la decisión siempre es del médico.</div></div>
+      </div>
     </div>
   </div></section>
 
   <!-- 5 Anatomía -->
   <section class="slide" data-sec="02 · Fundamento clínico"><div class="inner"><span class="wm">02</span>
-    <span class="kicker" data-rv>02 · Fundamento clínico</span>
-    <h2 data-rv style="--i:1">Anatomía de un latido en el ECG</h2>
-    <div class="g2 mt">
-      <div class="monitor" data-rv style="--i:2">
-        <div class="mh"><span>LATIDO NORMAL · DII</span><span class="on">● P · QRS · T</span></div>
-        <canvas id="anat" width="620" height="260" style="width:100%;height:auto;border-radius:10px;background:rgba(3,12,22,.55)"></canvas>
+    <div class="head"><span class="kicker" data-rv>02 · Fundamento clínico</span><h2 data-rv style="--i:1">Anatomía de un latido en el ECG</h2></div>
+    <div class="body" style="grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);align-items:stretch">
+      <div class="monitor" data-rv="l" style="--i:2;display:flex;flex-direction:column;justify-content:center">
+        <div class="mh"><span>LATIDO NORMAL · DII</span><span class="on" id="anatTag">● P · QRS · T</span></div>
+        <canvas id="anat" class="live" width="760" height="500"></canvas>
       </div>
-      <ul class="chk" data-rv style="--i:3">
-        <li><span><b>Onda P:</b> activación de las aurículas.</span></li>
-        <li><span><b>Intervalo PR:</b> el impulso viaja de las aurículas a los ventrículos (normal 120–200 ms).</span></li>
-        <li><span><b>Complejo QRS:</b> activación de los ventrículos; normal si dura menos de 120 ms.</span></li>
-        <li><span><b>Onda T:</b> recuperación (repolarización) de los ventrículos.</span></li>
-        <li><span><b>En Chagas</b> se daña el sistema de conducción: cambian el QRS y el PR, y aparecen latidos extra.</span></li>
-      </ul>
+      <div class="card" data-rv="r" style="--i:3"><ul class="chk partlist" id="partlist" style="margin:0;gap:1.15em;font-size:1.12em">
+        <li data-part="p"><span><b>Onda P:</b> activación de las aurículas.</span></li>
+        <li data-part="pr"><span><b>Intervalo PR:</b> el impulso viaja de las aurículas a los ventrículos (normal 120–200 ms).</span></li>
+        <li data-part="qrs"><span><b>Complejo QRS:</b> activación de los ventrículos; normal si dura menos de 120 ms.</span></li>
+        <li data-part="t"><span><b>Onda T:</b> recuperación (repolarización) de los ventrículos.</span></li>
+        <li data-part="chagas"><span><b>En Chagas</b> se daña el sistema de conducción: cambian el QRS y el PR, y aparecen latidos extra.</span></li>
+      </ul></div>
     </div>
   </div></section>
 
   <!-- 6 Patologías 1 -->
   <section class="slide" data-sec="03 · Patologías (1/2)"><div class="inner"><span class="wm">03</span>
-    <span class="kicker" data-rv>03 · Las patologías · 1 de 2</span>
-    <h2 data-rv style="--i:1">Lo que el modelo reconoce</h2>
-    <div class="g3 mt">
-      <div class="card pcard" data-rv style="--i:2">
+    <div class="head"><span class="kicker" data-rv>03 · Las patologías · 1 de 2</span><h2 data-rv style="--i:1">Lo que el modelo reconoce</h2></div>
+    <div class="body c3">
+      <div class="card pcard" data-rv="l" style="--i:2">
         <div class="ph"><div class="pname"><i style="color:#2fe0b0;background:#2fe0b0"></i>Normal</div><div class="full">ECG sin alteraciones</div></div>
-        <div class="pv"><canvas class="mini" data-kind="normal" data-color="#2fe0b0" width="360" height="110"></canvas></div>
+        <div class="pv"><canvas class="live" data-kind="normal" data-color="#2fe0b0" width="420" height="150"></canvas></div>
         <div class="pb">
           <div class="row"><b>Qué es</b>Ritmo sinusal: cada onda P va seguida de un QRS.</div>
           <div class="row"><b>En el ECG</b>PR de 120 a 200 ms y QRS estrecho (menos de 120 ms).</div>
           <div class="row"><b>En Chagas</b>Sirve de control. Un ECG normal no descarta la infección (forma indeterminada).</div>
         </div>
       </div>
-      <div class="card pcard" data-rv style="--i:3">
+      <div class="card pcard" data-rv="z" style="--i:3">
         <div class="ph"><div class="pname"><i style="color:#6ea0ff;background:#6ea0ff"></i>BRD</div><div class="full">Bloqueo de rama derecha</div></div>
-        <div class="pv"><canvas class="mini" data-kind="rbbb" data-color="#6ea0ff" width="360" height="110"></canvas></div>
+        <div class="pv"><canvas class="live" data-kind="rbbb" data-color="#6ea0ff" width="420" height="150"></canvas></div>
         <div class="pb">
           <div class="row"><b>Qué es</b>El impulso se retrasa al viajar por la rama derecha del haz de His.</div>
           <div class="row"><b>En el ECG</b>QRS ancho (120 ms o más) con una segunda R tardía, patrón «rSR'» en V1.</div>
           <div class="row"><b>En Chagas</b>Es el hallazgo electrocardiográfico más frecuente de la cardiopatía chagásica.</div>
         </div>
       </div>
-      <div class="card pcard" data-rv style="--i:4">
+      <div class="card pcard" data-rv="r" style="--i:4">
         <div class="ph"><div class="pname"><i style="color:#ffc24d;background:#ffc24d"></i>HBAI</div><div class="full">Hemibloqueo anterior izquierdo</div></div>
-        <div class="pv"><canvas class="mini" data-kind="lafb" data-color="#ffc24d" width="360" height="110"></canvas></div>
+        <div class="pv"><canvas class="live" data-kind="lafb" data-color="#ffc24d" width="420" height="150"></canvas></div>
         <div class="pb">
           <div class="row"><b>Qué es</b>Falla la división anterior de la rama izquierda del haz de His.</div>
           <div class="row"><b>En el ECG</b>Eje del QRS desviado a la izquierda (más allá de −45°) y QRS poco ensanchado.</div>
@@ -348,30 +408,29 @@ canvas.mini{display:block;width:100%;height:auto;border-radius:10px;background:r
 
   <!-- 7 Patologías 2 -->
   <section class="slide" data-sec="03 · Patologías (2/2)"><div class="inner"><span class="wm">03</span>
-    <span class="kicker" data-rv>03 · Las patologías · 2 de 2</span>
-    <h2 data-rv style="--i:1">Los patrones de mayor riesgo</h2>
-    <div class="g3 mt">
-      <div class="card pcard" data-rv style="--i:2">
+    <div class="head"><span class="kicker" data-rv>03 · Las patologías · 2 de 2</span><h2 data-rv style="--i:1">Los patrones de mayor riesgo</h2></div>
+    <div class="body c3">
+      <div class="card pcard" data-rv="l" style="--i:2">
         <div class="ph"><div class="pname"><i style="color:#ff5a6a;background:#ff5a6a"></i>BRD + HBAI</div><div class="full">Bloqueo bifascicular</div></div>
-        <div class="pv"><canvas class="mini" data-kind="rbbb_lafb" data-color="#ff5a6a" width="360" height="110"></canvas></div>
+        <div class="pv"><canvas class="live" data-kind="rbbb_lafb" data-color="#ff5a6a" width="420" height="150"></canvas></div>
         <div class="pb">
           <div class="row"><b>Qué es</b>Los dos bloqueos a la vez: dos de los tres fascículos de conducción están dañados.</div>
           <div class="row"><b>En el ECG</b>QRS ancho con rSR' en V1 y eje desviado a la izquierda.</div>
           <div class="row"><b>En Chagas</b>Es el patrón clásico, de alta sugestividad, y puede progresar a bloqueo completo.</div>
         </div>
       </div>
-      <div class="card pcard" data-rv style="--i:3">
+      <div class="card pcard" data-rv="z" style="--i:3">
         <div class="ph"><div class="pname"><i style="color:#a98bff;background:#a98bff"></i>Bloqueo AV</div><div class="full">Bloqueo aurículo-ventricular</div></div>
-        <div class="pv"><canvas class="mini" data-kind="av_block" data-color="#a98bff" width="360" height="110"></canvas></div>
+        <div class="pv"><canvas class="live" data-kind="av_block" data-color="#a98bff" width="420" height="150"></canvas></div>
         <div class="pb">
           <div class="row"><b>Qué es</b>El impulso se retrasa o se interrumpe entre aurículas y ventrículos.</div>
           <div class="row"><b>En el ECG</b>1.er grado: PR mayor de 200 ms. En el 3.er grado, aurículas y ventrículos laten sin coordinarse.</div>
           <div class="row"><b>En Chagas</b>Marca la progresión de la enfermedad; el grado avanzado puede necesitar marcapasos.</div>
         </div>
       </div>
-      <div class="card pcard" data-rv style="--i:4">
+      <div class="card pcard" data-rv="r" style="--i:4">
         <div class="ph"><div class="pname"><i style="color:#ff9254;background:#ff9254"></i>Extrasístole</div><div class="full">Extrasístole ventricular</div></div>
-        <div class="pv"><canvas class="mini" data-kind="pvc" data-color="#ff9254" width="360" height="110"></canvas></div>
+        <div class="pv"><canvas class="live" data-kind="pvc" data-color="#ff9254" width="420" height="150"></canvas></div>
         <div class="pb">
           <div class="row"><b>Qué es</b>Un latido prematuro que nace en el ventrículo, fuera del ritmo normal.</div>
           <div class="row"><b>En el ECG</b>QRS ancho y extraño, sin onda P delante, seguido de una pausa.</div>
@@ -379,177 +438,197 @@ canvas.mini{display:block;width:100%;height:auto;border-radius:10px;background:r
         </div>
       </div>
     </div>
-    <p class="note" data-rv style="--i:5">Información educativa de apoyo; la interpretación clínica corresponde al especialista.</p>
+    <p class="note" data-rv style="--i:5;margin-top:.9em">Información educativa de apoyo; la interpretación clínica corresponde al especialista.</p>
   </div></section>
 
   <!-- 8 Objetivo -->
   <section class="slide" data-sec="04 · Objetivo y diseño"><div class="inner"><span class="wm">04</span>
-    <span class="kicker" data-rv>04 · Metodología</span>
-    <h2 data-rv style="--i:1">Objetivo y diseño del trabajo</h2>
-    <div class="g2b mt">
-      <div class="card" data-rv style="--i:2"><div class="tag">Objetivo general</div>
-        <div class="d" style="margin-top:8px;font-size:1rem">Desarrollar una herramienta accesible que, a partir de la imagen de un electrocardiograma, reconozca los patrones de conducción asociados a la enfermedad de Chagas.</div></div>
-      <div class="card" data-rv style="--i:3"><div class="tag">Diseño</div>
-        <ul class="chk"><li>Investigación <b>aplicada</b>, enfoque cuantitativo y alcance descriptivo.</li><li>Clasificación de <b>imágenes</b> con aprendizaje automático.</li><li>Ejecución <b>en el navegador</b>, de bajo costo.</li></ul></div>
-    </div>
-    <div class="g3 mt">
-      <div class="card" data-rv style="--i:4"><div class="tag">Objetivo específico 1</div><div class="d">Reunir y anonimizar los datos de ECG.</div></div>
-      <div class="card" data-rv style="--i:5"><div class="tag">Objetivo específico 2</div><div class="d">Convertir las señales en imágenes y balancear las clases.</div></div>
-      <div class="card" data-rv style="--i:6"><div class="tag">Objetivo específico 3</div><div class="d">Entrenar el modelo e integrarlo en una interfaz de uso médico.</div></div>
+    <div class="head"><span class="kicker" data-rv>04 · Metodología</span><h2 data-rv style="--i:1">Objetivo y diseño del trabajo</h2></div>
+    <div class="body" style="grid-template-rows:1.25fr 1fr">
+      <div class="body c2" style="margin-top:0">
+        <div class="card" data-rv="l" style="--i:2"><div class="tag">Objetivo general</div>
+          <div class="d" style="font-size:1.2em;color:var(--ink)">Desarrollar una herramienta accesible que, a partir de la imagen de un electrocardiograma, reconozca los patrones de conducción asociados a la enfermedad de Chagas.</div></div>
+        <div class="card" data-rv="r" style="--i:3"><div class="tag">Diseño</div>
+          <ul class="chk"><li>Investigación <b>aplicada</b>, enfoque cuantitativo y alcance descriptivo.</li><li>Clasificación de <b>imágenes</b> con aprendizaje automático.</li><li>Ejecución <b>en el navegador</b>, de bajo costo.</li></ul></div>
+      </div>
+      <div class="body c3" style="margin-top:0">
+        <div class="card" data-rv="l" style="--i:4"><div class="tag">Objetivo específico 1</div><div class="d" style="font-size:1.08em">Reunir y anonimizar los datos de ECG.</div></div>
+        <div class="card" data-rv="z" style="--i:5"><div class="tag">Objetivo específico 2</div><div class="d" style="font-size:1.08em">Convertir las señales en imágenes y balancear las clases.</div></div>
+        <div class="card" data-rv="r" style="--i:6"><div class="tag">Objetivo específico 3</div><div class="d" style="font-size:1.08em">Entrenar el modelo e integrarlo en una interfaz de uso médico.</div></div>
+      </div>
     </div>
   </div></section>
 
   <!-- 9 Pipeline -->
   <section class="slide" data-sec="04 · Los cinco pasos"><div class="inner"><span class="wm">04</span>
-    <span class="kicker" data-rv>04 · Metodología</span>
-    <h2 data-rv style="--i:1">El proceso, en cinco pasos</h2>
-    <p class="lead" data-rv style="--i:2">Un sistema reproducible de punta a punta, del dato a la herramienta.</p>
-    <div class="pipe mt">
-      <div class="pstep" data-rv style="--i:3"><div class="bub">1</div><div class="card"><div class="t">Datos</div><div class="d">Obtener ECG públicos y propios, y anonimizarlos.</div></div></div>
-      <div class="pstep" data-rv style="--i:4"><div class="bub">2</div><div class="card"><div class="t">Imágenes</div><div class="d">Convertir cada señal en la imagen de su trazado.</div></div></div>
-      <div class="pstep" data-rv style="--i:5"><div class="bub">3</div><div class="card"><div class="t">Balanceo</div><div class="d">Igualar el número de imágenes por clase.</div></div></div>
-      <div class="pstep" data-rv style="--i:6"><div class="bub">4</div><div class="card"><div class="t">Entrenamiento</div><div class="d">Entrenar el modelo en Teachable Machine.</div></div></div>
-      <div class="pstep" data-rv style="--i:7"><div class="bub">5</div><div class="card"><div class="t">Integración</div><div class="d">Exportar e incrustar el modelo en la interfaz.</div></div></div>
+    <div class="head"><span class="kicker" data-rv>04 · Metodología</span><h2 data-rv style="--i:1">El proceso, en cinco pasos</h2>
+    <p class="lead" data-rv style="--i:2">Un sistema reproducible de punta a punta, del dato a la herramienta.</p></div>
+    <div class="body" style="grid-template-rows:1fr auto">
+      <div class="pipe">
+        <div class="pstep" data-rv style="--i:3"><div class="bub">1</div><div class="card"><div class="t">Datos</div><div class="d">Obtener ECG públicos y propios, y anonimizarlos.</div><span class="out">ECG anonimizados</span><span class="more">SaMi-Trop, CODE-15 %, PTB-XL y los ECG de Caja CORDES; se tapan el nombre y la historia clínica.</span></div></div>
+        <div class="pstep" data-rv style="--i:4"><div class="bub">2</div><div class="card"><div class="t">Imágenes</div><div class="d">Convertir cada señal en la imagen de su trazado.</div><span class="out">una carpeta por clase</span><span class="more">Se filtra la señal y se dibuja el trazado sobre papel milimetrado.</span></div></div>
+        <div class="pstep" data-rv style="--i:5"><div class="bub">3</div><div class="card"><div class="t">Balanceo</div><div class="d">Igualar el número de imágenes por clase.</div><span class="out">300 por clase</span><span class="more">Submuestreo: el mismo número de imágenes de cada clase; 300 en la demostración.</span></div></div>
+        <div class="pstep" data-rv style="--i:6"><div class="bub">4</div><div class="card"><div class="t">Entrenamiento</div><div class="d">Entrenar el modelo en Teachable Machine.</div><span class="out">50 épocas</span><span class="more">Transfer learning con MobileNetV2 en Teachable Machine: 50 épocas, lote de 16.</span></div></div>
+        <div class="pstep" data-rv style="--i:7"><div class="bub">5</div><div class="card"><div class="t">Integración</div><div class="d">Exportar e incrustar el modelo en la interfaz.</div><span class="out">1 archivo HTML</span><span class="more">Se exportan tres archivos y se incrustan en un único HTML que corre en el navegador.</span></div></div>
+      </div>
+      <p class="note" data-rv style="--i:8">Cada paso tiene su script documentado en la carpeta <b>scripts/</b> del repositorio de GitHub.</p>
     </div>
   </div></section>
 
   <!-- 10 Datos -->
   <section class="slide" data-sec="Paso 1 · Datos"><div class="inner"><span class="wm">1</span>
-    <span class="kicker" data-rv>Paso 1 · Datos</span>
-    <h2 data-rv style="--i:1">Obtención y anonimización</h2>
-    <div class="g4 mt">
-      <div class="card" data-rv style="--i:2"><div class="tag">Público</div><div class="t">SaMi-Trop</div><div class="d">Cohorte brasileña de pacientes con Chagas.</div></div>
-      <div class="card" data-rv style="--i:3"><div class="tag">Público</div><div class="t">CODE-15 %</div><div class="d">345.779 ECG con etiquetas de conducción.</div></div>
-      <div class="card" data-rv style="--i:4"><div class="tag">Público</div><div class="t">PTB-XL</div><div class="d">21.837 ECG clínicos con diagnósticos.</div></div>
-      <div class="card" data-rv style="--i:5"><div class="tag">Propio</div><div class="t">Caja CORDES</div><div class="d">ECG facilitados por la sede Cochabamba y su director.</div></div>
-    </div>
-    <p class="note" data-rv style="--i:6">Estas son las fuentes que alimentan el flujo de datos. El modelo de esta demostración se entrenó con <b>1.800 imágenes sintéticas</b> (300 por clase); incorporar los registros reales es la siguiente etapa.</p>
-    <div class="g2b mt">
-      <div class="card" data-rv style="--i:6"><div class="tag">Anonimización del conjunto propio</div>
-        <ul class="chk"><li>Se tapó el nombre y el número de historia clínica.</li><li>Se eliminaron los metadatos de la imagen (fecha, ubicación).</li><li>Solo se conserva el trazado del ECG.</li></ul></div>
-      <div class="card" data-rv style="--i:7"><div class="tag">Ética y licencias</div>
-        <ul class="chk"><li>Los datos públicos se usan bajo sus licencias y se citan.</li><li>No se identifica a ningún paciente.</li><li>El uso es exclusivamente académico.</li></ul></div>
+    <div class="head"><span class="kicker" data-rv>Paso 1 · Datos</span><h2 data-rv style="--i:1">Obtención y anonimización</h2></div>
+    <div class="body" style="grid-template-rows:1.05fr auto 1fr">
+      <div class="body c4" style="margin-top:0">
+        <div class="card" data-rv="l" style="--i:2"><div class="tag">Público</div><div class="t">SaMi-Trop</div><div class="d">Cohorte brasileña de pacientes con Chagas.</div></div>
+        <div class="card" data-rv="z" style="--i:3"><div class="tag">Público</div><div class="t">CODE-15 %</div><div class="d">345.779 ECG con etiquetas de conducción.</div></div>
+        <div class="card" data-rv="z" style="--i:4"><div class="tag">Público</div><div class="t">PTB-XL</div><div class="d">21.837 ECG clínicos con diagnósticos.</div></div>
+        <div class="card hl" data-rv="r" style="--i:5"><div class="tag">Propio</div><div class="t">Caja CORDES</div><div class="d">ECG facilitados por la sede Cochabamba y su director.</div></div>
+      </div>
+      <p class="note" data-rv style="--i:6;margin:0">Estas son las fuentes que alimentan el flujo de datos. El modelo de esta demostración se entrenó con <b>1.800 imágenes sintéticas</b> (300 por clase); incorporar los registros reales es la siguiente etapa.</p>
+      <div class="body c2" style="margin-top:0">
+        <div class="card" data-rv="l" style="--i:7"><div class="tag">Anonimización del conjunto propio</div>
+          <ul class="chk"><li>Se tapó el nombre y el número de historia clínica.</li><li>Se eliminaron los metadatos de la imagen (fecha, ubicación).</li><li>Solo se conserva el trazado del ECG.</li></ul></div>
+        <div class="card" data-rv="r" style="--i:8"><div class="tag">Ética y licencias</div>
+          <ul class="chk"><li>Los datos públicos se usan bajo sus licencias y se citan.</li><li>No se identifica a ningún paciente.</li><li>El uso es exclusivamente académico.</li></ul></div>
+      </div>
     </div>
   </div></section>
 
   <!-- 11 Preproceso -->
   <section class="slide" data-sec="Paso 2 · Imágenes"><div class="inner"><span class="wm">2</span>
-    <span class="kicker" data-rv>Paso 2 · Preprocesamiento</span>
-    <h2 data-rv style="--i:1">De la señal a la imagen</h2>
-    <div class="flowd mt">
-      <div class="fbox" data-rv style="--i:2"><div class="tag">Entrada</div><div class="t">Señal de ECG</div><div class="d">Registro de 12 derivaciones en formato digital.</div></div>
-      <div class="farrow" data-rv style="--i:3">→</div>
-      <div class="fbox" data-rv style="--i:3"><div class="tag">Limpieza</div><div class="t">Filtro de banda</div><div class="d">Quita la deriva de la línea base y el ruido de alta frecuencia.</div></div>
-      <div class="farrow" data-rv style="--i:4">→</div>
-      <div class="fbox" data-rv style="--i:4"><div class="tag">Conversión</div><div class="t">Imagen del trazado</div><div class="d">Se dibuja el trazado sobre papel milimetrado.</div></div>
-      <div class="farrow" data-rv style="--i:5">→</div>
-      <div class="fbox hl" data-rv style="--i:5"><div class="tag">Salida</div><div class="t">Una carpeta por clase</div><div class="d">Lista para subir a Teachable Machine.</div></div>
-    </div>
-    <div class="g2b mt">
-      <div class="card" data-rv style="--i:6"><div class="tag">Por qué imágenes</div><div class="d" style="margin-top:8px;font-size:.98rem">Teachable Machine clasifica <b>imágenes</b>, no señales. Convertir el ECG en imagen permite usar una plataforma gratuita y sin programar.</div></div>
-      <div class="card" data-rv style="--i:7"><div class="tag">Herramientas</div><div class="d" style="margin-top:8px;font-size:.98rem">Scripts en <b>Python</b> con librerías abiertas: lectura de registros, filtrado y generación de las imágenes por clase.</div></div>
+    <div class="head"><span class="kicker" data-rv>Paso 2 · Preprocesamiento</span><h2 data-rv style="--i:1">De la señal a la imagen</h2></div>
+    <div class="body" style="grid-template-rows:1.2fr 1fr">
+      <div class="flowd">
+        <div class="fbox" data-rv="l" style="--i:2"><div class="tag">Entrada</div><div class="t">Señal de ECG</div><div class="d">Registro de 12 derivaciones en formato digital.</div></div>
+        <div class="farrow" data-rv style="--i:3">→</div>
+        <div class="fbox" data-rv style="--i:3"><div class="tag">Limpieza</div><div class="t">Filtro de banda</div><div class="d">Quita la deriva de la línea base y el ruido de alta frecuencia.</div></div>
+        <div class="farrow" data-rv style="--i:4">→</div>
+        <div class="fbox" data-rv style="--i:4"><div class="tag">Conversión</div><div class="t">Imagen del trazado</div><div class="d">Se dibuja el trazado sobre papel milimetrado.</div></div>
+        <div class="farrow" data-rv style="--i:5">→</div>
+        <div class="fbox hl" data-rv="r" style="--i:5"><div class="tag">Salida</div><div class="t">Una carpeta por clase</div><div class="d">Lista para subir a Teachable Machine.</div></div>
+      </div>
+      <div class="body c2" style="margin-top:0">
+        <div class="card" data-rv="l" style="--i:6"><div class="tag">Por qué imágenes</div><div class="d" style="font-size:1.08em">Teachable Machine clasifica <b>imágenes</b>, no señales. Convertir el ECG en imagen permite usar una plataforma gratuita y sin programar.</div></div>
+        <div class="card" data-rv="r" style="--i:7"><div class="tag">Herramientas</div><div class="d" style="font-size:1.08em">Scripts en <b>Python</b> con librerías abiertas: lectura de registros, filtrado y generación de las imágenes por clase.</div></div>
+      </div>
     </div>
   </div></section>
 
   <!-- 12 Balanceo -->
   <section class="slide" data-sec="Paso 3 · Balanceo"><div class="inner"><span class="wm">3</span>
-    <span class="kicker" data-rv>Paso 3 · Clases y balanceo</span>
-    <h2 data-rv style="--i:1">Igualar las clases para no sesgar al modelo</h2>
-    <p class="lead" data-rv style="--i:2">En los datos reales predominan los ECG normales. Si se entrena así, el modelo aprende a decir «normal» casi siempre.</p>
-    <div class="g2b mt">
-      <div class="card" data-rv style="--i:3"><div class="tag">Antes · desbalanceado (ilustrativo)</div><div class="bars" id="barsBefore"></div></div>
-      <div class="card" data-rv style="--i:4"><div class="tag">Después · submuestreo</div><div class="bars" id="barsAfter"></div>
-        <p class="d" style="margin-top:14px;color:var(--dim);font-size:.86rem">Se toma el mismo número de imágenes por clase (300 por clase en el modelo de demostración).</p></div>
+    <div class="head"><span class="kicker" data-rv>Paso 3 · Clases y balanceo</span><h2 data-rv style="--i:1">Igualar las clases para no sesgar al modelo</h2>
+    <p class="lead" data-rv style="--i:2">En los datos reales predominan los ECG normales. Si se entrena así, el modelo aprende a decir «normal» casi siempre.</p></div>
+    <div class="body c2">
+      <div class="card" data-rv="l" style="--i:3"><div class="tag">Antes · desbalanceado (ilustrativo)</div><div class="bars" id="barsBefore"></div></div>
+      <div class="card hl" data-rv="r" style="--i:4"><div class="tag">Después · submuestreo</div><div class="bars" id="barsAfter"></div>
+        <p class="d" style="margin-top:.8em">Se toma el mismo número de imágenes por clase (300 por clase en el modelo de demostración).</p></div>
     </div>
   </div></section>
 
   <!-- 13 Entrenamiento -->
   <section class="slide" data-sec="Paso 4 · Entrenamiento"><div class="inner"><span class="wm">4</span>
-    <span class="kicker" data-rv>Paso 4 · Entrenamiento</span>
-    <h2 data-rv style="--i:1">Teachable Machine y <span class="grad">transfer learning</span></h2>
-    <p class="lead" data-rv style="--i:2">Teachable Machine (Google) entrena clasificadores de imágenes sin programar. En vez de empezar de cero, reutiliza una red que ya sabe «ver».</p>
-    <div class="flowd mt">
-      <div class="fbox" data-rv style="--i:3"><div class="tag">Entrada</div><div class="t">Imagen 224 × 224</div><div class="d">Cada imagen se redimensiona al tamaño que espera la red.</div></div>
-      <div class="farrow" data-rv style="--i:4">→</div>
-      <div class="fbox" data-rv style="--i:4"><div class="tag">Red base</div><div class="t">MobileNetV2</div><div class="d">Preentrenada con millones de imágenes; sus capas se conservan y extraen características.</div></div>
-      <div class="farrow" data-rv style="--i:5">→</div>
-      <div class="fbox hl" data-rv style="--i:5"><div class="tag">Se entrena aquí</div><div class="t">Capas nuevas</div><div class="d">Aprenden a separar los 6 patrones a partir de tus imágenes.</div></div>
-      <div class="farrow" data-rv style="--i:6">→</div>
-      <div class="fbox" data-rv style="--i:6"><div class="tag">Salida</div><div class="t">6 probabilidades</div><div class="d">Una por clase; suman 100 %.</div></div>
+    <div class="head"><span class="kicker" data-rv>Paso 4 · Entrenamiento</span><h2 data-rv style="--i:1">Teachable Machine y <span class="grad">transfer learning</span></h2>
+    <p class="lead" data-rv style="--i:2">Teachable Machine (Google) entrena clasificadores de imágenes sin programar. En vez de empezar de cero, reutiliza una red que ya sabe «ver».</p></div>
+    <div class="body" style="grid-template-rows:1.3fr auto">
+      <div class="flowd">
+        <div class="fbox" data-rv="l" style="--i:3"><div class="tag">Entrada</div><div class="t">Imagen 224 × 224</div><div class="d">Cada imagen se redimensiona al tamaño que espera la red.</div></div>
+        <div class="farrow" data-rv style="--i:4">→</div>
+        <div class="fbox" data-rv style="--i:4"><div class="tag">Red base</div><div class="t">MobileNetV2</div><div class="d">Preentrenada con millones de imágenes; sus capas se conservan y extraen características.</div></div>
+        <div class="farrow" data-rv style="--i:5">→</div>
+        <div class="fbox hl" data-rv style="--i:5"><div class="tag">Se entrena aquí</div><div class="t">Capas nuevas</div><div class="d">Aprenden a separar los 6 patrones a partir de tus imágenes.</div></div>
+        <div class="farrow" data-rv style="--i:6">→</div>
+        <div class="fbox" data-rv="r" style="--i:6"><div class="tag">Salida</div><div class="t">6 probabilidades</div><div class="d">Una por clase; suman 100 %.</div></div>
+      </div>
+      <div class="hp" data-rv="z" style="--i:7"><div class="tile"><b>50</b><span>épocas</span></div><div class="tile"><b>16</b><span>imágenes por lote</span></div><div class="tile"><b>0,001</b><span>tasa de aprendizaje</span></div><div class="tile"><b>6</b><span>clases de salida</span></div></div>
     </div>
-    <div class="files" data-rv style="--i:7"><span class="file">50 épocas</span><span class="file">lote de 16</span><span class="file">tasa de aprendizaje 0,001</span><span class="file">parámetros por defecto de la plataforma</span></div>
   </div></section>
 
   <!-- 14 Integración -->
   <section class="slide" data-sec="Paso 5 · Integración"><div class="inner"><span class="wm">5</span>
-    <span class="kicker" data-rv>Paso 5 · Integración</span>
-    <h2 data-rv style="--i:1">Del modelo entrenado a una herramienta de uso</h2>
-    <div class="g3 mt">
-      <div class="card" data-rv style="--i:2"><div class="tag">1 · Exportar</div><div class="t">Formato TensorFlow.js</div><div class="d">Teachable Machine descarga el modelo en tres archivos.</div>
-        <div class="files"><span class="file">model.json</span><span class="file">weights.bin</span><span class="file">metadata.json</span></div></div>
-      <div class="card" data-rv style="--i:3"><div class="tag">2 · Incrustar</div><div class="t">Un solo archivo</div><div class="d">Los tres archivos se integran dentro de una página web, junto con la interfaz.</div></div>
-      <div class="card" data-rv style="--i:4"><div class="tag">3 · Ejecutar</div><div class="t">En el navegador</div><div class="d">La imagen se analiza en el equipo del médico y nunca se envía a un servidor.</div></div>
+    <div class="head"><span class="kicker" data-rv>Paso 5 · Integración</span><h2 data-rv style="--i:1">Del modelo entrenado a una herramienta de uso</h2></div>
+    <div class="body" style="grid-template-rows:1.3fr 1fr">
+      <div class="body c3" style="margin-top:0">
+        <div class="card" data-rv="l" style="--i:2"><div class="tag">1 · Exportar</div><div class="t">Formato TensorFlow.js</div><div class="d">Teachable Machine descarga el modelo en tres archivos.</div>
+          <div class="files"><span class="file">model.json</span><span class="file">weights.bin</span><span class="file">metadata.json</span></div></div>
+        <div class="card" data-rv="z" style="--i:3"><div class="tag">2 · Incrustar</div><div class="t">Un solo archivo</div><div class="d">Los tres archivos se integran dentro de una página web, junto con la interfaz.</div></div>
+        <div class="card hl" data-rv="r" style="--i:4"><div class="tag">3 · Ejecutar</div><div class="t">En el navegador</div><div class="d">La imagen se analiza en el equipo del médico y nunca se envía a un servidor.</div></div>
+      </div>
+      <div class="card" data-rv style="--i:5"><div class="tag">Lo que ve el médico</div><ul class="chk"><li>La interfaz lo recibe, explica el uso y permite subir la imagen del ECG.</li><li>Muestra el patrón estimado y la confianza de cada clase.</li></ul></div>
     </div>
-    <ul class="chk mt" data-rv style="--i:5"><li>La interfaz recibe al médico, explica el uso y permite subir la imagen del ECG.</li><li>Muestra el patrón estimado y la confianza de cada clase.</li></ul>
   </div></section>
 
   <!-- 15 Cómo clasifica -->
   <section class="slide" data-sec="Resultados · Funcionamiento"><div class="inner"><span class="wm">05</span>
-    <span class="kicker" data-rv>05 · Funcionamiento</span>
-    <h2 data-rv style="--i:1">¿Cómo clasifica una imagen nueva?</h2>
-    <div class="g2 mt">
-      <ul class="chk" data-rv style="--i:2">
-        <li><span><b>1.</b> La imagen del ECG se redimensiona a <b>224 × 224 px</b>.</span></li>
-        <li><span><b>2.</b> MobileNetV2 extrae sus <b>características visuales</b>: formas, anchuras, picos.</span></li>
-        <li><span><b>3.</b> Las capas entrenadas asignan una <b>probabilidad a cada clase</b>.</span></li>
-        <li><span><b>4.</b> La interfaz muestra la clase más probable y el porcentaje de todas.</span></li>
-      </ul>
-      <div class="card" data-rv style="--i:3"><div class="tag">Ejemplo ilustrativo de salida</div><div class="bars" id="barsPred"></div></div>
+    <div class="head"><span class="kicker" data-rv>05 · Funcionamiento</span><h2 data-rv style="--i:1">¿Cómo clasifica una imagen nueva?</h2></div>
+    <div class="body c2" style="align-items:stretch">
+      <div class="steps" id="steps">
+        <div class="card" data-rv="l" style="--i:2"><span class="sn">1</span><div class="d" style="margin:0">La imagen del ECG se redimensiona a <b>224 × 224 px</b>.</div></div>
+        <div class="card" data-rv="l" style="--i:3"><span class="sn">2</span><div class="d" style="margin:0">MobileNetV2 extrae sus <b>características visuales</b>: formas, anchuras, picos.</div></div>
+        <div class="card" data-rv="l" style="--i:4"><span class="sn">3</span><div class="d" style="margin:0">Las capas entrenadas asignan una <b>probabilidad a cada clase</b>.</div></div>
+        <div class="card" data-rv="l" style="--i:5"><span class="sn">4</span><div class="d" style="margin:0">La interfaz muestra la clase más probable y el porcentaje de todas.</div></div>
+      </div>
+      <div class="monitor" data-rv="r" style="--i:3;display:flex;flex-direction:column">
+        <div class="mh"><span>EJEMPLO ILUSTRATIVO DE SALIDA</span><span class="on">● EN VIVO</span></div>
+        <canvas id="predcv" class="live" data-kind="rbbb_lafb" data-color="#ff5a6a" width="760" height="190"></canvas>
+        <div class="verdict" id="verdict">Bloqueo bifascicular<small id="vconf">87 % de confianza</small></div>
+        <div class="bars dyn" id="barsPred"></div>
+      </div>
     </div>
   </div></section>
 
   <!-- 16 Resultados -->
   <section class="slide" data-sec="Resultados"><div class="inner"><span class="wm">05</span>
-    <span class="kicker" data-rv>05 · Resultados</span>
-    <h2 data-rv style="--i:1">Lo que se obtuvo</h2>
-    <div class="g3 mt">
-      <div class="card stat" data-rv style="--i:2"><div class="v"><span data-count="5">0</span></div><div class="l">pasos reproducibles, de los datos a la interfaz, con scripts documentados.</div></div>
-      <div class="card stat" data-rv style="--i:3"><div class="v"><span data-count="6">0</span></div><div class="l">patrones reconocidos por el modelo entrenado en Teachable Machine.</div></div>
-      <div class="card stat" data-rv style="--i:4"><div class="v am"><span data-count="1">0</span></div><div class="l">archivo: un asistente que clasifica la imagen directamente en el navegador.</div></div>
+    <div class="head"><span class="kicker" data-rv>05 · Resultados</span><h2 data-rv style="--i:1">Lo que se obtuvo</h2></div>
+    <div class="body" style="grid-template-rows:1.2fr 1fr auto">
+      <div class="body c3" style="margin-top:0">
+        <div class="card stat" data-rv="l" style="--i:2"><div class="v"><span data-count="5">0</span></div><div class="l">pasos reproducibles, de los datos a la interfaz, con scripts documentados.</div></div>
+        <div class="card stat" data-rv="z" style="--i:3"><div class="v"><span data-count="6">0</span></div><div class="l">patrones reconocidos por el modelo entrenado en Teachable Machine.</div></div>
+        <div class="card stat" data-rv="r" style="--i:4"><div class="v am"><span data-count="1">0</span></div><div class="l">archivo: un asistente que clasifica la imagen directamente en el navegador.</div></div>
+      </div>
+      <div class="card" data-rv style="--i:5"><div class="tag">Entregables en el repositorio</div>
+        <div class="files" style="margin-top:.7em"><span class="file">app/asistente.html</span><span class="file">app/presentacion.html</span><span class="file">modelo/ (model.json · weights.bin · metadata.json)</span><span class="file">scripts/ (Python)</span><span class="file">informe/ (artículo, formato Revista 3i)</span></div></div>
+      <div data-rv="z" style="--i:6"><a class="cta" href="asistente.html" target="_blank" rel="noopener">Abrir el asistente →</a></div>
     </div>
-    <a class="cta" href="asistente.html" target="_blank" rel="noopener" data-rv style="--i:5">Abrir el asistente →</a>
   </div></section>
 
   <!-- 17 Limitaciones -->
   <section class="slide" data-sec="Limitaciones"><div class="inner"><span class="wm">06</span>
-    <span class="kicker" data-rv>06 · Limitaciones</span>
-    <h2 data-rv style="--i:1">Lo que hay que decir con honestidad</h2>
-    <div class="g3 mt">
-      <div class="card" data-rv style="--i:2"><div class="tag">Datos de demostración</div><div class="d" style="margin-top:8px;font-size:.98rem">El modelo mostrado se entrenó con imágenes <b>sintéticas</b>. Reconoce ese tipo de trazados; no es un modelo clínico.</div></div>
-      <div class="card" data-rv style="--i:3"><div class="tag">Brecha de dominio</div><div class="d" style="margin-top:8px;font-size:.98rem">Una foto de ECG en papel (cuadrícula, sombras, dedos) difiere de las imágenes de entrenamiento y puede bajar el acierto.</div></div>
-      <div class="card" data-rv style="--i:4"><div class="tag">Sin validación clínica</div><div class="d" style="margin-top:8px;font-size:.98rem">No se midieron sensibilidad ni especificidad frente a especialistas. Es una demostración educativa.</div></div>
+    <div class="head"><span class="kicker" data-rv>06 · Limitaciones</span><h2 data-rv style="--i:1">Lo que hay que decir con honestidad</h2></div>
+    <div class="body" style="grid-template-rows:1fr auto">
+      <div class="body c3" style="margin-top:0">
+        <div class="card" data-rv="l" style="--i:2"><div class="tag" style="color:var(--amber)">Datos de demostración</div><div class="d" style="font-size:1.1em">El modelo mostrado se entrenó con imágenes <b>sintéticas</b>. Reconoce ese tipo de trazados; no es un modelo clínico.</div></div>
+        <div class="card" data-rv="z" style="--i:3"><div class="tag" style="color:var(--amber)">Brecha de dominio</div><div class="d" style="font-size:1.1em">Una foto de ECG en papel (cuadrícula, sombras, dedos) difiere de las imágenes de entrenamiento y puede bajar el acierto.</div></div>
+        <div class="card" data-rv="r" style="--i:4"><div class="tag" style="color:var(--amber)">Sin validación clínica</div><div class="d" style="font-size:1.1em">No se midieron sensibilidad ni especificidad frente a especialistas. Es una demostración educativa.</div></div>
+      </div>
+      <div class="card hl" data-rv style="--i:5"><div class="quote">Por eso se presenta como <span class="grad">herramienta educativa de apoyo</span>, no como diagnóstico.</div></div>
     </div>
   </div></section>
 
   <!-- 18 Conclusiones -->
   <section class="slide" data-sec="Conclusiones"><div class="inner"><span class="wm">06</span>
-    <span class="kicker" data-rv>06 · Conclusiones</span>
-    <h2 data-rv style="--i:1">Conclusiones y trabajo futuro</h2>
-    <div class="g2b mt">
-      <div class="card" data-rv style="--i:2"><div class="tag">Conclusiones</div>
-        <ul class="chk"><li>Es <b>viable</b> construir con recursos accesibles un apoyo para reconocer patrones chagásicos en el ECG.</li><li>Puede aportar a la <b>docencia y al tamizaje</b> en contextos como Bolivia, siempre como apoyo al especialista.</li></ul></div>
-      <div class="card" data-rv style="--i:3"><div class="tag">Trabajo futuro</div>
-        <ul class="chk warn"><li>Ampliar y validar el conjunto propio de datos.</li><li>Entrenar con fotografías reales de ECG.</li><li>Evaluar con métricas clínicas frente a especialistas.</li></ul></div>
+    <div class="head"><span class="kicker" data-rv>06 · Conclusiones</span><h2 data-rv style="--i:1">Conclusiones y trabajo futuro</h2></div>
+    <div class="body" style="grid-template-rows:1.3fr auto">
+      <div class="body c2" style="margin-top:0">
+        <div class="card" data-rv="l" style="--i:2"><div class="tag">Conclusiones</div>
+          <ul class="chk"><li>Es <b>viable</b> construir con recursos accesibles un apoyo para reconocer patrones chagásicos en el ECG.</li><li>Puede aportar a la <b>docencia y al tamizaje</b> en contextos como Bolivia, siempre como apoyo al especialista.</li></ul></div>
+        <div class="card" data-rv="r" style="--i:3"><div class="tag">Trabajo futuro</div>
+          <ul class="chk warn"><li>Ampliar y validar el conjunto propio de datos.</li><li>Entrenar con fotografías reales de ECG.</li><li>Evaluar con métricas clínicas frente a especialistas.</li></ul></div>
+      </div>
+      <div class="card hl" data-rv="z" style="--i:4"><div class="quote">Un apoyo accesible para que el médico <span class="grad">reconozca antes</span> los patrones del Chagas.</div></div>
     </div>
   </div></section>
 
   <!-- 19 Gracias -->
-  <section class="slide" data-sec="Gracias"><div class="inner" style="text-align:center">
-    <span class="kicker" data-rv>Gracias</span>
-    <h1 data-rv style="--i:1" class="grad">Gracias</h1>
-    <p class="lead" data-rv style="--i:2;margin-left:auto;margin-right:auto">¿Preguntas?<br>Luna Saleth Gallego Martínez · Universidad Católica Boliviana «San Pablo»</p>
-    <p class="lead" data-rv style="--i:3;margin-left:auto;margin-right:auto;font-size:.95rem">Agradecimiento: Caja CORDES (sede Cochabamba) y su director, por facilitar los electrocardiogramas.</p>
-    <div class="hintnav" data-rv style="--i:4;justify-content:center">Apoyo educativo · no diagnóstico</div>
+  <section class="slide" data-sec="Gracias"><div class="inner">
+    <div class="rings" style="right:50%;margin-right:-23em" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="fin">
+      <span class="kicker" data-rv>Gracias</span>
+      <h1 data-rv="z" style="--i:1" class="grad">Gracias</h1>
+      <p class="lead" data-rv style="--i:2;font-size:1.4em">¿Preguntas?<br>Luna Saleth Gallego Martínez · Universidad Católica Boliviana «San Pablo»</p>
+      <p class="lead" data-rv style="--i:3;font-size:1em">Agradecimiento: Caja CORDES (sede Cochabamba) y su director, por facilitar los electrocardiogramas.</p>
+      <div class="hintnav" data-rv style="--i:4">Apoyo educativo · no diagnóstico</div>
+    </div>
   </div></section>
 </div>
 
@@ -568,7 +647,7 @@ canvas.mini{display:block;width:100%;height:auto;border-radius:10px;background:r
 (function(){
   "use strict";
   var slides=Array.prototype.slice.call(document.querySelectorAll(".slide"));
-  var total=slides.length, idx=0, timer=null;
+  var total=slides.length, idx=0, timer=null, rafLive=0;
   var reduce=matchMedia("(prefers-reduced-motion:reduce)").matches;
   function $(id){return document.getElementById(id)}
 
@@ -582,41 +661,53 @@ canvas.mini{display:block;width:100%;height:auto;border-radius:10px;background:r
       if(kind==="lafb")v+=gauss(t,.322,.008,-.18);}
     v+=gauss(t,(kind==="av_block"?.7:.58),.045,.28);return v;
   }
-  function drawKind(cv,kind,color){
-    var ctx=cv.getContext("2d"),W=cv.width,H=cv.height;ctx.clearRect(0,0,W,H);
-    ctx.strokeStyle="rgba(0,188,235,.10)";ctx.lineWidth=1;
-    for(var x=0;x<W;x+=10){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
-    for(var y=0;y<H;y+=10){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
-    ctx.strokeStyle=color;ctx.lineWidth=2.4;ctx.lineJoin="round";ctx.shadowColor=color;ctx.shadowBlur=8;
-    var T=2.8,fs=250,mid=H*.62,gain=H*.46,sx=W/T,rr=kind==="av_block"?1.0:.8,first=true;ctx.beginPath();
-    function pt(tt,v){var X=tt*sx,Y=mid-v*gain;if(first){ctx.moveTo(X,Y);first=false;}else ctx.lineTo(X,Y);}
-    if(kind==="pvc"){var seq=["N","N","V"],pos=.05;
-      for(var s=0;s<seq.length;s++){var isV=seq[s]==="V";
-        for(var i=0;i<.8*fs;i++){var tt=i/fs,v=isV?(gauss(tt,.33,.05,-1.1)+gauss(tt,.46,.07,.55)):beat(tt,"normal");pt(pos+tt,v);}
-        pos+=isV?rr*1.4:rr;}
-    }else{for(var p=.05;p<T;p+=rr){for(var j=0;j<.8*fs;j++){var tj=j/fs;if(p+tj>T)break;pt(p+tj,beat(tj,kind));}}}
-    ctx.stroke();ctx.shadowBlur=0;
+  /* señal periódica continua (para que el trazado se desplace) */
+  function signal(t,kind){
+    if(kind==="pvc"){var P=2.72,m=((t%P)+P)%P;
+      if(m<.8)return beat(m,"normal"); if(m<1.6)return beat(m-.8,"normal");
+      var vv=m-1.6;return vv<.8?gauss(vv,.33,.05,-1.1)+gauss(vv,.46,.07,.55):0;}
+    var rr=kind==="av_block"?1.0:.8,tm=((t%rr)+rr)%rr;return tm<.8?beat(tm,kind):0;
   }
-  Array.prototype.forEach.call(document.querySelectorAll("canvas[data-kind]"),function(cv){drawKind(cv,cv.getAttribute("data-kind"),cv.getAttribute("data-color"));});
-
-  /* anatomía anotada */
-  (function(){
-    var cv=$("anat"),ctx=cv.getContext("2d"),W=cv.width,H=cv.height;
-    ctx.strokeStyle="rgba(0,188,235,.10)";ctx.lineWidth=1;
-    for(var x=0;x<W;x+=12){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
-    for(var y=0;y<H;y+=12){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
-    var mid=H*.64,gain=H*.52,sx=W/.86,x0=W*.06,fs=400;
-    function X(t){return x0+t*sx*0.95}
-    ctx.strokeStyle="#2fe0b0";ctx.lineWidth=3;ctx.lineJoin="round";ctx.shadowColor="#2fe0b0";ctx.shadowBlur=10;ctx.beginPath();
-    for(var i=0;i<.8*fs;i++){var t=i/fs,Y=mid-beat(t,"normal")*gain;if(i===0)ctx.moveTo(X(t),Y);else ctx.lineTo(X(t),Y);}
+  function grid(ctx,W,H,s,a){ctx.strokeStyle="rgba(0,188,235,"+a+")";ctx.lineWidth=1;ctx.beginPath();
+    for(var x=0;x<W;x+=s){ctx.moveTo(x,0);ctx.lineTo(x,H);}for(var y=0;y<H;y+=s){ctx.moveTo(0,y);ctx.lineTo(W,y);}ctx.stroke();}
+  function drawLive(cv,off){
+    var kind=cv.getAttribute("data-kind"),color=cv.getAttribute("data-color"),ctx=cv.getContext("2d"),W=cv.width,H=cv.height;
+    ctx.clearRect(0,0,W,H);grid(ctx,W,H,H/11,.1);
+    var T=2.8,sx=W/T,mid=H*.64,gain=H*.46,lw=Math.max(2,H/60);
+    ctx.strokeStyle=color;ctx.lineWidth=lw;ctx.lineJoin="round";ctx.shadowColor=color;ctx.shadowBlur=7;ctx.beginPath();
+    for(var x=0;x<=W;x+=2){var v=signal(off+x/sx,kind),Y=mid-v*gain;if(x===0)ctx.moveTo(x,Y);else ctx.lineTo(x,Y);}
     ctx.stroke();ctx.shadowBlur=0;
-    ctx.font="600 15px IBM Plex Mono, monospace";ctx.textAlign="center";
-    function lab(t,y,txt,col){ctx.fillStyle=col;ctx.fillText(txt,X(t),y);}
-    lab(.15,mid-.12*gain-26,"P","#ffc24d");lab(.34,mid-gain-14,"QRS","#ff5a6a");lab(.58,mid-.28*gain-26,"T","#6ea0ff");
-    ctx.strokeStyle="rgba(255,255,255,.4)";ctx.lineWidth=1.5;ctx.setLineDash([4,4]);
-    var yb=H-24;ctx.beginPath();ctx.moveTo(X(.12),yb);ctx.lineTo(X(.31),yb);ctx.stroke();ctx.setLineDash([]);
-    ctx.fillStyle="#cfe3ef";ctx.font="500 13px IBM Plex Mono, monospace";ctx.fillText("PR",(X(.12)+X(.31))/2,yb-6);
-  })();
+    var ye=mid-signal(off+W/sx,kind)*gain;ctx.fillStyle="#fff";ctx.shadowColor=color;ctx.shadowBlur=14;ctx.beginPath();ctx.arc(W-3,ye,lw*1.5,0,6.2832);ctx.fill();ctx.shadowBlur=0;
+  }
+  var liveCvs=[];
+  function collectLive(){liveCvs=Array.prototype.slice.call(slides[idx].querySelectorAll("canvas.live[data-kind]"));}
+  function liveLoop(ts){var off=ts/1000*.9;liveCvs.forEach(function(c){drawLive(c,off);});rafLive=requestAnimationFrame(liveLoop);}
+
+  /* anatomía con resaltado por partes */
+  var anat=$("anat"),PARTS={p:{a:.08,b:.23,c:"#ffc24d",tag:"P · AURÍCULAS"},pr:{a:.12,b:.31,c:"#00bceb",tag:"PR · CONDUCCIÓN"},qrs:{a:.29,b:.43,c:"#ff5a6a",tag:"QRS · VENTRÍCULOS"},t:{a:.47,b:.70,c:"#6ea0ff",tag:"T · RECUPERACIÓN"},chagas:{a:.12,b:.43,c:"#ff5a6a",tag:"CHAGAS · PR + QRS"}};
+  function drawAnat(part){
+    var ctx=anat.getContext("2d"),W=anat.width,H=anat.height;ctx.clearRect(0,0,W,H);grid(ctx,W,H,H/12,.1);
+    var mid=H*.66,gain=H*.52,x0=W*.06,fs=400,sx=W*.95/.86;
+    function X(t){return x0+t*sx}
+    function path(a,b){ctx.beginPath();var f=true;for(var i=Math.round(a*fs);i<=Math.round(b*fs);i++){var t=i/fs,Y=mid-beat(t,"normal")*gain;if(f){ctx.moveTo(X(t),Y);f=false;}else ctx.lineTo(X(t),Y);}ctx.stroke();}
+    ctx.lineJoin="round";ctx.lineWidth=3;ctx.strokeStyle=part?"rgba(47,224,176,.35)":"#2fe0b0";ctx.shadowColor="#2fe0b0";ctx.shadowBlur=part?0:10;path(0,.8);ctx.shadowBlur=0;
+    var P=part&&PARTS[part];
+    if(P){ctx.lineWidth=5.5;ctx.strokeStyle=P.c;ctx.shadowColor=P.c;ctx.shadowBlur=16;path(P.a,P.b);ctx.shadowBlur=0;
+      ctx.fillStyle=P.c.replace("#","#")+"22";}
+    ctx.font="600 "+Math.round(H/20)+"px IBM Plex Mono, monospace";ctx.textAlign="center";
+    function lab(t,y,txt,col,on){ctx.fillStyle=on?col:"rgba(255,255,255,.55)";ctx.fillText(txt,X(t),y);}
+    lab(.15,mid-.12*gain-H*.09,"P","#ffc24d",part==="p");lab(.34,mid-gain-H*.05,"QRS","#ff5a6a",part==="qrs"||part==="chagas");lab(.58,mid-.28*gain-H*.09,"T","#6ea0ff",part==="t");
+    var yb=H-H*.09;ctx.strokeStyle=(part==="pr"||part==="chagas")?"#00bceb":"rgba(255,255,255,.4)";ctx.lineWidth=2;ctx.setLineDash([6,5]);ctx.beginPath();ctx.moveTo(X(.12),yb);ctx.lineTo(X(.31),yb);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle=(part==="pr"||part==="chagas")?"#00bceb":"#cfe3ef";ctx.font="500 "+Math.round(H/24)+"px IBM Plex Mono, monospace";ctx.fillText("PR",(X(.12)+X(.31))/2,yb-H*.025);
+    if($("anatTag"))$("anatTag").textContent="● "+(P?P.tag:"P · QRS · T");
+  }
+  var anatSeq=["p","pr","qrs","t","chagas"],anatI=0,anatT=null;
+  function anatStart(){anatStop();anatI=0;(function step(){var part=anatSeq[anatI%anatSeq.length];drawAnat(part);
+    Array.prototype.forEach.call(document.querySelectorAll("#partlist li"),function(li){li.classList.toggle("on",li.getAttribute("data-part")===part);});anatI++;})();
+    anatT=setInterval(function(){var part=anatSeq[anatI%anatSeq.length];drawAnat(part);
+      Array.prototype.forEach.call(document.querySelectorAll("#partlist li"),function(li){li.classList.toggle("on",li.getAttribute("data-part")===part);});anatI++;},2000);}
+  function anatStop(){if(anatT){clearInterval(anatT);anatT=null;}}
+  drawAnat(null);
 
   /* barras */
   function bars(id,rows){var el=$(id);rows.forEach(function(r){var d=document.createElement("div");d.className="brow";
@@ -624,7 +715,44 @@ canvas.mini{display:block;width:100%;height:auto;border-radius:10px;background:r
   var C={n:"#2fe0b0",b:"#6ea0ff",h:"#ffc24d",bh:"#ff5a6a",av:"#a98bff",ev:"#ff9254"};
   bars("barsBefore",[["Normal",100,"muy alta",C.n],["BRD",36,"media",C.b],["HBAI",22,"baja",C.h],["BRD + HBAI",14,"baja",C.bh],["Bloqueo AV",24,"baja",C.av],["Extrasístole",10,"muy baja",C.ev]]);
   bars("barsAfter",[["Normal",70,"300",C.n],["BRD",70,"300",C.b],["HBAI",70,"300",C.h],["BRD + HBAI",70,"300",C.bh],["Bloqueo AV",70,"300",C.av],["Extrasístole",70,"300",C.ev]]);
-  bars("barsPred",[["BRD + HBAI",87,"87,0 %",C.bh],["BRD",7,"7,0 %",C.b],["HBAI",3,"3,0 %",C.h],["Bloqueo AV",2,"2,0 %",C.av],["Normal",1,"1,0 %",C.n],["Extrasístole",1,"0,5 %",C.ev]]);
+
+  /* predicción ilustrativa que recorre los seis patrones */
+  var PRED=[
+    {k:"normal",c:C.n,name:"ECG normal",conf:91,p:[91,2,2,1,2,2]},
+    {k:"rbbb",c:C.b,name:"Bloqueo de rama derecha",conf:84,p:[3,84,5,3,3,2]},
+    {k:"lafb",c:C.h,name:"Hemibloqueo anterior izquierdo",conf:79,p:[4,6,79,6,3,2]},
+    {k:"rbbb_lafb",c:C.bh,name:"Bloqueo bifascicular",conf:87,p:[1,7,3,87,1,1]},
+    {k:"av_block",c:C.av,name:"Bloqueo aurículo-ventricular",conf:82,p:[4,3,3,2,82,6]},
+    {k:"pvc",c:C.ev,name:"Extrasístole ventricular",conf:88,p:[3,2,2,2,3,88]}];
+  var PN=["Normal","BRD","HBAI","BRD + HBAI","Bloqueo AV","Extrasístole"],PC=[C.n,C.b,C.h,C.bh,C.av,C.ev];
+  var pel=$("barsPred"),predRows=[];
+  PN.forEach(function(n,i){var d=document.createElement("div");d.className="brow";
+    d.innerHTML='<div class="bl"><span>'+n+'</span><span class="pv">0 %</span></div><div class="btrack"><div class="bfill" style="--w:0%;background:'+PC[i]+'"></div></div>';pel.appendChild(d);predRows.push(d);});
+  var predI=0,predT=null,stepsT=null;
+  function showPred(i){var e=PRED[i],cv=$("predcv");cv.setAttribute("data-kind",e.k);cv.setAttribute("data-color",e.c);
+    var vd=$("verdict");vd.firstChild.nodeValue=e.name;vd.style.color=e.c;$("vconf").textContent=e.conf+" % de confianza · ejemplo ilustrativo";
+    predRows.forEach(function(r,j){r.classList.toggle("top",e.p[j]===e.conf);r.querySelector(".bfill").style.setProperty("--w",e.p[j]+"%");r.querySelector(".pv").textContent=e.p[j]+" %";});
+    var st=$("steps").children;Array.prototype.forEach.call(st,function(s,j){s.classList.toggle("on",j===(i%4));});}
+  function predStart(){predStop();predI=0;showPred(0);predT=setInterval(function(){predI=(predI+1)%PRED.length;showPred(predI);},3200);}
+  function predStop(){if(predT){clearInterval(predT);predT=null;}Array.prototype.forEach.call($("steps").children,function(s){s.classList.remove("on");});}
+
+  /* 100 puntos del Chagas cardíaco */
+  (function(){var p=$("pop"),h="";for(var i=0;i<100;i++){var cls=i<20?"a":(i<30?"b":"");h+='<i class="'+cls+'" style="--d:'+i+'"></i>';}p.innerHTML=h;})();
+
+  /* red de partículas de fondo */
+  (function(){
+    var cv=$("net"),ctx=cv.getContext("2d"),W,H,pts=[],N=54;
+    function rs(){W=cv.width=window.innerWidth;H=cv.height=window.innerHeight;}
+    rs();window.addEventListener("resize",rs);
+    for(var i=0;i<N;i++)pts.push({x:Math.random(),y:Math.random(),vx:(Math.random()-.5)*.00022,vy:(Math.random()-.5)*.00022,r:1+Math.random()*1.6});
+    function frame(){ctx.clearRect(0,0,W,H);
+      for(var i=0;i<N;i++){var a=pts[i];a.x+=a.vx;a.y+=a.vy;if(a.x<0||a.x>1)a.vx*=-1;if(a.y<0||a.y>1)a.vy*=-1;
+        for(var j=i+1;j<N;j++){var b=pts[j],dx=(a.x-b.x)*W,dy=(a.y-b.y)*H,d=Math.sqrt(dx*dx+dy*dy);
+          if(d<170){ctx.strokeStyle="rgba(0,188,235,"+(.2*(1-d/170))+")";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(a.x*W,a.y*H);ctx.lineTo(b.x*W,b.y*H);ctx.stroke();}}
+        ctx.fillStyle="rgba(120,220,255,.55)";ctx.beginPath();ctx.arc(a.x*W,a.y*H,a.r,0,6.2832);ctx.fill();}
+      if(!reduce)requestAnimationFrame(frame);}
+    frame();
+  })();
 
   /* navegación */
   var dots=$("dots");
@@ -635,18 +763,23 @@ canvas.mini{display:block;width:100%;height:auto;border-radius:10px;background:r
   function countUp(slide){slide.querySelectorAll("[data-count]").forEach(function(el){
     var target=parseFloat(el.getAttribute("data-count")),suf=el.getAttribute("data-suffix")||"";
     if(reduce){el.textContent=target+suf;return;}
-    var t0=null,dur=1000;function step(ts){if(!t0)t0=ts;var p=Math.min(1,(ts-t0)/dur);
+    var t0=null,dur=1100;function step(ts){if(!t0)t0=ts;var p=Math.min(1,(ts-t0)/dur);
       el.textContent=Math.round(target*(p*p*(3-2*p)))+suf;if(p<1)requestAnimationFrame(step);else el.textContent=target+suf;}
     el.textContent="0"+suf;requestAnimationFrame(step);});}
 
-  function go(n){n=(n+total)%total;
-    slides.forEach(function(s,i){s.classList.remove("active","prev");if(i<n)s.classList.add("prev");});
+  function go(n){n=(n+total)%total;var rev=n<idx;
+    var sw=$("sweep");sw.classList.remove("go","rev");void sw.offsetWidth;if(n!==idx&&!reduce){if(rev)sw.classList.add("rev");sw.classList.add("go");}
+    slides.forEach(function(s,i){s.classList.remove("active","before");if(i<n)s.classList.add("before");});
     slides[n].classList.add("active");slides[n].scrollTop=0;idx=n;
+    document.body.style.setProperty("--p",(n/(total-1)).toFixed(3));
     $("progress").style.width=((n+1)/total*100)+"%";
     $("counter").textContent=(n+1)+" / "+total;
     $("seclabel").textContent=slides[n].getAttribute("data-sec")||"";
-    dotEls.forEach(function(d,i){d.classList.toggle("on",i===n);});countUp(slides[n]);}
-  function play(){stop();$("play").textContent="⏸";timer=setInterval(function(){go(idx+1);},12000);}
+    dotEls.forEach(function(d,i){d.classList.toggle("on",i===n);});countUp(slides[n]);
+    collectLive();anatStop();predStop();
+    if(slides[n].querySelector("#anat"))anatStart();
+    if(slides[n].querySelector("#predcv"))predStart();}
+  function play(){stop();$("play").textContent="⏸";timer=setInterval(function(){go(idx+1);},14000);}
   function stop(){if(timer){clearInterval(timer);timer=null;$("play").textContent="▶";}}
   $("play").addEventListener("click",function(){timer?stop():play();});
   $("next").addEventListener("click",function(){stop();go(idx+1);});
@@ -659,10 +792,10 @@ canvas.mini{display:block;width:100%;height:auto;border-radius:10px;background:r
     else if(e.key==="Home"){stop();go(0);}else if(e.key==="End"){stop();go(total-1);}
     else if(e.key==="p"||e.key==="P"){timer?stop():play();}
     else if(e.key==="f"||e.key==="F"){$("fs").click();}});
-  var x0=null;
-  document.addEventListener("touchstart",function(e){x0=e.touches[0].clientX;},{passive:true});
-  document.addEventListener("touchend",function(e){if(x0===null)return;var dx=e.changedTouches[0].clientX-x0;
-    if(Math.abs(dx)>60){stop();go(idx+(dx<0?1:-1));}x0=null;},{passive:true});
+  var tx=null;
+  document.addEventListener("touchstart",function(e){tx=e.touches[0].clientX;},{passive:true});
+  document.addEventListener("touchend",function(e){if(tx===null)return;var dx=e.changedTouches[0].clientX-tx;
+    if(Math.abs(dx)>60){stop();go(idx+(dx<0?1:-1));}tx=null;},{passive:true});
 
   /* ---- franja de ECG con barrido; la interfaz late con el QRS ---- */
   var beatTimer=null;
@@ -691,6 +824,8 @@ canvas.mini{display:block;width:100%;height:auto;border-radius:10px;background:r
     else{(function loop(){for(var s=0;s<SPEED;s++)seg();cursor();requestAnimationFrame(loop);})();}
   })();
 
+  if(reduce){Array.prototype.forEach.call(document.querySelectorAll("canvas.live[data-kind]"),function(c){drawLive(c,0);});}
+  else{rafLive=requestAnimationFrame(liveLoop);}
   go(0);
 })();
 </script>
