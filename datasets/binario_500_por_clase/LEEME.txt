@@ -1,0 +1,26 @@
+DATASET DE DEMOSTRACION - ECG Chagas / No Chagas
+=================================================
+
+Carpetas:
+  chagas/     -> 500 imagenes de ECG con patrones asociados a Chagas
+                 (bloqueo de rama derecha, hemibloqueo anterior izquierdo,
+                  su combinacion, bloqueo AV y extrasistole ventricular)
+  no_chagas/  -> 500 imagenes de ECG normal
+  pruebas/    -> imagenes NO usadas en el entrenamiento, para subir en la demo en vivo
+
+COMO ENTRENAR EN TEACHABLE MACHINE
+1. Entra a https://teachablemachine.withgoogle.com/  ->  Get Started
+2. Image Project  ->  Standard image model
+3. Clase 1: nombrala "Chagas"     y sube TODA la carpeta chagas/
+   Clase 2: nombrala "No Chagas"  y sube TODA la carpeta no_chagas/
+4. Train Model  (espera unos minutos, no cierres la pestaña)
+5. Export Model  ->  TensorFlow.js  ->  Download  (baja un .zip con 3 archivos)
+6. Abre la interfaz (index.html) y sube esos 3 archivos:
+   model.json, weights.bin, metadata.json
+7. Arrastra una imagen de pruebas/ y veras la clasificacion Chagas / No Chagas.
+
+AVISO IMPORTANTE (honestidad)
+Estas imagenes son SINTETICAS, generadas para demostrar el funcionamiento del
+sistema. El modelo distinguira trazados de este tipo, pero NO es un modelo
+clinico: no sirve para diagnosticar Chagas en pacientes reales. Uselo solo como
+demostracion educativa.

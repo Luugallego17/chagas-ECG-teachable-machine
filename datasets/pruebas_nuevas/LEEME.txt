@@ -1,0 +1,18 @@
+IMAGENES DE PRUEBA NUEVAS - Asistente ECG Chagas
+================================================
+
+Son imagenes que el modelo NUNCA vio durante el entrenamiento (generadas con
+semillas distintas; se verifico que ninguna es identica a una de entrenamiento).
+
+  por_clase/   20 imagenes por patologia, en carpetas con su nombre (120 en total).
+               Sirven para mostrar que cada patron se reconoce.
+  a_ciegas/    las mismas 120 imagenes mezcladas y con nombre numerico, mas
+               clave_respuestas.csv. Sirven para una prueba "a ciegas" ante el
+               tribunal: se sube una, se lee la prediccion y luego se compara con la clave.
+
+Como usarlas: abre asistente.html, arrastra una imagen y mira la lectura.
+
+AVISO IMPORTANTE
+Son imagenes SINTETICAS del mismo tipo que las de entrenamiento: son nuevas para
+el modelo, pero no son fotos reales. Que las reconozca demuestra que el sistema
+funciona, no que diagnostique ECG reales de pacientes.

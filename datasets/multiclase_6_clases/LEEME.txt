@@ -1,0 +1,24 @@
+DATASET MULTICLASE - Patologias chagasicas en ECG
+==================================================
+
+Sube cada carpeta como una CLASE en Teachable Machine con este nombre:
+
+  carpeta 'normal/'  ->  clase "Normal"
+  carpeta 'brd/'  ->  clase "BRD"
+  carpeta 'hbai/'  ->  clase "HBAI"
+  carpeta 'brd_hbai/'  ->  clase "BRD + HBAI"
+  carpeta 'bloqueo_av/'  ->  clase "Bloqueo AV"
+  carpeta 'extrasistole_ventricular/'  ->  clase "Extrasistole ventricular"
+
+pruebas/ = imagenes NO usadas en el entrenamiento, para subir en la demo.
+
+PASOS
+1. teachablemachine.withgoogle.com -> Get Started -> Image Project -> Standard
+2. Crea 6 clases, nombralas como arriba y sube cada carpeta a su clase.
+3. Train Model (no cierres la pestana).
+4. Export Model -> TensorFlow.js -> Download (3 archivos).
+5. En index.html sube model.json, weights.bin y metadata.json.
+6. Arrastra una imagen de pruebas/ y vera la patologia detectada.
+
+AVISO: imagenes SINTETICAS para demostracion educativa; no es un modelo
+clinico y no diagnostica Chagas en pacientes reales.

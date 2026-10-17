@@ -61,12 +61,14 @@ deja ambos archivos en la misma carpeta.
 ├── informe/                  # artículo científico (formato Revista 3i): .docx y .pdf imprimible
 ├── scripts/
 │   ├── generar_dataset_demo.py  # imágenes sintéticas por clase (multiclase o binario)
+│   ├── generar_pruebas_nuevas.py # imágenes de prueba nuevas + clave a ciegas
 │   ├── synthesize_ecg.py     # trazados sintéticos en SVG (validación del flujo)
 │   ├── download_data.py      # descarga datasets desde Zenodo / indicaciones de PhysioNet
 │   ├── wfdb_to_images.py     # señales ECG (WFDB / HDF5) -> imágenes PNG por clase
 │   ├── scp_class_map.py      # mapeo de etiquetas (PTB-XL SCP / CODE-15 %) -> clases
 │   ├── plan_balanced_set.py  # distribución de clases + manifiesto balanceado
 │   └── deidentify_images.py  # des-identifica fotos de ECG (quita metadatos y tapa datos)
+├── datasets/                 # imágenes sintéticas: entrenamiento (6 clases), pruebas nuevas, binarios
 ├── docs/                     # catálogo de datasets y mapeo de etiquetas PTB-XL
 ├── notebooks/01_explorar_datos.ipynb  # explorar -> balancear -> renderizar
 ├── samples/                  # SVGs de ejemplo, uno por clase
