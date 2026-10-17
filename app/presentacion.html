@@ -26,9 +26,16 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);over
   opacity:.5;animation:feed 9s linear infinite}
 @keyframes feed{to{transform:translateX(-80px)}}
 #ecg{position:absolute;inset:0;width:100%;height:100%}
-.pulse{position:absolute;left:50%;top:46%;width:40vmax;height:40vmax;margin:-20vmax 0 0 -20vmax;border-radius:50%;
-  background:radial-gradient(circle,rgba(47,224,176,.16),transparent 62%);animation:beat .86s ease-out infinite}
-@keyframes beat{0%{transform:scale(.72);opacity:.25}18%{transform:scale(1);opacity:.6}40%{transform:scale(.86);opacity:.3}100%{transform:scale(.72);opacity:.22}}
+.pulse{position:absolute;left:50%;top:50%;width:48vmax;height:48vmax;margin:-24vmax 0 0 -24vmax;border-radius:50%;
+  background:radial-gradient(circle,rgba(47,224,176,.18),transparent 60%);transform:scale(.72);opacity:.2;
+  transition:transform .55s cubic-bezier(.19,1,.22,1),opacity .55s ease}
+body.beat .pulse{transform:scale(1.08);opacity:.62;transition:transform .08s ease-out,opacity .08s}
+/* la interfaz late en sincronía con el QRS */
+body.beat .progress{box-shadow:0 0 26px var(--teal)}
+body.beat .hud .hb{transform:scale(1.35);color:var(--crimson)}
+.hud{position:fixed;top:12px;right:clamp(16px,4vw,40px);z-index:5;font-family:var(--mono);font-size:.72rem;
+  letter-spacing:.1em;color:var(--dim);display:inline-flex;align-items:center;gap:7px}
+.hud .hb{display:inline-block;color:var(--teal);transition:transform .5s cubic-bezier(.19,1,.22,1),color .5s}
 .glowblob{position:absolute;border-radius:50%;filter:blur(80px);opacity:.4;mix-blend-mode:screen}
 .g1{width:50vw;height:50vw;left:-12vw;top:-16vw;background:radial-gradient(circle,#15b39a,transparent 62%);animation:drift1 20s ease-in-out infinite alternate}
 .g2{width:46vw;height:46vw;right:-12vw;bottom:-14vw;background:radial-gradient(circle,#2f6df0,transparent 62%);animation:drift2 24s ease-in-out infinite alternate}
@@ -106,7 +113,7 @@ h2{font-family:var(--serif);font-weight:600;letter-spacing:-.015em;line-height:1
 .cta:hover{transform:translateY(-2px)}
 .foot-disc{margin-top:1.8em;color:var(--faint);font-size:.84rem;border-left:2px solid var(--amber);padding-left:12px;max-width:46ch}
 
-.progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--teal),var(--blue));z-index:6;width:0;transition:width .6s cubic-bezier(.19,1,.22,1);box-shadow:0 0 12px var(--teal)}
+.progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--teal),var(--blue));z-index:6;width:0;transition:width .6s cubic-bezier(.19,1,.22,1),box-shadow .12s ease;box-shadow:0 0 12px var(--teal)}
 .nav{position:fixed;z-index:5;left:0;right:0;bottom:0;display:flex;align-items:center;gap:14px;padding:14px clamp(16px,4vw,40px);padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))}
 .dots{display:flex;gap:7px;flex:1;flex-wrap:wrap}
 .dots button{width:9px;height:9px;border-radius:50%;border:0;background:rgba(120,230,200,.25);cursor:pointer;padding:0;transition:transform .2s}
@@ -133,6 +140,7 @@ h2{font-family:var(--serif);font-weight:600;letter-spacing:-.015em;line-height:1
 
 <div class="progress" id="progress"></div>
 <div class="brandtag">UCB «San Pablo» · Ingeniería en IA</div>
+<div class="hud">DII · <span class="num">72</span> lpm <span class="hb">♥</span></div>
 
 <div class="deck" id="deck">
   <section class="slide active"><div class="inner cover">
@@ -318,30 +326,35 @@ h2{font-family:var(--serif);font-weight:600;letter-spacing:-.015em;line-height:1
   document.addEventListener("touchend",function(e){if(x0===null)return;var dx=e.changedTouches[0].clientX-x0;
     if(Math.abs(dx)>50){stop();go(idx+(dx<0?1:-1));}x0=null;},{passive:true});
 
-  /* ===== trazados de ECG vivos (fondo temático) ===== */
+  /* ===== monitor de ECG con barrido: el trazo avanza y la escena late con el QRS ===== */
+  var beatTimer=null;
+  function fireBeat(){document.body.classList.add("beat");
+    if(beatTimer)clearTimeout(beatTimer);beatTimer=setTimeout(function(){document.body.classList.remove("beat");},130);}
   (function(){
     var cv=document.getElementById("ecg"),ctx=cv.getContext("2d"),dpr=Math.min(window.devicePixelRatio||1,2),W,H;
     function gauss(t,c,w,a){return a*Math.exp(-((t-c)*(t-c))/(2*w*w))}
     function beat(t){return gauss(t,.15,.02,.1)+gauss(t,.31,.012,-.1)+gauss(t,.34,.012,1)+gauss(t,.37,.012,-.22)+gauss(t,.56,.045,.26)}
-    var lanes=[{y:.26,col:"47,224,176",amp:.14,sp:.009,ph:0,a:.55,w:2.2},
-               {y:.56,col:"110,160,255",amp:.10,sp:.0066,ph:.37,a:.4,w:1.8},
-               {y:.82,col:"255,90,77",amp:.085,sp:.012,ph:.7,a:.3,w:1.6}];
-    var buf=lanes.map(function(){return[]});
+    var midY,amp,x,lastY,phase=0,armed=true,ERASE=52;
+    function geom(){midY=H*0.70;amp=H*0.22;}
     function resize(){W=cv.clientWidth=window.innerWidth;H=cv.clientHeight=window.innerHeight;
-      cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
-      buf=lanes.map(function(l){var m=H*l.y,arr=[];for(var i=0;i<W;i++)arr.push(m);return arr;});}
+      cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);geom();ctx.clearRect(0,0,W,H);x=0;lastY=midY;}
     resize();window.addEventListener("resize",resize);
-    function push(li){var l=lanes[li];l.ph+=l.sp;if(l.ph>=1)l.ph-=1;
-      return H*l.y-beat(l.ph)*H*l.amp;}
-    function draw(){ctx.clearRect(0,0,W,H);
-      for(var li=0;li<lanes.length;li++){var l=lanes[li],b=buf[li];
-        ctx.lineWidth=l.w;ctx.strokeStyle="rgba("+l.col+","+l.a+")";ctx.shadowColor="rgba("+l.col+",.55)";ctx.shadowBlur=7;
-        ctx.beginPath();for(var i=0;i<b.length;i++){if(i===0)ctx.moveTo(i,b[i]);else ctx.lineTo(i,b[i]);}ctx.stroke();}
-      ctx.shadowBlur=0;}
-    if(reduce){for(var li=0;li<lanes.length;li++){for(var i=0;i<W;i++){buf[li][i]=push(li);}}draw();}
-    else{(function loop(){for(var li=0;li<lanes.length;li++){var step=li===2?3:2;
-        for(var s=0;s<step;s++){buf[li].push(push(li));if(buf[li].length>W)buf[li].shift();}}
-      draw();requestAnimationFrame(loop);})();}
+    function seg(){
+      var nx=x+1;
+      if(nx>=W){x=0;lastY=midY;ctx.clearRect(0,0,ERASE,H);return;}
+      phase+=0.0046;if(phase>=1)phase-=1;
+      var v=beat(phase),y=midY-v*amp;
+      if(v>0.6&&armed){fireBeat();armed=false;}
+      if(v<0.2)armed=true;
+      ctx.strokeStyle="rgba(47,224,176,.92)";ctx.lineWidth=2.4;ctx.shadowColor="rgba(47,224,176,.7)";ctx.shadowBlur=9;
+      ctx.beginPath();ctx.moveTo(x,lastY);ctx.lineTo(nx,y);ctx.stroke();ctx.shadowBlur=0;
+      lastY=y;x=nx;
+      ctx.clearRect(Math.min(W-1,x+2),0,ERASE,H); // borra por delante (el hueco del barrido)
+    }
+    if(reduce){ctx.clearRect(0,0,W,H);ctx.strokeStyle="rgba(47,224,176,.8)";ctx.lineWidth=2.2;
+      ctx.beginPath();for(var i=0;i<W;i++){phase+=0.0046;if(phase>=1)phase-=1;var yy=midY-beat(phase)*amp;
+        if(i===0)ctx.moveTo(i,yy);else ctx.lineTo(i,yy);}ctx.stroke();}
+    else{(function loop(){for(var s=0;s<4;s++)seg();requestAnimationFrame(loop);})();}
   })();
 
   go(0);
