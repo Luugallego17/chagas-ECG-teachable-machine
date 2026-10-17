@@ -1,222 +1,235 @@
 <title>Asistente ECG Chagas</title>
-<meta name="description" content="Asistente clínico de lectura de ECG para el reconocimiento de patrones chagásicos">
+<meta name="description" content="Asistente de lectura de electrocardiogramas para reconocer patrones asociados a la enfermedad de Chagas">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
-/* Identidad: monitor clínico (cabezal oscuro con trazado vivo) + paneles de papel milimetrado. */
+/* Concepto: la pantalla es el papel de un electrocardiógrafo (cuadrícula, pluma, pulso de calibración).
+   La lectura se presenta como un informe: diagnóstico en cursiva editorial y escala graduada de confianza. */
 :root{
-  --bg:#eceeec; --surface:#ffffff; --surface-2:#f4f2ec; --ink:#141b1a; --muted:#5c6a66;
-  --line:#dde2df; --hair:#c9d2cd;
-  --accent:#0a6b61; --accent-2:#0d8a7c; --crimson:#c0392b;
-  /* papel ECG */
-  --paper:#fdf3ef; --grid-min:rgba(201,74,60,.14); --grid-maj:rgba(201,74,60,.28);
-  /* estados */
-  --good:#1f8a5b; --good-bg:#e8f4ec; --alert:#b4521a; --alert-bg:#fbeee2;
-  /* clases */
-  --c-norm:#0f8a6a; --c-brd:#2f66d8; --c-hbai:#a9780a; --c-brdhbai:#c0392b; --c-av:#6f45c7; --c-pvc:#cf5a1e;
-  --serif:"Fraunces",Georgia,"Times New Roman",serif;
+  --paper:#fff5f2; --sheet:rgba(255,255,255,.78); --ink:#16192b; --muted:#5d6277; --line:rgba(22,25,43,.22);
+  --grid-min:rgba(205,72,86,.13); --grid-maj:rgba(205,72,86,.30);
+  --pen:#14213d; --accent:#b4233a; --accent-ink:#fff;
+  --good:#0f7a5a; --good-bg:rgba(15,122,90,.10); --alert:#a8480e; --alert-bg:rgba(168,72,14,.10);
+  --c-norm:#0f7a5a; --c-brd:#2c5fd0; --c-hbai:#9a6d06; --c-brdhbai:#b4233a; --c-av:#6a41c0; --c-pvc:#c4551a;
+  --display:"Instrument Serif",Georgia,"Times New Roman",serif;
   --sans:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
-  --shadow:0 1px 2px rgba(20,27,26,.05),0 14px 40px rgba(20,40,38,.08);
-  --radius:14px;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0f1514; --surface:#161d1c; --surface-2:#1b2422; --ink:#e9efec; --muted:#9aa9a3;
-  --line:#28322f; --hair:#303b38;
-  --accent:#2bb7a4; --accent-2:#39cdb6; --crimson:#ef5a48;
-  --paper:#171210; --grid-min:rgba(239,90,72,.12); --grid-maj:rgba(239,90,72,.22);
-  --good:#4fc78a; --good-bg:#132a20; --alert:#e0914a; --alert-bg:#2a2013;
-  --c-norm:#38c0a0; --c-brd:#6e9bff; --c-hbai:#e0a93e; --c-brdhbai:#ef6a58; --c-av:#ad8cf2; --c-pvc:#ff8f54;
-  --shadow:0 1px 2px rgba(0,0,0,.35),0 16px 44px rgba(0,0,0,.45); color-scheme:dark;
-}}
+  --paper:#0c1517; --sheet:rgba(14,28,31,.78); --ink:#e8f1ee; --muted:#9bb0ab; --line:rgba(232,241,238,.22);
+  --grid-min:rgba(80,200,180,.10); --grid-maj:rgba(80,200,180,.22);
+  --pen:#6ef0c4; --accent:#ff6a7d; --accent-ink:#1b0a0e;
+  --good:#58d6a4; --good-bg:rgba(88,214,164,.12); --alert:#f0a35a; --alert-bg:rgba(240,163,90,.12);
+  --c-norm:#58d6a4; --c-brd:#7fa6ff; --c-hbai:#e8b84a; --c-brdhbai:#ff6a7d; --c-av:#b99cf5; --c-pvc:#ff9a5c;
+  color-scheme:dark;}}
 :root[data-theme="dark"]{
-  --bg:#0f1514; --surface:#161d1c; --surface-2:#1b2422; --ink:#e9efec; --muted:#9aa9a3;
-  --line:#28322f; --hair:#303b38;
-  --accent:#2bb7a4; --accent-2:#39cdb6; --crimson:#ef5a48;
-  --paper:#171210; --grid-min:rgba(239,90,72,.12); --grid-maj:rgba(239,90,72,.22);
-  --good:#4fc78a; --good-bg:#132a20; --alert:#e0914a; --alert-bg:#2a2013;
-  --c-norm:#38c0a0; --c-brd:#6e9bff; --c-hbai:#e0a93e; --c-brdhbai:#ef6a58; --c-av:#ad8cf2; --c-pvc:#ff8f54;
-  --shadow:0 1px 2px rgba(0,0,0,.35),0 16px 44px rgba(0,0,0,.45); color-scheme:dark;
-}
+  --paper:#0c1517; --sheet:rgba(14,28,31,.78); --ink:#e8f1ee; --muted:#9bb0ab; --line:rgba(232,241,238,.22);
+  --grid-min:rgba(80,200,180,.10); --grid-maj:rgba(80,200,180,.22);
+  --pen:#6ef0c4; --accent:#ff6a7d; --accent-ink:#1b0a0e;
+  --good:#58d6a4; --good-bg:rgba(88,214,164,.12); --alert:#f0a35a; --alert-bg:rgba(240,163,90,.12);
+  --c-norm:#58d6a4; --c-brd:#7fa6ff; --c-hbai:#e8b84a; --c-brdhbai:#ff6a7d; --c-av:#b99cf5; --c-pvc:#ff9a5c;
+  color-scheme:dark}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased}
-.wrap{max-width:1060px;margin:0 auto;padding-inline:16px;padding-block:20px 48px}
-h1,h2,h3{margin:0;text-wrap:balance}
-.kicker{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--accent)}
-.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
-
-/* ====== Monitor (siempre oscuro, por diseño) ====== */
-.monitor{--mbg:#0b1413;--mline:#18312c;--mtrace:#3fe0a6;--mink:#dbeee7;--mdim:#6f8b83;
-  position:relative;border-radius:18px;overflow:hidden;background:var(--mbg);
-  border:1px solid #1d2f2b;box-shadow:inset 0 0 0 1px rgba(63,224,166,.06),var(--shadow);
-  padding:22px 22px 0}
-.monitor .bar{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;position:relative;z-index:2}
-.monitor .lead{display:flex;align-items:center;gap:12px;color:var(--mdim);font-family:var(--mono);font-size:.72rem;letter-spacing:.08em}
-.monitor .lead .tag{color:var(--mtrace);border:1px solid #1f4038;border-radius:6px;padding:2px 8px}
-.led{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.74rem;color:var(--mdim);
-  border:1px solid #1f3a34;border-radius:999px;padding:6px 12px;background:rgba(63,224,166,.04)}
-.led .d{width:8px;height:8px;border-radius:50%;background:#e0a94a;box-shadow:0 0 8px #e0a94a;animation:blink 1.1s infinite}
-.led.ok{color:#aee6d3} .led.ok .d{background:var(--mtrace);box-shadow:0 0 10px var(--mtrace);animation:none}
-.led.err{color:#f2b6ad} .led.err .d{background:#ef5a48;box-shadow:0 0 8px #ef5a48;animation:none}
-@keyframes blink{50%{opacity:.3}}
-.monitor h1{color:var(--mink);font-family:var(--serif);font-weight:600;font-size:clamp(1.7rem,4.6vw,2.6rem);
-  letter-spacing:-.015em;line-height:1.06;margin:16px 0 0;position:relative;z-index:2;max-width:20ch}
-.monitor .hello{position:relative;z-index:2;margin-top:14px;color:#b9d2cb;font-size:.98rem;max-width:56ch}
-.monitor .hello b{color:var(--mtrace);font-weight:600}
-.screen{position:relative;z-index:2;margin:18px -22px 0;height:118px;border-top:1px solid var(--mline);
+body{margin:0;color:var(--ink);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased;
   background:
-    linear-gradient(rgba(63,224,166,.05) 1px,transparent 1px) 0 0/22px 22px,
-    linear-gradient(90deg,rgba(63,224,166,.05) 1px,transparent 1px) 0 0/22px 22px}
-.screen canvas{display:block;width:100%;height:100%}
-.screen .cap{position:absolute;right:12px;bottom:8px;font-family:var(--mono);font-size:.64rem;color:var(--mdim);letter-spacing:.06em}
-
-.themebtn{font-family:var(--mono);font-size:.72rem;color:#cfe6df;background:rgba(63,224,166,.06);
-  border:1px solid #1f3a34;border-radius:999px;padding:7px 13px;cursor:pointer}
-.themebtn:hover{border-color:var(--mtrace)}
-
-/* ====== Pasos ====== */
-.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--hair);
-  border:1px solid var(--hair);border-radius:12px;overflow:hidden;margin-top:18px}
-.steps .s{background:var(--surface);padding:13px 15px}
-.steps .n{font-family:var(--mono);font-size:.72rem;color:var(--accent);letter-spacing:.08em}
-.steps b{display:block;margin-top:3px;font-size:.92rem}
-.steps span{font-size:.8rem;color:var(--muted)}
-@media (max-width:620px){.steps{grid-template-columns:1fr}}
-
-.disc{display:flex;gap:10px;align-items:flex-start;margin-top:16px;font-size:.86rem;color:var(--muted);
-  border-left:2px solid var(--alert);padding-left:12px}
-.disc b{color:var(--ink)}
-
-/* ====== Trabajo ====== */
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:20px;align-items:start}
-@media (max-width:780px){.grid2{grid-template-columns:1fr}}
-.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
-.panel .head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;
-  padding:14px 16px;border-bottom:1px solid var(--line)}
-.panel .head h2{font-family:var(--serif);font-weight:600;font-size:1.12rem}
-.panel .head .hint{font-family:var(--mono);font-size:.68rem;color:var(--muted);letter-spacing:.06em}
-.panel .body{padding:16px}
-
-.paper{background:
     linear-gradient(var(--grid-min) 1px,transparent 1px) 0 0/8px 8px,
     linear-gradient(90deg,var(--grid-min) 1px,transparent 1px) 0 0/8px 8px,
     linear-gradient(var(--grid-maj) 1px,transparent 1px) 0 0/40px 40px,
     linear-gradient(90deg,var(--grid-maj) 1px,transparent 1px) 0 0/40px 40px,
     var(--paper)}
-.drop{border:1.5px dashed var(--hair);border-radius:11px;padding:20px;text-align:center;cursor:pointer;transition:border-color .15s}
-.drop:hover,.drop.over{border-color:var(--accent)}
-.drop .ic{width:40px;height:40px;margin:0 auto;color:var(--accent)}
-.drop .big{font-weight:600;margin-top:8px}
-.drop .small{font-size:.82rem;color:var(--muted);margin-top:2px}
-.preview{margin-top:14px;border-radius:10px;border:1px solid var(--line);overflow:hidden;min-height:140px;
-  display:flex;align-items:center;justify-content:center}
-.preview img,.preview canvas{display:block;max-width:100%;max-height:280px}
-.preview .ph{font-size:.82rem;color:var(--muted);padding:24px}
-.examples{margin-top:16px}
-.examples .kicker{display:block;margin-bottom:9px}
-.exrow{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
-.ex{border:1px solid var(--line);border-radius:9px;background:var(--surface);padding:6px;cursor:pointer;display:flex;flex-direction:column;gap:5px;text-align:left}
-.ex:hover{border-color:var(--accent)}
-.ex.active{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 26%,transparent)}
-.ex canvas{width:100%;height:38px;border-radius:5px;background:#fff}
-.ex .lab{font-family:var(--mono);font-size:.64rem;color:var(--muted);line-height:1.2}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:16px;padding-block:18px 56px}
+h1,h2,h3,p{margin:0}
+.mono{font-family:var(--mono)}
+.tiny{font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
-/* ====== Lectura ====== */
-.readout{display:flex;gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:16px}
-.readout .stripe{width:7px;flex:none;background:var(--muted)}
-.readout.good .stripe{background:var(--good)} .readout.alert .stripe{background:var(--alert)}
-.readout .rb{flex:1;min-width:0;padding:15px 16px}
-.readout.good .rb{background:var(--good-bg)} .readout.alert .rb{background:var(--alert-bg)}
-.readout .rt{font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
-  display:flex;align-items:center;gap:8px}
-.readout .rl{font-family:var(--serif);font-weight:600;font-size:1.5rem;letter-spacing:-.01em;margin-top:4px;line-height:1.05}
-.readout .rc{font-size:.86rem;color:var(--muted);margin-top:5px}
-.readout .rc .conf{color:var(--ink);font-family:var(--mono)}
-.bars{display:flex;flex-direction:column;gap:12px}
-.bar .bl{display:flex;justify-content:space-between;gap:10px;align-items:baseline;font-size:.84rem;margin-bottom:5px}
-.bar .bl .nm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bar.top .bl .nm{font-weight:600}
-.bar .bl .pct{color:var(--muted);flex:none;font-size:.78rem}
-.track{height:9px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);overflow:hidden}
-.fill{height:100%;width:0;border-radius:999px;transition:width .65s cubic-bezier(.2,.75,.2,1)}
-.emptymsg{color:var(--muted);font-size:.9rem}
+/* ---- cabecera tipo encabezado de registro ---- */
+.mast{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:28px;align-items:end;padding-bottom:18px;border-bottom:2px solid var(--ink)}
+.mast .top{display:flex;justify-content:space-between;align-items:center;gap:12px;grid-column:1/-1}
+.themebtn{font-family:var(--mono);font-size:.7rem;background:transparent;border:1px solid var(--line);border-radius:999px;padding:6px 12px;cursor:pointer}
+.themebtn:hover{border-color:var(--ink)}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(2.6rem,7.4vw,5.6rem);line-height:.92;letter-spacing:-.02em;margin-top:10px}
+h1 em{font-style:italic;color:var(--accent)}
+.greet{font-family:var(--display);font-size:clamp(1.4rem,2.6vw,2rem);margin-top:16px}
+.greet em{color:var(--accent)}
+.lede{max-width:56ch;color:var(--muted);margin-top:8px}
+.meta{font-family:var(--mono);font-size:.74rem;line-height:1.9;border-left:2px solid var(--ink);padding-left:14px;min-width:230px}
+.meta b{font-weight:600;display:inline-block;min-width:92px;color:var(--muted)}
+.led{display:inline-flex;align-items:center;gap:8px;margin-top:6px;font-size:.74rem}
+.led i{width:9px;height:9px;border-radius:50%;background:var(--alert);flex:none;animation:blink 1.1s infinite}
+.led.ok i{background:var(--good);animation:none}
+.led.err i{background:var(--accent);animation:none}
+@keyframes blink{50%{opacity:.25}}
+@media (max-width:760px){.mast{grid-template-columns:1fr}.meta{border-left:0;border-top:2px solid var(--ink);padding:10px 0 0;min-width:0}}
 
-/* ====== Leyenda ====== */
-.legend{margin-top:40px}
-.legend .kicker{display:block}
-.legend h2{font-family:var(--serif);font-weight:600;font-size:1.4rem;margin:4px 0 14px}
-.lgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(222px,1fr));gap:12px}
-.lc{display:flex;gap:11px;border:1px solid var(--line);border-radius:11px;background:var(--surface);padding:13px}
-.lc .mk{width:5px;border-radius:3px;flex:none}
-.lc .ab{font-family:var(--mono);font-weight:600;font-size:.82rem;color:var(--ink)}
-.lc .fn{font-size:.86rem;font-weight:600;margin-top:1px}
-.lc .d{font-size:.8rem;color:var(--muted);margin-top:3px}
-.foot{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);display:flex;justify-content:space-between;
-  gap:12px;flex-wrap:wrap;font-size:.8rem;color:var(--muted)}
-.foot .mono{font-family:var(--mono)}
-@media (prefers-reduced-motion:reduce){.fill{transition:none}}
+/* ---- tira de registro: el papel avanza, la pluma queda fija ---- */
+.recorder{position:relative;height:96px;margin-top:0;border-bottom:1px solid var(--line);background:var(--sheet);overflow:hidden}
+.recorder canvas{position:absolute;inset:0;width:100%;height:100%}
+.recorder .tag{position:absolute;right:10px;bottom:6px;font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;color:var(--muted)}
+
+/* ---- pasos ---- */
+.ticks{display:flex;gap:0;margin:18px 0 0;padding:0;list-style:none;border-top:1px solid var(--line)}
+.ticks li{flex:1;padding:10px 14px 0 0;position:relative;font-size:.86rem;color:var(--muted)}
+.ticks li::before{content:"";position:absolute;left:0;top:-5px;width:1px;height:9px;background:var(--ink)}
+.ticks li b{display:block;color:var(--ink);font-weight:600}
+.ticks li span{font-family:var(--mono);font-size:.66rem;letter-spacing:.14em;color:var(--accent)}
+@media (max-width:640px){.ticks{flex-direction:column;gap:10px;border-top:0}.ticks li{padding-left:14px;border-left:1px solid var(--line)}.ticks li::before{display:none}}
+
+.disc{margin-top:14px;font-size:.86rem;color:var(--muted);display:flex;gap:10px}
+.disc::before{content:"";flex:none;width:3px;background:var(--alert)}
+.disc b{color:var(--ink)}
+
+/* ---- paneles (marco con esquinas de registro) ---- */
+.work{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;margin-top:22px;align-items:start}
+@media (max-width:860px){.work{grid-template-columns:1fr}}
+.slip{position:relative;background:var(--sheet);border:1px solid var(--line);padding:18px}
+.slip::before,.slip::after{content:"";position:absolute;width:14px;height:14px;border:2px solid var(--ink);pointer-events:none}
+.slip::before{left:-1px;top:-1px;border-right:0;border-bottom:0}
+.slip::after{right:-1px;bottom:-1px;border-left:0;border-top:0}
+.slip h2{font-family:var(--display);font-weight:400;font-size:1.9rem;line-height:1;display:flex;align-items:center;gap:10px}
+.slip h2 .lead{font-family:var(--mono);font-size:.7rem;font-weight:600;letter-spacing:.06em;border:1.5px solid var(--ink);padding:3px 7px;border-radius:2px}
+
+.drop{margin-top:14px;border:1.5px dashed var(--ink);padding:22px 16px;text-align:center;cursor:pointer;position:relative;background:transparent;transition:background .15s}
+.drop:hover,.drop.over{background:var(--good-bg)}
+.drop svg{width:78px;height:30px;color:var(--ink)}
+.drop .big{font-family:var(--display);font-size:1.5rem;margin-top:4px}
+.drop .small{font-size:.82rem;color:var(--muted)}
+.preview{margin-top:14px;border:1px solid var(--line);min-height:150px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.5)}
+:root[data-theme="dark"] .preview{background:rgba(0,0,0,.25)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .preview{background:rgba(0,0,0,.25)}}
+.preview img,.preview canvas{display:block;max-width:100%;max-height:260px}
+.preview .ph{padding:26px;color:var(--muted);font-size:.86rem}
+.fileinfo{margin-top:8px;font-family:var(--mono);font-size:.7rem;color:var(--muted);min-height:1.2em}
+.examples{margin-top:14px}
+.exrow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.ex{border:1px solid var(--line);background:rgba(255,255,255,.55);padding:5px;cursor:pointer;display:flex;flex-direction:column;gap:4px;text-align:left}
+:root[data-theme="dark"] .ex{background:rgba(0,0,0,.2)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .ex{background:rgba(0,0,0,.2)}}
+.ex:hover{border-color:var(--ink)}
+.ex.active{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.ex canvas{width:100%;height:36px;background:#fff;display:block}
+.ex .lab{font-family:var(--mono);font-size:.64rem;color:var(--muted)}
+.again{margin-top:12px;font-family:var(--mono);font-size:.74rem;background:transparent;border:1px solid var(--ink);padding:7px 12px;cursor:pointer}
+.again:hover{background:var(--ink);color:var(--paper)}
+
+/* ---- informe de lectura ---- */
+.waiting{margin-top:16px;color:var(--muted);font-size:.92rem;border-top:1px solid var(--line);padding-top:14px}
+.report{margin-top:14px;border-top:2px solid var(--ink);padding-top:12px}
+.report .vname{font-family:var(--display);font-style:italic;font-size:clamp(2.2rem,5vw,3.4rem);line-height:1;margin-top:6px}
+.report .vmsg{margin-top:8px;font-size:.96rem}
+.report .vdesc{margin-top:6px;color:var(--muted);font-size:.88rem}
+.conf{display:flex;align-items:baseline;gap:10px;margin-top:16px}
+.conf .n{font-family:var(--mono);font-weight:600;font-size:2.1rem;font-variant-numeric:tabular-nums;line-height:1}
+.conf .u{font-family:var(--mono);font-size:.74rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.ruler{position:relative;height:30px;margin-top:8px;border-bottom:1.5px solid var(--ink);
+  background:
+    repeating-linear-gradient(90deg,var(--ink) 0 1px,transparent 1px 10%) 0 100%/100% 14px no-repeat,
+    repeating-linear-gradient(90deg,var(--line) 0 1px,transparent 1px 2%) 0 100%/100% 7px no-repeat}
+.ruler .mark{position:absolute;bottom:-1px;left:0;width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:13px solid var(--mc,var(--accent));
+  transform:translateX(-7px);transition:left .9s cubic-bezier(.19,1,.22,1)}
+.ruler .fillbar{position:absolute;left:0;bottom:-1.5px;height:4px;width:0;background:var(--mc,var(--accent));transition:width .9s cubic-bezier(.19,1,.22,1)}
+.scale{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.62rem;color:var(--muted);margin-top:3px}
+.note{margin-top:12px;font-size:.84rem;padding:9px 12px;border-left:3px solid var(--alert);background:var(--alert-bg)}
+.note.ok{border-left-color:var(--good);background:var(--good-bg)}
+.others{margin-top:16px;border-top:1px solid var(--line)}
+.others .hd{padding-top:10px}
+.orow{display:grid;grid-template-columns:minmax(0,200px) minmax(0,1fr) 56px;gap:10px;align-items:center;margin-top:9px;font-size:.84rem}
+.orow .nm{line-height:1.2}
+.orow.top .nm{font-weight:600}
+.orow .pc{font-family:var(--mono);font-size:.76rem;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+.otrack{height:10px;position:relative;background:repeating-linear-gradient(90deg,var(--line) 0 1px,transparent 1px 10%);border-bottom:1px solid var(--line)}
+.ofill{position:absolute;left:0;bottom:0;height:6px;width:0;background:var(--c,var(--accent));transition:width .8s cubic-bezier(.19,1,.22,1)}
+.foot-note{margin-top:14px;font-size:.74rem;color:var(--muted)}
+
+/* ---- atlas ---- */
+.atlas{margin-top:34px}
+.atlas h2{font-family:var(--display);font-weight:400;font-size:clamp(2rem,4vw,2.8rem);line-height:1;margin-top:6px}
+.agrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:16px}
+@media (max-width:860px){.agrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:540px){.agrid{grid-template-columns:1fr}}
+.acard{background:var(--sheet);border:1px solid var(--line);padding:12px 14px 14px;position:relative}
+.acard canvas{display:block;width:100%;height:auto;border-bottom:1px solid var(--line);margin-bottom:8px}
+.acard .ab{font-family:var(--mono);font-weight:600;font-size:.76rem;display:flex;align-items:center;gap:8px}
+.acard .ab i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.acard .fn{font-family:var(--display);font-size:1.3rem;line-height:1.1;margin-top:4px}
+.acard .d{font-size:.82rem;color:var(--muted);margin-top:4px}
+.foot{margin-top:40px;padding-top:14px;border-top:2px solid var(--ink);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font-size:.78rem;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){.ruler .mark,.ruler .fillbar,.ofill{transition:none}.led i{animation:none}}
 </style>
 
 <div class="wrap">
-  <!-- Monitor -->
-  <section class="monitor" id="monitor">
-    <div class="bar">
-      <div class="lead"><span class="tag">II</span><span>DII · derivación de ritmo</span></div>
+  <header class="mast">
+    <div class="top">
+      <span class="tiny">Registro electrocardiográfico · Enfermedad de Chagas</span>
       <button class="themebtn" id="theme" type="button">◐ Tema</button>
     </div>
-    <h1>Asistente de lectura electrocardiográfica</h1>
-    <p class="hello"><b>Bienvenido/a, doctor/a.</b> Suba la imagen de un electrocardiograma y el asistente reconocerá el patrón de conducción asociado a la enfermedad de Chagas, indicando su nivel de confianza. Es un apoyo para la docencia y el tamizaje.</p>
-    <div class="screen"><canvas id="trace"></canvas><span class="cap">25 mm/s · 10 mm/mV</span></div>
-    <div style="position:relative;z-index:2;padding:12px 0">
-      <span class="led" id="status"><span class="d"></span>Cargando el modelo…</span>
+    <div>
+      <h1>Lectura<br><em>electrocardiográfica</em></h1>
+      <p class="greet"><span id="saludo">Buenos días</span>, <em>doctor/a</em>.</p>
+      <p class="lede">Suba la imagen de un electrocardiograma. El asistente reconocerá si el trazado corresponde a uno de los seis patrones de conducción que se estudian en la enfermedad de Chagas y le indicará su nivel de confianza.</p>
     </div>
+    <div class="meta">
+      <div><b>Velocidad</b>25 mm/s</div>
+      <div><b>Ganancia</b>10 mm/mV</div>
+      <div><b>Fecha</b><span id="fecha">—</span></div>
+      <div><b>Patrones</b>6 clases</div>
+      <div class="led" id="status"><i></i><span>Cargando el modelo…</span></div>
+    </div>
+  </header>
+
+  <div class="recorder" aria-hidden="true"><canvas id="pen"></canvas><span class="tag">REGISTRO EN CURSO · DII</span></div>
+
+  <ol class="ticks">
+    <li><span>01</span><b>Cargue el trazado</b>Arrastre o elija la imagen.</li>
+    <li><span>02</span><b>Lectura automática</b>El modelo la analiza al instante.</li>
+    <li><span>03</span><b>Informe</b>Patrón estimado y confianza.</li>
+  </ol>
+  <p class="disc"><span><b>Apoyo educativo, no diagnóstico.</b> La lectura es orientativa y no sustituye la valoración clínica ni la de un especialista.</span></p>
+
+  <div class="work">
+    <article class="slip" id="in">
+      <h2><span class="lead">I</span>Registro</h2>
+      <div class="drop" id="drop" tabindex="0" role="button" aria-label="Subir imagen de ECG">
+        <svg viewBox="0 0 78 30" fill="none" aria-hidden="true"><path d="M2 22h8V6h10v16h16l3-4 4 10 3-18 3 12h20" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>
+        <div class="big">Arrastre aquí el electrocardiograma</div>
+        <div class="small">o haga clic para elegir un archivo · PNG, JPG</div>
+        <input type="file" id="f-img" accept="image/*" hidden>
+      </div>
+      <div class="preview" id="preview"><span class="ph">El trazado aparecerá aquí</span></div>
+      <div class="fileinfo" id="fileinfo"></div>
+      <div class="examples">
+        <span class="tiny">O pruebe con un ejemplo</span>
+        <div class="exrow" id="exrow"></div>
+      </div>
+    </article>
+
+    <article class="slip" id="out" aria-live="polite">
+      <h2><span class="lead">II</span>Lectura</h2>
+      <p class="waiting" id="waiting">Aún no hay ninguna lectura. Suba un electrocardiograma o elija un ejemplo: el modelo ya está incorporado en esta página y no hace falta cargar nada.</p>
+      <div class="report" id="report" hidden>
+        <span class="tiny" id="rk">Lectura</span>
+        <div class="vname" id="vname">—</div>
+        <p class="vmsg" id="vmsg"></p>
+        <p class="vdesc" id="vdesc"></p>
+        <div class="conf"><span class="n" id="cn">0</span><span class="u">% de confianza</span></div>
+        <div class="ruler" id="ruler"><span class="fillbar" id="rfill"></span><span class="mark" id="rmark"></span></div>
+        <div class="scale"><span>0</span><span>20</span><span>40</span><span>60</span><span>80</span><span>100</span></div>
+        <div class="note" id="lownote" hidden>Confianza baja: la imagen puede diferir de los trazados con que se entrenó el modelo. Interprete la lectura con cautela.</div>
+        <div class="others"><div class="hd tiny">Probabilidad por patrón</div><div id="orows"></div></div>
+        <button class="again" id="again" type="button">Nueva lectura</button>
+        <p class="foot-note">Modelo de demostración entrenado con trazados sintéticos.</p>
+      </div>
+    </article>
+  </div>
+
+  <section class="atlas">
+    <span class="tiny">Atlas de patrones</span>
+    <h2>Los seis trazados que reconoce</h2>
+    <div class="agrid" id="agrid"></div>
   </section>
-
-  <div class="steps">
-    <div class="s"><span class="n">01</span><b>Cargar el ECG</b><span>Arrastre o seleccione la imagen del trazado.</span></div>
-    <div class="s"><span class="n">02</span><b>Lectura automática</b><span>El modelo analiza la imagen al instante.</span></div>
-    <div class="s"><span class="n">03</span><b>Patrón y confianza</b><span>Resultado por cada clase reconocida.</span></div>
-  </div>
-
-  <p class="disc"><span><b>Apoyo educativo, no diagnóstico.</b> El resultado es orientativo y no sustituye la valoración clínica ni la lectura de un especialista.</span></p>
-
-  <div class="grid2">
-    <section class="panel">
-      <div class="head"><h2>Trazado</h2><span class="hint">PNG · JPG</span></div>
-      <div class="body">
-        <div class="drop paper" id="drop" tabindex="0" role="button" aria-label="Subir imagen de ECG">
-          <svg class="ic" viewBox="0 0 48 24" fill="none" aria-hidden="true"><path d="M1 12h9l3-9 4 18 3-11 2 5h22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <div class="big">Arrastre la imagen del ECG</div>
-          <div class="small">o haga clic para elegir un archivo</div>
-          <input type="file" id="f-img" accept="image/*" hidden>
-        </div>
-        <div class="preview paper" id="preview"><span class="ph">El trazado aparecerá aquí</span></div>
-        <div class="examples">
-          <span class="kicker">Ejemplos para probar</span>
-          <div class="exrow" id="exrow"></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="panel">
-      <div class="head"><h2>Lectura</h2><span class="hint" id="rhint">en espera</span></div>
-      <div class="body">
-        <div class="readout" id="readout" hidden>
-          <div class="stripe"></div>
-          <div class="rb"><div class="rt" id="rt">Patrón estimado</div><div class="rl" id="rl">—</div><div class="rc" id="rc"></div></div>
-        </div>
-        <div class="bars" id="bars"><p class="emptymsg">Suba un ECG o elija un ejemplo. El modelo ya está incorporado en esta página; no hace falta cargar nada.</p></div>
-      </div>
-    </section>
-  </div>
-
-  <div class="legend">
-    <span class="kicker">Referencia clínica</span>
-    <h2>Patrones que reconoce</h2>
-    <div class="lgrid" id="lgrid"></div>
-  </div>
 
   <footer class="foot">
     <span>Asistente ECG · Chagas — modelo entrenado en Teachable Machine</span>
@@ -234,101 +247,136 @@ h1,h2,h3{margin:0;text-wrap:balance}
 (function(){
   "use strict";
   var $=function(s){return document.querySelector(s)};
+  var reduce=matchMedia("(prefers-reduced-motion:reduce)").matches;
   $("#year").textContent="© "+new Date().getFullYear();
+  var h=new Date().getHours();
+  $("#saludo").textContent=h<12?"Buenos días":(h<19?"Buenas tardes":"Buenas noches");
+  $("#fecha").textContent=new Date().toLocaleDateString("es-BO",{day:"2-digit",month:"2-digit",year:"numeric"});
+
+  /* ---- tema ---- */
   try{var tp=localStorage.getItem("ecgasist-theme"); if(tp)document.documentElement.setAttribute("data-theme",tp);}catch(e){}
   $("#theme").addEventListener("click",function(){
     var cur=document.documentElement.getAttribute("data-theme");
     var dark=cur?cur==="dark":matchMedia("(prefers-color-scheme:dark)").matches;
     var n=dark?"light":"dark";document.documentElement.setAttribute("data-theme",n);
     try{localStorage.setItem("ecgasist-theme",n);}catch(e){}
+    paintAtlas();
   });
-
-  var META={
-    "ECG NORMAL":{css:"--c-norm",kind:"normal",ab:"Normal",full:"ECG normal",desc:"Ritmo sinusal sin alteraciones de la conducción."},
-    "BRD":{css:"--c-brd",kind:"rbbb",ab:"BRD",full:"Bloqueo de rama derecha",desc:"Hallazgo de conducción frecuente en Chagas."},
-    "HBAI":{css:"--c-hbai",kind:"lafb",ab:"HBAI",full:"Hemibloqueo anterior izquierdo",desc:"Muy frecuente en la miocardiopatía chagásica."},
-    "BRD + HBAI":{css:"--c-brdhbai",kind:"rbbb_lafb",ab:"BRD+HBAI",full:"Bloqueo bifascicular",desc:"Patrón chagásico clásico, de alta especificidad."},
-    "Bloqueo AV":{css:"--c-av",kind:"av_block",ab:"BAV",full:"Bloqueo aurículo-ventricular",desc:"Marcador de progresión de la enfermedad."},
-    "Extrasistole ventricular":{css:"--c-pvc",kind:"pvc",ab:"EV",full:"Extrasístole ventricular",desc:"Arritmia ventricular; riesgo de muerte súbita."}
-  };
-  var NORMAL_LABEL="ECG NORMAL";
   function cvar(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim()||"#888"}
-  function metaOf(l){return META[l]||{css:"--accent",kind:"normal",desc:""}}
 
-  (function(){var g=$("#lgrid");Object.keys(META).forEach(function(l){var m=META[l];
-    var d=document.createElement("div");d.className="lc";
-    d.innerHTML='<div class="mk" style="background:var('+m.css+')"></div><div><div class="ab">'+m.ab+'</div><div class="fn">'+m.full+'</div><div class="d">'+m.desc+'</div></div>';
-    g.appendChild(d);});})();
+  /* ---- patrones ---- */
+  var META={
+    "ECG NORMAL":{css:"--c-norm",kind:"normal",ab:"Normal",full:"ECG normal",desc:"Ritmo sinusal sin alteraciones de la conducción.",msg:"Sin patrones chagásicos evidentes en esta imagen."},
+    "BRD":{css:"--c-brd",kind:"rbbb",ab:"BRD",full:"Bloqueo de rama derecha",desc:"QRS ancho con segunda R tardía. Hallazgo frecuente en la cardiopatía chagásica.",msg:"Patrón sugestivo de alteración de la conducción; correlacione con la clínica."},
+    "HBAI":{css:"--c-hbai",kind:"lafb",ab:"HBAI",full:"Hemibloqueo anterior izquierdo",desc:"Eje del QRS desviado a la izquierda. Muy frecuente en Chagas, casi siempre junto al BRD.",msg:"Patrón sugestivo de alteración de la conducción; correlacione con la clínica."},
+    "BRD + HBAI":{css:"--c-brdhbai",kind:"rbbb_lafb",ab:"BRD+HBAI",full:"Bloqueo bifascicular",desc:"Combinación de ambos bloqueos: patrón chagásico clásico, de alta sugestividad.",msg:"Patrón sugestivo de afectación chagásica; correlacione con la clínica."},
+    "Bloqueo AV":{css:"--c-av",kind:"av_block",ab:"BAV",full:"Bloqueo aurículo-ventricular",desc:"Retraso o interrupción entre aurículas y ventrículos. Marca la progresión de la enfermedad.",msg:"Patrón sugestivo de alteración de la conducción; correlacione con la clínica."},
+    "Extrasistole ventricular":{css:"--c-pvc",kind:"pvc",ab:"EV",full:"Extrasístole ventricular",desc:"Latido prematuro de origen ventricular, con QRS ancho y pausa posterior. Marcador de riesgo.",msg:"Patrón sugestivo de arritmia ventricular; correlacione con la clínica."}
+  };
+  var NORMAL_LABEL="ECG NORMAL", LOW=0.70;
+  function metaOf(l){return META[l]||{css:"--accent",kind:"normal",ab:l,full:l,desc:"",msg:""}}
 
-  /* ---- generador ECG ---- */
+  /* ---- formas de onda ---- */
   function gauss(t,c,w,a){return a*Math.exp(-((t-c)*(t-c))/(2*w*w))}
   function beat(t,kind){
     var v=gauss(t,.15,.02,.12);
     if(kind==="rbbb"||kind==="rbbb_lafb"){v+=gauss(t,.35,.012,.85)+gauss(t,.385,.01,-.3)+gauss(t,.435,.016,.55);
       if(kind==="rbbb_lafb")v+=gauss(t,.325,.008,-.2);}
     else{var q=kind==="av_block"?.46:.34;v+=gauss(t,q-.03,.012,-.1)+gauss(t,q,.012,1)+gauss(t,q+.03,.012,-.22);
-      if(kind==="lafb")v+=gauss(t,.322,.008,-.18);if(kind==="av_block")v+=gauss(t,.15,.02,.12);}
+      if(kind==="lafb")v+=gauss(t,.322,.008,-.18);}
     v+=gauss(t,(kind==="av_block"?.7:.58),.045,.28);return v;
   }
-  function drawECG(cv,kind){
-    var ctx=cv.getContext("2d"),W=cv.width,H=cv.height;
-    ctx.fillStyle="#fff";ctx.fillRect(0,0,W,H);
-    ctx.strokeStyle="rgba(201,74,60,.16)";ctx.lineWidth=1;
-    for(var x=0;x<W;x+=6){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
-    for(var y=0;y<H;y+=6){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
-    ctx.strokeStyle="#15110f";ctx.lineWidth=1.4;ctx.beginPath();
-    var mid=H*.58,gain=H*.34,fs=250,rr=(kind==="av_block"?1:.8),sx=W/4.8,first=true,pos=.12;
-    if(kind==="pvc"){var seq=["N","N","V","N","N"];for(var s=0;s<seq.length;s++){var isV=seq[s]==="V";
-      for(var i=0;i<.8*fs;i++){var tt=i/fs,vv=isV?(gauss(tt,.33,.05,-1.1)+gauss(tt,.46,.07,.55)):beat(tt,"normal");
-        var X=(pos+tt)*sx,Y=mid-vv*gain;if(first){ctx.moveTo(X,Y);first=false;}else ctx.lineTo(X,Y);}pos+=isV?rr*1.4:rr;}}
-    else{for(var p=.12;p<4.6;p+=rr){for(var j=0;j<.8*fs;j++){var tj=j/fs,vj=beat(tj,kind),Xx=(p+tj)*sx,Yy=mid-vj*gain;
-      if(first){ctx.moveTo(Xx,Yy);first=false;}else ctx.lineTo(Xx,Yy);}}}
+  function trace(ctx,W,H,kind,color,lw){
+    var fs=250,T=2.8,rr=kind==="av_block"?1:.8,mid=H*.62,gain=H*.46,sx=W/T,first=true;
+    ctx.strokeStyle=color;ctx.lineWidth=lw;ctx.lineJoin="round";ctx.beginPath();
+    function pt(tt,v){var X=tt*sx,Y=mid-v*gain;if(first){ctx.moveTo(X,Y);first=false;}else ctx.lineTo(X,Y);}
+    if(kind==="pvc"){var seq=["N","N","V"],pos=.05;
+      for(var s=0;s<seq.length;s++){var isV=seq[s]==="V";
+        for(var i=0;i<.8*fs;i++){var tt=i/fs,v=isV?(gauss(tt,.33,.05,-1.1)+gauss(tt,.46,.07,.55)):beat(tt,"normal");pt(pos+tt,v);}
+        pos+=isV?rr*1.4:rr;}
+    }else{for(var p=.05;p<T;p+=rr){for(var j=0;j<.8*fs;j++){var tj=j/fs;if(p+tj>T)break;pt(p+tj,beat(tj,kind));}}}
     ctx.stroke();
   }
-  var exLabels=Object.keys(META);
-  (function(){var row=$("#exrow");exLabels.forEach(function(l){var m=META[l];
+  function paper(ctx,W,H,minC,majC){
+    ctx.lineWidth=1;
+    for(var x=0;x<W;x+=8){ctx.strokeStyle=(x%40===0)?majC:minC;ctx.beginPath();ctx.moveTo(x+.5,0);ctx.lineTo(x+.5,H);ctx.stroke();}
+    for(var y=0;y<H;y+=8){ctx.strokeStyle=(y%40===0)?majC:minC;ctx.beginPath();ctx.moveTo(0,y+.5);ctx.lineTo(W,y+.5);ctx.stroke();}
+  }
+  function drawExample(cv,kind){ /* imagen "de papel" para los ejemplos: siempre fondo blanco y trazo negro */
+    var ctx=cv.getContext("2d"),W=cv.width,H=cv.height;ctx.fillStyle="#fff";ctx.fillRect(0,0,W,H);
+    paper(ctx,W,H,"rgba(201,74,60,.16)","rgba(201,74,60,.30)");
+    trace(ctx,W,H,kind,"#15110f",1.5);
+  }
+
+  /* ---- atlas ---- */
+  function paintAtlas(){
+    document.querySelectorAll("#agrid canvas").forEach(function(cv){
+      var ctx=cv.getContext("2d");ctx.clearRect(0,0,cv.width,cv.height);
+      paper(ctx,cv.width,cv.height,cvar("--grid-min"),cvar("--grid-maj"));
+      trace(ctx,cv.width,cv.height,cv.getAttribute("data-kind"),cvar(cv.getAttribute("data-css")),2.4);
+    });
+  }
+  (function(){var g=$("#agrid");Object.keys(META).forEach(function(l){var m=META[l];
+    var d=document.createElement("div");d.className="acard";
+    d.innerHTML='<canvas width="360" height="112" data-kind="'+m.kind+'" data-css="'+m.css+'"></canvas>'+
+      '<div class="ab"><i style="background:var('+m.css+')"></i>'+m.ab+'</div><div class="fn">'+m.full+'</div><div class="d">'+m.desc+'</div>';
+    g.appendChild(d);});paintAtlas();
+    matchMedia("(prefers-color-scheme:dark)").addEventListener&&matchMedia("(prefers-color-scheme:dark)").addEventListener("change",paintAtlas);
+  })();
+
+  /* ---- ejemplos ---- */
+  var labels=Object.keys(META),activeEl=null;
+  (function(){var row=$("#exrow");labels.forEach(function(l){var m=META[l];
     var b=document.createElement("button");b.className="ex";b.type="button";
-    var cv=document.createElement("canvas");cv.width=150;cv.height=38;drawECG(cv,m.kind);
+    var cv=document.createElement("canvas");cv.width=150;cv.height=36;drawExample(cv,m.kind);
     var lab=document.createElement("span");lab.className="lab";lab.textContent=m.ab;
     b.appendChild(cv);b.appendChild(lab);b.addEventListener("click",function(){selectExample(l,b);});row.appendChild(b);});})();
 
-  /* ---- monitor vivo ---- */
+  /* ---- registrador: el papel avanza, la pluma queda fija ---- */
   (function(){
-    var cv=$("#trace"),ctx=cv.getContext("2d"),dpr=Math.min(window.devicePixelRatio||1,2);
-    var W=0,H=0,buf=[],phase=0;
-    function resize(){var r=cv.getBoundingClientRect();W=Math.max(200,r.width|0);H=r.height|0||118;
-      cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
-      if(buf.length>W)buf=buf.slice(buf.length-W);while(buf.length<W)buf.push(H*0.5);}
-    resize();window.addEventListener("resize",resize);
-    var mid=function(){return H*0.52},gain=function(){return H*0.34};
-    function sample(){phase+=0.0065;if(phase>=1)phase-=1;return mid()-beat(phase,"normal")*gain();}
-    var reduce=matchMedia("(prefers-reduced-motion:reduce)").matches;
-    function paint(){
+    var cv=$("#pen"),ctx=cv.getContext("2d"),box=cv.parentElement,dpr=Math.min(window.devicePixelRatio||1,2),
+        W=0,H=0,buf=[],phase=0,off=0,glow=0,armed=true,SP=2,PENX=0,col={};
+    function colors(){col={min:cvar("--grid-min"),maj:cvar("--grid-maj"),pen:cvar("--pen"),acc:cvar("--accent"),ink:cvar("--ink")};}
+    function b2(t){return gauss(t,.15,.02,.1)+gauss(t,.31,.012,-.1)+gauss(t,.34,.012,1)+gauss(t,.37,.012,-.22)+gauss(t,.56,.045,.26)}
+    function resize(){W=box.clientWidth||600;H=box.clientHeight||96;cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
+      PENX=W-30;var n=Math.max(60,PENX-56);colors();buf=[];for(var i=0;i<n;i++)buf.push(sample());glow=0;}
+    function sample(){phase+=.0058;if(phase>=1)phase-=1;var v=b2(phase);
+      if(v>.6&&armed){glow=1;armed=false;}if(v<.2)armed=true;return H*.62-v*H*.5;}
+    function draw(){
       ctx.clearRect(0,0,W,H);
-      ctx.lineWidth=1.8;ctx.strokeStyle="#3fe0a6";ctx.shadowColor="rgba(63,224,166,.6)";ctx.shadowBlur=6;
-      ctx.beginPath();for(var i=0;i<buf.length;i++){if(i===0)ctx.moveTo(i,buf[i]);else ctx.lineTo(i,buf[i]);}ctx.stroke();
-      ctx.shadowBlur=0;
+      ctx.lineWidth=1;
+      for(var x=-off%40;x<W;x+=8){var gx=Math.round(x);var isMaj=(Math.round((x+off)/8)%5===0);
+        ctx.strokeStyle=isMaj?col.maj:col.min;ctx.beginPath();ctx.moveTo(gx+.5,0);ctx.lineTo(gx+.5,H);ctx.stroke();}
+      for(var y=0;y<H;y+=8){ctx.strokeStyle=(y%40===0)?col.maj:col.min;ctx.beginPath();ctx.moveTo(0,y+.5);ctx.lineTo(W,y+.5);ctx.stroke();}
+      // pulso de calibración de 1 mV, fijo a la izquierda
+      var base=H*.62,top=base-H*.5;ctx.strokeStyle=col.ink;ctx.lineWidth=1.8;ctx.beginPath();
+      ctx.moveTo(10,base);ctx.lineTo(18,base);ctx.lineTo(18,top);ctx.lineTo(42,top);ctx.lineTo(42,base);ctx.lineTo(50,base);ctx.stroke();
+      // trazo
+      var x0=PENX-buf.length;ctx.strokeStyle=col.pen;ctx.lineWidth=1.9;ctx.lineJoin="round";ctx.beginPath();
+      for(var i=0;i<buf.length;i++){var X=x0+i;if(i===0)ctx.moveTo(X,buf[i]);else ctx.lineTo(X,buf[i]);}ctx.stroke();
+      // pluma
+      var py=buf[buf.length-1];ctx.fillStyle=col.acc;ctx.shadowColor=col.acc;ctx.shadowBlur=6+glow*14;
+      ctx.beginPath();ctx.arc(PENX,py,3.2+glow*1.6,0,6.2832);ctx.fill();ctx.shadowBlur=0;glow*=.9;
     }
-    if(reduce){for(var k=0;k<W;k++){buf[k]=sample();}paint();}
-    else{(function loop(){for(var s=0;s<3;s++){buf.push(sample());if(buf.length>W)buf.shift();}paint();requestAnimationFrame(loop);})();}
+    resize();window.addEventListener("resize",resize);
+    document.getElementById("theme").addEventListener("click",function(){setTimeout(colors,30);});
+    matchMedia("(prefers-color-scheme:dark)").addEventListener&&matchMedia("(prefers-color-scheme:dark)").addEventListener("change",function(){setTimeout(colors,30);});
+    if(reduce){for(var k=0;k<buf.length;k++){buf[k]=sample();}draw();}
+    else{(function loop(){for(var s=0;s<SP;s++){buf.push(sample());buf.shift();off=(off+1)%40;}draw();requestAnimationFrame(loop);})();}
   })();
 
   /* ---- modelo incrustado ---- */
-  var model=null,activeEl=null;
-  function setStatus(cls,txt){var s=$("#status");s.className="led"+(cls?" "+cls:"");s.innerHTML='<span class="d"></span>'+txt;}
+  var model=null;
+  function setStatus(cls,txt){var s=$("#status");s.className="led"+(cls?" "+cls:"");s.innerHTML="<i></i><span>"+txt+"</span>";}
   function b64ToBytes(b64){var bin=atob(b64.trim()),n=bin.length,u=new Uint8Array(n);for(var i=0;i<n;i++)u[i]=bin.charCodeAt(i);return u;}
   function loadModel(){
-    if(typeof tmImage==="undefined"){setStatus("err","No se pudo cargar la librería");return;}
+    if(typeof tmImage==="undefined"){setStatus("err","No se pudo cargar la librería (revise su conexión)");return;}
     try{
-      var mj=document.getElementById("model-json").textContent,
-          md=document.getElementById("metadata-json").textContent,
-          b64=document.getElementById("weights-b64").textContent;
-      var mf=new File([mj],"model.json",{type:"application/json"}),
-          mdf=new File([md],"metadata.json",{type:"application/json"}),
+      var mj=document.getElementById("model-json").textContent,md=document.getElementById("metadata-json").textContent,b64=document.getElementById("weights-b64").textContent;
+      var mf=new File([mj],"model.json",{type:"application/json"}),mdf=new File([md],"metadata.json",{type:"application/json"}),
           wf=new File([b64ToBytes(b64)],"weights.bin",{type:"application/octet-stream"});
-      tmImage.loadFromFiles(mf,wf,mdf).then(function(m){
-        model=m;setStatus("ok","Modelo activo · "+m.getTotalClasses()+" patrones · listo para leer");
-      }).catch(function(e){console.error(e);setStatus("err","No se pudo cargar el modelo");});
+      tmImage.loadFromFiles(mf,wf,mdf).then(function(m){model=m;setStatus("ok","Modelo activo · "+m.getTotalClasses()+" patrones");})
+        .catch(function(e){console.error(e);setStatus("err","No se pudo cargar el modelo");});
     }catch(e){console.error(e);setStatus("err","No se pudo preparar el modelo");}
   }
 
@@ -339,32 +387,47 @@ h1,h2,h3{margin:0;text-wrap:balance}
   drop.addEventListener("dragover",function(e){e.preventDefault();drop.classList.add("over");});
   drop.addEventListener("dragleave",function(){drop.classList.remove("over");});
   drop.addEventListener("drop",function(e){e.preventDefault();drop.classList.remove("over");if(e.dataTransfer.files[0])loadImageFile(e.dataTransfer.files[0]);});
-  fimg.addEventListener("change",function(e){if(e.target.files[0])loadImageFile(e.target.files[0]);});
+  fimg.addEventListener("change",function(e){if(e.target.files[0])loadImageFile(e.target.files[0]);fimg.value="";});
   function clearActive(){if(activeEl){activeEl.classList.remove("active");activeEl=null;}}
   function loadImageFile(file){if(!/^image\//.test(file.type))return;clearActive();
-    var img=new Image();img.onload=function(){showPreview(img);classify(img);};img.src=URL.createObjectURL(file);}
+    var img=new Image();img.onload=function(){showPreview(img);
+      $("#fileinfo").textContent=file.name+" · "+img.naturalWidth+" × "+img.naturalHeight+" px";classify(img);};
+    img.src=URL.createObjectURL(file);}
   function showPreview(node){var p=$("#preview");p.innerHTML="";
     if(node.tagName==="CANVAS"){var c=node.cloneNode(true);c.getContext("2d").drawImage(node,0,0);p.appendChild(c);}else p.appendChild(node);}
   function selectExample(label,el){clearActive();if(el){el.classList.add("active");activeEl=el;}
-    var cv=document.createElement("canvas");cv.width=460;cv.height=150;drawECG(cv,META[label].kind);showPreview(cv);classify(cv);}
+    var cv=document.createElement("canvas");cv.width=460;cv.height=150;drawExample(cv,META[label].kind);
+    showPreview(cv);$("#fileinfo").textContent="Ejemplo sintético · "+metaOf(label).full;classify(cv);}
+  $("#again").addEventListener("click",function(){clearActive();
+    $("#preview").innerHTML='<span class="ph">El trazado aparecerá aquí</span>';$("#fileinfo").textContent="";
+    $("#report").hidden=true;$("#waiting").hidden=false;});
 
-  function classify(input){if(!model)return;
+  /* ---- clasificación e informe ---- */
+  function pct(x){return (x*100).toFixed(1).replace(".",",")}
+  function classify(input){
+    if(!model){setStatus("err","El modelo aún no está listo");return;}
     model.predict(input).then(function(preds){
-      var items=preds.map(function(p){return {label:p.className,prob:p.probability,color:cvar(metaOf(p.className).css)};})
-        .sort(function(a,b){return b.prob-a.prob});render(items);
-    }).catch(function(e){console.error(e);});}
+      var items=preds.map(function(p){return {label:p.className,prob:p.probability};}).sort(function(a,b){return b.prob-a.prob});
+      render(items);
+    }).catch(function(e){console.error(e);});
+  }
   function render(items){
-    var top=items[0],isN=top.label===NORMAL_LABEL;
-    $("#rhint").textContent="completada";
-    var r=$("#readout");r.hidden=false;r.className="readout "+(isN?"good":"alert");
-    $("#rt").textContent=isN?"Lectura":"Patrón sugestivo";
-    $("#rl").textContent=top.label;
-    $("#rc").innerHTML=(isN?"Sin patrones chagásicos evidentes":"Posible afectación chagásica")+" · confianza <span class='conf'>"+(top.prob*100).toFixed(1)+"%</span>";
-    var bars=$("#bars");bars.innerHTML="";
-    items.forEach(function(it,idx){var row=document.createElement("div");row.className="bar"+(idx===0?" top":"");
-      row.innerHTML='<div class="bl"><span class="nm">'+it.label+'</span><span class="pct num">'+(it.prob*100).toFixed(1)+'%</span></div><div class="track"><div class="fill"></div></div>';
-      bars.appendChild(row);var f=row.querySelector(".fill");f.style.background=it.color;
-      requestAnimationFrame(function(){f.style.width=(it.prob*100)+"%";});});
+    var top=items[0],m=metaOf(top.label),isN=top.label===NORMAL_LABEL,color=cvar(m.css);
+    $("#waiting").hidden=true;$("#report").hidden=false;
+    $("#rk").textContent="Lectura · "+new Date().toLocaleTimeString("es-BO",{hour:"2-digit",minute:"2-digit"})+" · etiqueta del modelo: "+top.label;
+    var vn=$("#vname");vn.textContent=m.full;vn.style.color=color;
+    $("#vmsg").textContent=m.msg;$("#vdesc").textContent=m.desc;
+    $("#cn").textContent=pct(top.prob);
+    var ru=$("#ruler");ru.style.setProperty("--mc",color);
+    var mk=$("#rmark"),fl=$("#rfill");mk.style.left="0%";fl.style.width="0%";
+    requestAnimationFrame(function(){requestAnimationFrame(function(){mk.style.left=(top.prob*100)+"%";fl.style.width=(top.prob*100)+"%";});});
+    var ln=$("#lownote");ln.hidden=!(top.prob<LOW);
+    var rows=$("#orows");rows.innerHTML="";
+    items.forEach(function(it,idx){var mm=metaOf(it.label);
+      var r=document.createElement("div");r.className="orow"+(idx===0?" top":"");
+      r.innerHTML='<span class="nm">'+mm.full+'</span><span class="otrack"><span class="ofill" style="--c:'+cvar(mm.css)+'"></span></span><span class="pc">'+pct(it.prob)+'%</span>';
+      rows.appendChild(r);var f=r.querySelector(".ofill");
+      requestAnimationFrame(function(){requestAnimationFrame(function(){f.style.width=(it.prob*100)+"%";});});});
   }
 
   if(window.tf&&window.tmImage)loadModel();else window.addEventListener("load",loadModel);
