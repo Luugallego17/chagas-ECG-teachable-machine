@@ -20,7 +20,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);over
 .bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
 .glowblob{opacity:.3}
 /* franja de monitor ECG, fija abajo (nunca cruza el contenido) */
-.ecgband{position:fixed;left:0;right:0;bottom:56px;height:clamp(104px,17vh,168px);z-index:1;overflow:hidden;
+.ecgband{position:fixed;left:0;right:0;bottom:56px;height:clamp(80px,12vh,128px);z-index:1;overflow:hidden;
   border-top:1px solid rgba(63,224,176,.25);
   background:
     linear-gradient(rgba(63,224,176,.05) 1px,transparent 1px) 0 0/18px 18px,
@@ -47,7 +47,7 @@ body.beat .hud .hb{transform:scale(1.35);color:var(--crimson)}
 /* ===== deck ===== */
 .deck{position:relative;height:100%;width:100%;z-index:1;perspective:1600px}
 .slide{position:absolute;inset:0;display:grid;place-items:center;padding:clamp(20px,5vw,72px);
-  padding-bottom:clamp(190px,30vh,270px);
+  padding-bottom:clamp(150px,20vh,196px);
   opacity:0;visibility:hidden;transform:translateY(42px) scale(.93) rotateX(7deg);filter:blur(7px);transform-origin:50% 60%;
   transition:opacity .7s ease,transform .85s cubic-bezier(.19,1,.22,1),filter .6s ease,visibility 0s linear .85s}
 .slide.active{opacity:1;visibility:visible;transform:none;filter:none;transition-delay:0s}
@@ -148,122 +148,155 @@ h2{font-family:var(--serif);font-weight:600;letter-spacing:-.015em;line-height:1
 
 <div class="deck" id="deck">
   <section class="slide active"><div class="inner cover">
-    <span class="kicker" data-rv style="--i:0">Inteligencia artificial aplicada a la salud</span>
+    <span class="kicker" data-rv style="--i:0">Defensa de proyecto · Inteligencia Artificial</span>
     <h1 data-rv style="--i:1">Detección de patrones chagásicos en el ECG con <span class="grad">inteligencia artificial</span></h1>
     <div class="author" data-rv style="--i:2"><span class="nm">Luna Saleth Gallego Martínez</span><span class="sub">Carrera de Ingeniería en Inteligencia Artificial · Universidad Católica Boliviana «San Pablo»</span></div>
-    <div class="hintnav" data-rv style="--i:3"><span class="key">←</span><span class="key">→</span> navegar · <span class="key">P</span> auto · <span class="key">F</span> pantalla completa</div>
+    <div class="hintnav" data-rv style="--i:3"><span class="key">←</span><span class="key">→</span> navegar · <span class="key">F</span> pantalla completa</div>
   </div></section>
 
   <section class="slide"><div class="inner">
-    <span class="kicker" data-rv>01 · El problema</span>
-    <h2 data-rv style="--i:1">Una enfermedad silenciosa</h2>
+    <span class="kicker" data-rv>Objetivo</span>
+    <h2 data-rv style="--i:1">¿Qué se buscó resolver?</h2>
     <ul class="blist">
-      <li data-rv style="--i:2"><span class="dot"></span>Causada por el parásito <b>Trypanosoma cruzi</b>, transmitido por la vinchuca (<i>Triatoma infestans</i>).</li>
-      <li data-rv style="--i:3"><span class="dot"></span>Tras una fase aguda casi siempre asintomática, puede permanecer oculta <b>años o décadas</b>.</li>
-      <li data-rv style="--i:4"><span class="dot"></span>Con el tiempo, hasta un tercio de los infectados desarrolla <b>daño cardíaco</b>.</li>
+      <li data-rv style="--i:2"><span class="dot"></span><b>Objetivo general:</b> desarrollar una herramienta accesible que, a partir de una imagen de electrocardiograma, reconozca los patrones de conducción asociados a la enfermedad de Chagas.</li>
+      <li data-rv style="--i:3"><span class="dot"></span><b>Enfoque:</b> clasificación de imágenes con aprendizaje automático (Teachable Machine), ejecutable en el navegador y de bajo costo.</li>
+      <li data-rv style="--i:4"><span class="dot"></span><b>Alcance:</b> apoyo educativo y de tamizaje; no reemplaza el diagnóstico de un especialista.</li>
     </ul>
   </div></section>
 
   <section class="slide"><div class="inner">
-    <span class="kicker" data-rv>02 · Por qué Bolivia</span>
-    <h2 data-rv style="--i:1">Bolivia: <span class="grad">el epicentro mundial</span> del Chagas</h2>
+    <span class="kicker" data-rv>Justificación</span>
+    <h2 data-rv style="--i:1">Por qué el Chagas en <span class="grad">Bolivia</span></h2>
     <div class="stats">
       <div class="stat" data-rv style="--i:2"><div class="v cr"><span data-count="6" data-suffix="%">0</span></div><div class="l">de la población se estima infectada: la <b>mayor prevalencia del mundo</b> (OPS).</div></div>
       <div class="stat" data-rv style="--i:3"><div class="v">#<span data-count="1">0</span></div><div class="l">país con más Chagas a nivel mundial; endémico en gran parte del país.</div></div>
       <div class="stat" data-rv style="--i:4"><div class="v am"><span data-count="4">0</span></div><div class="l">regiones muy afectadas: Cochabamba, Santa Cruz, Tarija y Chuquisaca.</div></div>
     </div>
-    <p class="lead big" data-rv style="--i:5">En zonas rurales el acceso a un cardiólogo que lea el ECG es limitado. Por eso elegí esta patología: <b>alto impacto y una necesidad real de herramientas accesibles</b>.</p>
+    <p class="lead big" data-rv style="--i:5">En zonas rurales el acceso a un cardiólogo que lea el ECG es limitado: <b>alto impacto y una necesidad real de herramientas accesibles</b>.</p>
   </div></section>
 
   <section class="slide"><div class="inner">
-    <span class="kicker" data-rv>03 · El corazón en riesgo</span>
-    <h2 data-rv style="--i:1">El ECG como ventana al daño</h2>
-    <p class="lead" data-rv style="--i:2">La afectación cardíaca deja huellas características en el electrocardiograma. Reconocerlas a tiempo permite estratificar el riesgo.</p>
-    <ul class="blist" data-rv style="--i:3">
-      <li><span class="dot"></span>Bloqueo de rama derecha y hemibloqueo anterior izquierdo (su combinación es muy sugestiva).</li>
-      <li><span class="dot"></span>Bloqueos AV y arritmias ventriculares como marcadores de progresión.</li>
-    </ul>
-  </div></section>
-
-  <section class="slide"><div class="inner">
-    <span class="kicker" data-rv>04 · La idea</span>
-    <h2 data-rv style="--i:1">Inteligencia artificial <span class="grad">accesible</span></h2>
-    <p class="lead big" data-rv style="--i:2">Un clasificador entrenado en <b>Teachable Machine</b> que reconoce los patrones chagásicos, funciona <b>en el navegador</b>, sin costo y <b>sin enviar datos</b>.</p>
-    <div class="cards">
-      <div class="c" data-rv style="--i:3"><div class="tag">ACCESIBLE</div><div class="t">Sin programación</div><div class="d">Plataforma gratuita y visual.</div></div>
-      <div class="c" data-rv style="--i:4"><div class="tag">PRIVADO</div><div class="t">Corre local</div><div class="d">La imagen no sale del dispositivo.</div></div>
-      <div class="c" data-rv style="--i:5"><div class="tag">PORTÁTIL</div><div class="t">Un solo archivo</div><div class="d">Se abre en cualquier navegador.</div></div>
-    </div>
-  </div></section>
-
-  <section class="slide"><div class="inner">
-    <span class="kicker" data-rv>05 · El proceso</span>
-    <h2 data-rv style="--i:1">De la señal a la predicción</h2>
-    <div class="flow">
-      <div class="step" data-rv style="--i:2"><div class="n">PASO 1</div><div class="t">Señal ECG</div><div class="d">12 derivaciones.</div></div>
-      <div class="arrow" data-rv style="--i:3">→</div>
-      <div class="step" data-rv style="--i:3"><div class="n">PASO 2</div><div class="t">Imagen</div><div class="d">Cada trazado a imagen.</div></div>
-      <div class="arrow" data-rv style="--i:4">→</div>
-      <div class="step" data-rv style="--i:4"><div class="n">PASO 3</div><div class="t">Balanceo</div><div class="d">Igualar clases.</div></div>
-      <div class="arrow" data-rv style="--i:5">→</div>
-      <div class="step" data-rv style="--i:5"><div class="n">PASO 4</div><div class="t">Teachable Machine</div><div class="d">Transfer learning.</div></div>
-      <div class="arrow" data-rv style="--i:6">→</div>
-      <div class="step" data-rv style="--i:6"><div class="n">PASO 5</div><div class="t">Interfaz</div><div class="d">Inferencia en el navegador.</div></div>
-    </div>
-  </div></section>
-
-  <section class="slide"><div class="inner">
-    <span class="kicker" data-rv>06 · Los datos</span>
-    <h2 data-rv style="--i:1">Fuentes honestas y des-identificadas</h2>
-    <div class="cards">
-      <div class="c" data-rv style="--i:2"><div class="tag">PÚBLICO</div><div class="t">SaMi-Trop</div><div class="d">Cohorte brasileña de Chagas.</div></div>
-      <div class="c" data-rv style="--i:3"><div class="tag">PÚBLICO</div><div class="t">CODE-15%</div><div class="d">345.779 ECG etiquetados.</div></div>
-      <div class="c" data-rv style="--i:4"><div class="tag">PÚBLICO</div><div class="t">PTB-XL</div><div class="d">21.837 ECG clínicos.</div></div>
-      <div class="c" data-rv style="--i:5"><div class="tag">PROPIO</div><div class="t">Práctica clínica</div><div class="d">ECG des-identificados (Santa Cruz).</div></div>
-    </div>
-    <p class="lead" data-rv style="--i:6">Los públicos se usan bajo sus licencias y se citan; el propio fue anonimizado.</p>
-  </div></section>
-
-  <section class="slide"><div class="inner">
-    <span class="kicker" data-rv>07 · El modelo</span>
-    <h2 data-rv style="--i:1">Seis patrones reconocidos</h2>
+    <span class="kicker" data-rv>Fundamento clínico</span>
+    <h2 data-rv style="--i:1">¿Qué vamos a reconocer en el ECG?</h2>
+    <p class="lead" data-rv style="--i:2">La miocardiopatía chagásica deja alteraciones de la conducción típicas. El modelo distingue seis clases:</p>
     <div class="cls" id="clsgrid"></div>
   </div></section>
 
   <section class="slide"><div class="inner">
-    <span class="kicker" data-rv>08 · La herramienta</span>
-    <h2 data-rv style="--i:1">Un asistente de lectura para el médico</h2>
-    <p class="lead big" data-rv style="--i:2">Se sube la imagen del ECG y el asistente devuelve el <b>patrón estimado</b> y su <b>confianza</b>, con un trazado tipo monitor. Apoyo a la docencia y al tamizaje.</p>
-    <a class="cta" href="https://claude.ai/artifact/7kzuJzNBVkvtuA195PpVy7" target="_blank" rel="noopener" data-rv style="--i:3">Abrir el asistente en vivo →</a>
+    <span class="kicker" data-rv>Metodología</span>
+    <h2 data-rv style="--i:1">El proceso, en cinco pasos</h2>
+    <p class="lead" data-rv style="--i:2">Investigación aplicada: se construyó un sistema reproducible de principio a fin.</p>
+    <div class="flow">
+      <div class="step" data-rv style="--i:3"><div class="n">PASO 1</div><div class="t">Datos</div><div class="d">Obtención y anonimización.</div></div>
+      <div class="arrow" data-rv style="--i:4">→</div>
+      <div class="step" data-rv style="--i:4"><div class="n">PASO 2</div><div class="t">Imagen</div><div class="d">Señal → imagen del trazado.</div></div>
+      <div class="arrow" data-rv style="--i:5">→</div>
+      <div class="step" data-rv style="--i:5"><div class="n">PASO 3</div><div class="t">Balanceo</div><div class="d">Igualar clases.</div></div>
+      <div class="arrow" data-rv style="--i:6">→</div>
+      <div class="step" data-rv style="--i:6"><div class="n">PASO 4</div><div class="t">Entrenar</div><div class="d">Teachable Machine.</div></div>
+      <div class="arrow" data-rv style="--i:7">→</div>
+      <div class="step" data-rv style="--i:7"><div class="n">PASO 5</div><div class="t">Integrar</div><div class="d">Interfaz en el navegador.</div></div>
+    </div>
   </div></section>
 
   <section class="slide"><div class="inner">
-    <span class="kicker" data-rv>09 · Resultados</span>
-    <h2 data-rv style="--i:1">Lo que se logró</h2>
+    <span class="kicker" data-rv>Paso 1 · Datos</span>
+    <h2 data-rv style="--i:1">Obtención y anonimización</h2>
+    <ul class="blist">
+      <li data-rv style="--i:2"><span class="dot"></span><b>Fuentes públicas de investigación:</b> SaMi-Trop (cohorte de Chagas), CODE-15% (345.779 ECG) y PTB-XL (21.837 ECG clínicos), usadas bajo sus licencias.</li>
+      <li data-rv style="--i:3"><span class="dot"></span><b>Conjunto propio:</b> ECG recolectados en práctica clínica (Santa Cruz), <b>des-identificados</b> — se quitaron nombre, número de historia y metadatos de la imagen.</li>
+      <li data-rv style="--i:4"><span class="dot"></span><b>Ética:</b> se respetaron las licencias de los datos y la privacidad de los pacientes.</li>
+    </ul>
+  </div></section>
+
+  <section class="slide"><div class="inner">
+    <span class="kicker" data-rv>Paso 2 · Preprocesamiento</span>
+    <h2 data-rv style="--i:1">De la señal a la imagen</h2>
+    <ul class="blist">
+      <li data-rv style="--i:2"><span class="dot"></span><b>Por qué imágenes:</b> Teachable Machine clasifica imágenes, no señales; por eso cada ECG se convierte en una <b>imagen del trazado</b>.</li>
+      <li data-rv style="--i:3"><span class="dot"></span><b>Limpieza:</b> se aplicó un filtrado de banda para reducir la deriva de la línea base y el ruido de alta frecuencia.</li>
+      <li data-rv style="--i:4"><span class="dot"></span><b>Organización:</b> las imágenes resultantes se guardan en una carpeta por clase.</li>
+    </ul>
+  </div></section>
+
+  <section class="slide"><div class="inner">
+    <span class="kicker" data-rv>Paso 3 · Clases y balanceo</span>
+    <h2 data-rv style="--i:1">Definir clases y evitar el sesgo</h2>
+    <ul class="blist">
+      <li data-rv style="--i:2"><span class="dot"></span><b>Clases:</b> se definieron 6 (Normal, BRD, HBAI, BRD+HBAI, Bloqueo AV y Extrasístole ventricular).</li>
+      <li data-rv style="--i:3"><span class="dot"></span><b>Problema:</b> los datos están desbalanceados (predominan los ECG normales), lo que sesga al modelo hacia la clase mayoritaria.</li>
+      <li data-rv style="--i:4"><span class="dot"></span><b>Solución:</b> balanceo por <b>submuestreo</b> — se iguala el número de imágenes por clase antes de entrenar.</li>
+    </ul>
+  </div></section>
+
+  <section class="slide"><div class="inner">
+    <span class="kicker" data-rv>Paso 4 · Entrenamiento</span>
+    <h2 data-rv style="--i:1">Teachable Machine y transfer learning</h2>
+    <ul class="blist">
+      <li data-rv style="--i:2"><span class="dot"></span><b>Qué es:</b> plataforma de Google que entrena clasificadores de imágenes sin programar.</li>
+      <li data-rv style="--i:3"><span class="dot"></span><b>Cómo aprende:</b> usa <b>aprendizaje por transferencia</b> sobre MobileNet (una red convolucional ya entrenada): reutiliza su conocimiento visual y aprende con pocos ejemplos por clase.</li>
+      <li data-rv style="--i:4"><span class="dot"></span><b>Procedimiento:</b> se sube cada carpeta como una clase, se entrena el modelo y se verifica su respuesta con imágenes de prueba.</li>
+    </ul>
+  </div></section>
+
+  <section class="slide"><div class="inner">
+    <span class="kicker" data-rv>Paso 5 · Integración</span>
+    <h2 data-rv style="--i:1">Exportación e interfaz</h2>
+    <ul class="blist">
+      <li data-rv style="--i:2"><span class="dot"></span><b>Exportación:</b> el modelo entrenado se descarga en formato <b>TensorFlow.js</b> (model.json, weights.bin, metadata.json).</li>
+      <li data-rv style="--i:3"><span class="dot"></span><b>Integración:</b> se incrustó dentro de una página web; la inferencia corre en el <b>navegador</b>, sin enviar datos a ningún servidor.</li>
+      <li data-rv style="--i:4"><span class="dot"></span><b>Resultado:</b> un asistente de un solo archivo donde se sube la imagen y se obtiene la clasificación.</li>
+    </ul>
+  </div></section>
+
+  <section class="slide"><div class="inner">
+    <span class="kicker" data-rv>Funcionamiento</span>
+    <h2 data-rv style="--i:1">¿Cómo clasifica una imagen nueva?</h2>
+    <ul class="blist">
+      <li data-rv style="--i:2"><span class="dot"></span><b>1.</b> La imagen del ECG se redimensiona a <b>224×224 px</b>, la entrada que espera el modelo.</li>
+      <li data-rv style="--i:3"><span class="dot"></span><b>2.</b> MobileNet extrae las <b>características visuales</b> del trazado.</li>
+      <li data-rv style="--i:4"><span class="dot"></span><b>3.</b> La capa final asigna una <b>probabilidad</b> a cada clase; se muestra la más probable y la confianza (%) de todas.</li>
+    </ul>
+  </div></section>
+
+  <section class="slide"><div class="inner">
+    <span class="kicker" data-rv>Resultados</span>
+    <h2 data-rv style="--i:1">Lo que se obtuvo</h2>
     <ul class="blist">
       <li data-rv style="--i:2"><span class="dot"></span>Un <b>sistema reproducible</b> de principio a fin: de los datos a la interfaz.</li>
       <li data-rv style="--i:3"><span class="dot"></span>Un <b>modelo de 6 clases</b> entrenado en Teachable Machine.</li>
-      <li data-rv style="--i:4"><span class="dot"></span>Una <b>interfaz funcional</b> que clasifica en el navegador, de bajo costo.</li>
+      <li data-rv style="--i:4"><span class="dot"></span>Un <b>asistente funcional</b> que clasifica una imagen en el navegador.</li>
     </ul>
-    <p class="foot-disc" data-rv style="--i:5">Demostración educativa: no es un dispositivo médico ni sustituye el juicio clínico.</p>
+    <a class="cta" href="https://claude.ai/artifact/7kzuJzNBVkvtuA195PpVy7" target="_blank" rel="noopener" data-rv style="--i:5">Abrir el asistente en vivo →</a>
   </div></section>
 
   <section class="slide"><div class="inner">
-    <span class="kicker" data-rv>10 · Conclusiones</span>
-    <h2 data-rv style="--i:1">Un apoyo accesible, con camino por delante</h2>
-    <p class="lead big" data-rv style="--i:2">La IA accesible puede <b>complementar la formación y el tamizaje</b> del Chagas en contextos como Bolivia, siempre como apoyo y nunca en reemplazo del especialista.</p>
-    <ul class="blist" data-rv style="--i:3">
-      <li><span class="dot"></span>A futuro: ampliar y validar el conjunto propio de datos.</li>
-      <li><span class="dot"></span>Entrenar con fotos reales de ECG y evaluar con métricas clínicas.</li>
+    <span class="kicker" data-rv>Limitaciones</span>
+    <h2 data-rv style="--i:1">Limitaciones del trabajo</h2>
+    <ul class="blist">
+      <li data-rv style="--i:2"><span class="dot"></span><b>Datos de demostración:</b> el modelo mostrado se entrenó con imágenes sintéticas; reconoce ese tipo de trazados, <b>no es un modelo clínico</b>.</li>
+      <li data-rv style="--i:3"><span class="dot"></span><b>Brecha de dominio:</b> una foto real de ECG en papel (cuadrícula, sombras) difiere de las imágenes de entrenamiento y puede reducir el acierto.</li>
+      <li data-rv style="--i:4"><span class="dot"></span><b>Sin validación clínica:</b> es una demostración educativa, no un dispositivo médico.</li>
+    </ul>
+  </div></section>
+
+  <section class="slide"><div class="inner">
+    <span class="kicker" data-rv>Conclusiones</span>
+    <h2 data-rv style="--i:1">Conclusiones y trabajo futuro</h2>
+    <ul class="blist">
+      <li data-rv style="--i:2"><span class="dot"></span>Es <b>viable</b> construir, con recursos accesibles, un apoyo para reconocer patrones chagásicos en el ECG, útil para docencia y tamizaje en contextos como Bolivia.</li>
+      <li data-rv style="--i:3"><span class="dot"></span><b>Futuro:</b> ampliar y validar el conjunto propio de datos.</li>
+      <li data-rv style="--i:4"><span class="dot"></span><b>Futuro:</b> entrenar con fotos reales y evaluar con métricas clínicas (sensibilidad, especificidad) frente a especialistas.</li>
     </ul>
   </div></section>
 
   <section class="slide"><div class="inner" style="text-align:center">
     <span class="kicker" data-rv>Gracias</span>
     <h1 data-rv style="--i:1" class="grad">Gracias</h1>
-    <p class="lead" data-rv style="--i:2;margin-left:auto;margin-right:auto">Luna Saleth Gallego Martínez · Ingeniería en Inteligencia Artificial<br>Universidad Católica Boliviana «San Pablo»</p>
+    <p class="lead" data-rv style="--i:2;margin-left:auto;margin-right:auto">¿Preguntas?<br>Luna Saleth Gallego Martínez · Universidad Católica Boliviana «San Pablo»</p>
     <div class="hintnav" data-rv style="--i:3;justify-content:center">Apoyo educativo · no diagnóstico</div>
   </div></section>
+
 </div>
 
 <div class="nav">
@@ -271,7 +304,7 @@ h2{font-family:var(--serif);font-weight:600;letter-spacing:-.015em;line-height:1
   <div class="ctrls">
     <button id="play" aria-label="Reproducción automática">▶</button>
     <button id="prev" aria-label="Anterior">‹</button>
-    <span class="counter" id="counter">1 / 12</span>
+    <span class="counter" id="counter">1 / 15</span>
     <button id="next" aria-label="Siguiente">›</button>
     <button id="fs" aria-label="Pantalla completa">⛶</button>
   </div>
