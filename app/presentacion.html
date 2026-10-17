@@ -18,18 +18,19 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);over
 
 /* ===== fondo clínico animado ===== */
 .bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-.ecgpaper{position:absolute;inset:-40px;background:
-    linear-gradient(rgba(255,90,77,.06) 1px,transparent 1px) 0 0/16px 16px,
-    linear-gradient(90deg,rgba(255,90,77,.06) 1px,transparent 1px) 0 0/16px 16px,
-    linear-gradient(rgba(255,90,77,.10) 1px,transparent 1px) 0 0/80px 80px,
-    linear-gradient(90deg,rgba(255,90,77,.10) 1px,transparent 1px) 0 0/80px 80px;
-  opacity:.5;animation:feed 9s linear infinite}
-@keyframes feed{to{transform:translateX(-80px)}}
+.glowblob{opacity:.3}
+/* franja de monitor ECG, fija abajo (nunca cruza el contenido) */
+.ecgband{position:fixed;left:0;right:0;bottom:56px;height:clamp(104px,17vh,168px);z-index:1;overflow:hidden;
+  border-top:1px solid rgba(63,224,176,.25);
+  background:
+    linear-gradient(rgba(63,224,176,.05) 1px,transparent 1px) 0 0/18px 18px,
+    linear-gradient(90deg,rgba(63,224,176,.05) 1px,transparent 1px) 0 0/18px 18px,
+    linear-gradient(180deg,rgba(10,26,24,.0),rgba(7,18,17,.55));
+  box-shadow:inset 0 0 0 1px rgba(63,224,176,.04);transition:box-shadow .25s ease}
+body.beat .ecgband{box-shadow:inset 0 0 44px rgba(63,224,176,.18)}
+.ecgband .bandlabel{position:absolute;top:8px;left:clamp(16px,4vw,40px);z-index:2;font-family:var(--mono);
+  font-size:.66rem;letter-spacing:.14em;color:var(--faint)}
 #ecg,#cursor{position:absolute;inset:0;width:100%;height:100%}
-.pulse{position:absolute;left:50%;top:50%;width:48vmax;height:48vmax;margin:-24vmax 0 0 -24vmax;border-radius:50%;
-  background:radial-gradient(circle,rgba(47,224,176,.18),transparent 60%);transform:scale(.72);opacity:.2;
-  transition:transform .55s cubic-bezier(.19,1,.22,1),opacity .55s ease}
-body.beat .pulse{transform:scale(1.08);opacity:.62;transition:transform .08s ease-out,opacity .08s}
 /* la interfaz late en sincronía con el QRS */
 body.beat .progress{box-shadow:0 0 26px var(--teal)}
 body.beat .hud .hb{transform:scale(1.35);color:var(--crimson)}
@@ -46,6 +47,7 @@ body.beat .hud .hb{transform:scale(1.35);color:var(--crimson)}
 /* ===== deck ===== */
 .deck{position:relative;height:100%;width:100%;z-index:1;perspective:1600px}
 .slide{position:absolute;inset:0;display:grid;place-items:center;padding:clamp(20px,5vw,72px);
+  padding-bottom:clamp(190px,30vh,270px);
   opacity:0;visibility:hidden;transform:translateY(42px) scale(.93) rotateX(7deg);filter:blur(7px);transform-origin:50% 60%;
   transition:opacity .7s ease,transform .85s cubic-bezier(.19,1,.22,1),filter .6s ease,visibility 0s linear .85s}
 .slide.active{opacity:1;visibility:visible;transform:none;filter:none;transition-delay:0s}
@@ -133,11 +135,11 @@ h2{font-family:var(--serif);font-weight:600;letter-spacing:-.015em;line-height:1
 
 <div class="bg" aria-hidden="true">
   <div class="glowblob g1"></div><div class="glowblob g2"></div>
-  <div class="ecgpaper"></div>
-  <div class="pulse"></div>
+</div>
+<div class="ecgband" aria-hidden="true">
+  <span class="bandlabel">DII · derivación de ritmo</span>
   <canvas id="ecg"></canvas>
   <canvas id="cursor"></canvas>
-  <div class="vignette"></div>
 </div>
 
 <div class="progress" id="progress"></div>
@@ -338,9 +340,9 @@ h2{font-family:var(--serif);font-weight:600;letter-spacing:-.015em;line-height:1
         dpr=Math.min(window.devicePixelRatio||1,2),W,H;
     function gauss(t,c,w,a){return a*Math.exp(-((t-c)*(t-c))/(2*w*w))}
     function beat(t){return gauss(t,.15,.02,.1)+gauss(t,.31,.012,-.1)+gauss(t,.34,.012,1)+gauss(t,.37,.012,-.22)+gauss(t,.56,.045,.26)}
-    var midY,amp,x,lastY,phase=0,armed=true,ERASE=70,SPEED=5;
-    function geom(){midY=H*0.66;amp=H*0.30;}
-    function resize(){W=window.innerWidth;H=window.innerHeight;
+    var band=cv.parentElement,midY,amp,x,lastY,phase=0,armed=true,ERASE=64,SPEED=5;
+    function geom(){midY=H*0.54;amp=H*0.34;}
+    function resize(){W=band.clientWidth||window.innerWidth;H=band.clientHeight||140;
       [cv,cu].forEach(function(c){c.width=W*dpr;c.height=H*dpr;c.getContext("2d").setTransform(dpr,0,0,dpr,0,0);});
       geom();ctx.clearRect(0,0,W,H);x=0;lastY=midY;}
     resize();window.addEventListener("resize",resize);
