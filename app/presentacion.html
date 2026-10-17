@@ -25,7 +25,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);over
     linear-gradient(90deg,rgba(255,90,77,.10) 1px,transparent 1px) 0 0/80px 80px;
   opacity:.5;animation:feed 9s linear infinite}
 @keyframes feed{to{transform:translateX(-80px)}}
-#ecg{position:absolute;inset:0;width:100%;height:100%}
+#ecg,#cursor{position:absolute;inset:0;width:100%;height:100%}
 .pulse{position:absolute;left:50%;top:50%;width:48vmax;height:48vmax;margin:-24vmax 0 0 -24vmax;border-radius:50%;
   background:radial-gradient(circle,rgba(47,224,176,.18),transparent 60%);transform:scale(.72);opacity:.2;
   transition:transform .55s cubic-bezier(.19,1,.22,1),opacity .55s ease}
@@ -41,7 +41,7 @@ body.beat .hud .hb{transform:scale(1.35);color:var(--crimson)}
 .g2{width:46vw;height:46vw;right:-12vw;bottom:-14vw;background:radial-gradient(circle,#2f6df0,transparent 62%);animation:drift2 24s ease-in-out infinite alternate}
 @keyframes drift1{to{transform:translate(10vw,8vh) scale(1.15)}}
 @keyframes drift2{to{transform:translate(-8vw,-8vh) scale(1.12)}}
-.vignette{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 45%,transparent 32%,rgba(6,15,14,.55) 76%,rgba(6,15,14,.92) 100%)}
+.vignette{position:absolute;inset:0;background:radial-gradient(130% 100% at 50% 45%,transparent 45%,rgba(6,15,14,.28) 82%,rgba(6,15,14,.62) 100%)}
 
 /* ===== deck ===== */
 .deck{position:relative;height:100%;width:100%;z-index:1;perspective:1600px}
@@ -52,7 +52,8 @@ body.beat .hud .hb{transform:scale(1.35);color:var(--crimson)}
 .slide.prev{transform:translateY(-42px) scale(.93) rotateX(-7deg)}
 .inner{width:100%;max-width:1000px;position:relative}
 .inner::before{content:"";position:absolute;inset:-28px -34px;z-index:-1;border-radius:26px;
-  background:radial-gradient(90% 90% at 30% 20%,rgba(9,24,22,.6),rgba(6,15,14,.25));box-shadow:0 30px 80px rgba(0,0,0,.45)}
+  background:radial-gradient(85% 85% at 35% 25%,rgba(7,18,17,.46),rgba(6,15,14,.08));backdrop-filter:blur(2px)}
+h1,h2{text-shadow:0 2px 18px rgba(0,0,0,.55)} .lead,.blist li{text-shadow:0 1px 10px rgba(0,0,0,.5)}
 
 .kicker{font-family:var(--mono);font-size:clamp(.66rem,1.4vw,.78rem);letter-spacing:.24em;text-transform:uppercase;color:var(--teal)}
 .kicker::after{content:"";display:inline-block;width:34px;height:1px;background:linear-gradient(90deg,var(--teal),transparent);margin-left:12px;vertical-align:middle}
@@ -135,6 +136,7 @@ h2{font-family:var(--serif);font-weight:600;letter-spacing:-.015em;line-height:1
   <div class="ecgpaper"></div>
   <div class="pulse"></div>
   <canvas id="ecg"></canvas>
+  <canvas id="cursor"></canvas>
   <div class="vignette"></div>
 </div>
 
@@ -331,13 +333,16 @@ h2{font-family:var(--serif);font-weight:600;letter-spacing:-.015em;line-height:1
   function fireBeat(){document.body.classList.add("beat");
     if(beatTimer)clearTimeout(beatTimer);beatTimer=setTimeout(function(){document.body.classList.remove("beat");},130);}
   (function(){
-    var cv=document.getElementById("ecg"),ctx=cv.getContext("2d"),dpr=Math.min(window.devicePixelRatio||1,2),W,H;
+    var cv=document.getElementById("ecg"),ctx=cv.getContext("2d"),
+        cu=document.getElementById("cursor"),cctx=cu.getContext("2d"),
+        dpr=Math.min(window.devicePixelRatio||1,2),W,H;
     function gauss(t,c,w,a){return a*Math.exp(-((t-c)*(t-c))/(2*w*w))}
     function beat(t){return gauss(t,.15,.02,.1)+gauss(t,.31,.012,-.1)+gauss(t,.34,.012,1)+gauss(t,.37,.012,-.22)+gauss(t,.56,.045,.26)}
-    var midY,amp,x,lastY,phase=0,armed=true,ERASE=52;
-    function geom(){midY=H*0.70;amp=H*0.22;}
-    function resize(){W=cv.clientWidth=window.innerWidth;H=cv.clientHeight=window.innerHeight;
-      cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);geom();ctx.clearRect(0,0,W,H);x=0;lastY=midY;}
+    var midY,amp,x,lastY,phase=0,armed=true,ERASE=70,SPEED=5;
+    function geom(){midY=H*0.66;amp=H*0.30;}
+    function resize(){W=window.innerWidth;H=window.innerHeight;
+      [cv,cu].forEach(function(c){c.width=W*dpr;c.height=H*dpr;c.getContext("2d").setTransform(dpr,0,0,dpr,0,0);});
+      geom();ctx.clearRect(0,0,W,H);x=0;lastY=midY;}
     resize();window.addEventListener("resize",resize);
     function seg(){
       var nx=x+1;
@@ -346,15 +351,25 @@ h2{font-family:var(--serif);font-weight:600;letter-spacing:-.015em;line-height:1
       var v=beat(phase),y=midY-v*amp;
       if(v>0.6&&armed){fireBeat();armed=false;}
       if(v<0.2)armed=true;
-      ctx.strokeStyle="rgba(47,224,176,.92)";ctx.lineWidth=2.4;ctx.shadowColor="rgba(47,224,176,.7)";ctx.shadowBlur=9;
+      ctx.strokeStyle="rgba(63,240,180,.95)";ctx.lineWidth=3.2;ctx.lineJoin="round";
+      ctx.shadowColor="rgba(47,224,176,.9)";ctx.shadowBlur=14;
       ctx.beginPath();ctx.moveTo(x,lastY);ctx.lineTo(nx,y);ctx.stroke();ctx.shadowBlur=0;
       lastY=y;x=nx;
       ctx.clearRect(Math.min(W-1,x+2),0,ERASE,H); // borra por delante (el hueco del barrido)
     }
-    if(reduce){ctx.clearRect(0,0,W,H);ctx.strokeStyle="rgba(47,224,176,.8)";ctx.lineWidth=2.2;
+    function cursor(){
+      cctx.clearRect(0,0,W,H);
+      // borde de borrado + punto brillante que avanza
+      var grad=cctx.createLinearGradient(x,0,x+ERASE,0);
+      grad.addColorStop(0,"rgba(63,240,180,.22)");grad.addColorStop(1,"rgba(63,240,180,0)");
+      cctx.fillStyle=grad;cctx.fillRect(x,0,ERASE,H);
+      cctx.fillStyle="#eafff8";cctx.shadowColor="rgba(63,240,180,1)";cctx.shadowBlur=18;
+      cctx.beginPath();cctx.arc(x,lastY,4.5,0,6.2832);cctx.fill();cctx.shadowBlur=0;
+    }
+    if(reduce){ctx.clearRect(0,0,W,H);ctx.strokeStyle="rgba(63,240,180,.85)";ctx.lineWidth=3;ctx.lineJoin="round";
       ctx.beginPath();for(var i=0;i<W;i++){phase+=0.0046;if(phase>=1)phase-=1;var yy=midY-beat(phase)*amp;
         if(i===0)ctx.moveTo(i,yy);else ctx.lineTo(i,yy);}ctx.stroke();}
-    else{(function loop(){for(var s=0;s<4;s++)seg();requestAnimationFrame(loop);})();}
+    else{(function loop(){for(var s=0;s<SPEED;s++)seg();cursor();requestAnimationFrame(loop);})();}
   })();
 
   go(0);
