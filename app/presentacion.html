@@ -1,0 +1,374 @@
+<title>Chagas IA · Presentación</title>
+<meta name="description" content="Presentación interactiva: detección de patrones chagásicos en el ECG con inteligencia artificial">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Deck cinematográfico oscuro (una sola estética, por diseño): monitor ECG + acentos. */
+:root{
+  --bg:#07100f; --bg2:#0b1a18; --panel:#0f201d; --line:#1c3330;
+  --ink:#eaf3ef; --dim:#8fa8a1; --faint:#5e7771;
+  --teal:#2fe0b0; --teal-2:#19b894; --crimson:#ff5a4d; --amber:#ffc24d; --violet:#b78cff; --blue:#6ea0ff;
+  --serif:"Fraunces",Georgia,serif; --sans:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:radial-gradient(120% 120% at 80% -10%,#0e2320 0%,var(--bg) 55%);
+  color:var(--ink);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased}
+.deck{position:relative;height:100%;width:100%}
+
+/* trazado de fondo */
+#bgtrace{position:fixed;inset:0;width:100%;height:100%;opacity:.5;z-index:0;pointer-events:none}
+
+/* slides */
+.slide{position:absolute;inset:0;z-index:1;display:grid;place-items:center;padding:clamp(20px,5vw,72px);
+  opacity:0;visibility:hidden;transform:translateY(24px) scale(.99);
+  transition:opacity .6s ease,transform .6s cubic-bezier(.2,.75,.2,1),visibility 0s linear .6s}
+.slide.active{opacity:1;visibility:visible;transform:none;transition-delay:0s,0s,0s}
+.slide.prev{transform:translateY(-24px) scale(.99)}
+.inner{width:100%;max-width:1000px}
+
+.kicker{font-family:var(--mono);font-size:clamp(.66rem,1.4vw,.78rem);letter-spacing:.22em;text-transform:uppercase;color:var(--teal)}
+h1{font-family:var(--serif);font-weight:600;letter-spacing:-.02em;line-height:1.02;margin:.35em 0 0;
+  font-size:clamp(2rem,6.2vw,4.3rem)}
+h2{font-family:var(--serif);font-weight:600;letter-spacing:-.015em;line-height:1.05;margin:.2em 0 0;
+  font-size:clamp(1.7rem,4.8vw,3rem)}
+.lead{color:var(--dim);font-size:clamp(1rem,2.2vw,1.35rem);line-height:1.5;margin-top:.9em;max-width:40ch}
+.big{font-size:clamp(1.05rem,2.3vw,1.45rem)}
+.mono{font-family:var(--mono)}
+
+/* animación de entrada por elemento */
+[data-rv]{opacity:0;transform:translateY(16px);transition:opacity .55s ease,transform .55s cubic-bezier(.2,.75,.2,1)}
+.slide.active [data-rv]{opacity:1;transform:none}
+.slide.active [data-rv]{transition-delay:calc(var(--i,0)*90ms + 120ms)}
+
+/* portada */
+.cover .author{margin-top:1.6em;display:flex;flex-direction:column;gap:3px}
+.cover .author .nm{font-weight:600;font-size:1.15rem}
+.cover .author .sub{color:var(--dim);font-size:.92rem}
+.hintnav{margin-top:2.2em;display:inline-flex;align-items:center;gap:10px;color:var(--faint);font-family:var(--mono);font-size:.8rem}
+.key{border:1px solid var(--line);border-radius:6px;padding:2px 9px;color:var(--dim);background:var(--panel)}
+
+/* listas / bullets */
+.blist{list-style:none;padding:0;margin:1.3em 0 0;display:flex;flex-direction:column;gap:14px;max-width:46ch}
+.blist li{display:flex;gap:13px;align-items:flex-start;font-size:clamp(1rem,2.1vw,1.2rem);line-height:1.45}
+.blist .dot{width:10px;height:10px;border-radius:50%;margin-top:.5em;flex:none;background:var(--teal);box-shadow:0 0 12px var(--teal)}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:1.6em}
+@media (max-width:720px){.stats{grid-template-columns:1fr}}
+.stat{background:linear-gradient(180deg,var(--panel),transparent);border:1px solid var(--line);border-radius:16px;padding:22px}
+.stat .v{font-family:var(--serif);font-weight:700;font-size:clamp(2.2rem,6vw,3.4rem);line-height:1;color:var(--teal);
+  font-variant-numeric:tabular-nums}
+.stat .v.cr{color:var(--crimson)} .stat .v.am{color:var(--amber)}
+.stat .l{color:var(--dim);margin-top:10px;font-size:.95rem;line-height:1.4}
+
+/* pipeline */
+.flow{display:flex;align-items:stretch;gap:0;margin-top:1.8em;flex-wrap:wrap}
+.step{flex:1 1 150px;min-width:140px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;
+  position:relative}
+.step .n{font-family:var(--mono);font-size:.7rem;color:var(--teal);letter-spacing:.1em}
+.step .t{font-weight:600;margin-top:6px;font-size:1.02rem}
+.step .d{color:var(--dim);font-size:.84rem;margin-top:4px;line-height:1.4}
+.arrow{align-self:center;color:var(--faint);font-size:1.5rem;padding:0 6px}
+@media (max-width:720px){.arrow{transform:rotate(90deg);padding:4px 0}.flow{flex-direction:column}.step{min-width:0}}
+
+/* cards genéricas */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-top:1.6em}
+.c{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+.c .t{font-weight:600} .c .d{color:var(--dim);font-size:.86rem;margin-top:5px;line-height:1.4}
+.c .tag{font-family:var(--mono);font-size:.68rem;color:var(--teal)}
+
+/* clases */
+.cls{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:1.6em}
+@media (max-width:720px){.cls{grid-template-columns:1fr 1fr}}
+.cl{border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--panel);display:flex;gap:12px;align-items:flex-start}
+.cl .mk{width:6px;align-self:stretch;border-radius:4px;flex:none}
+.cl .ab{font-family:var(--mono);font-weight:600}
+.cl .d{color:var(--dim);font-size:.82rem;margin-top:3px;line-height:1.35}
+
+.cta{display:inline-flex;align-items:center;gap:10px;margin-top:1.8em;background:var(--teal);color:#06231d;
+  font-weight:700;border-radius:999px;padding:13px 22px;text-decoration:none;font-size:1rem}
+.cta:hover{background:var(--teal-2)}
+
+.foot-disc{margin-top:1.8em;color:var(--faint);font-size:.84rem;border-left:2px solid var(--amber);padding-left:12px;max-width:46ch}
+
+/* navegación */
+.nav{position:fixed;z-index:5;left:0;right:0;bottom:0;display:flex;align-items:center;gap:14px;
+  padding:14px clamp(16px,4vw,40px);padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+.progress{position:fixed;top:0;left:0;height:3px;background:var(--teal);z-index:6;width:0;transition:width .5s ease;box-shadow:0 0 10px var(--teal)}
+.dots{display:flex;gap:7px;flex:1;flex-wrap:wrap}
+.dots button{width:9px;height:9px;border-radius:50%;border:0;background:var(--line);cursor:pointer;padding:0}
+.dots button.on{background:var(--teal);box-shadow:0 0 8px var(--teal)}
+.ctrls{display:flex;align-items:center;gap:8px}
+.ctrls button{background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:10px;
+  width:42px;height:38px;font-size:1.1rem;cursor:pointer}
+.ctrls button:hover{border-color:var(--teal)}
+.counter{font-family:var(--mono);font-size:.82rem;color:var(--dim);min-width:52px;text-align:center}
+.brandtag{position:fixed;top:14px;left:clamp(16px,4vw,40px);z-index:5;font-family:var(--mono);font-size:.7rem;
+  letter-spacing:.14em;color:var(--faint);text-transform:uppercase}
+
+@media (prefers-reduced-motion:reduce){
+  .slide{transition:opacity .2s}.slide,[data-rv]{transform:none}
+  [data-rv]{transition:opacity .2s}
+}
+</style>
+
+<div class="deck" id="deck">
+  <canvas id="bgtrace" aria-hidden="true"></canvas>
+  <div class="progress" id="progress"></div>
+  <div class="brandtag">UPDS · Ingeniería en IA</div>
+
+  <!-- 1 Portada -->
+  <section class="slide cover active">
+    <div class="inner">
+      <span class="kicker" data-rv style="--i:0">Proyecto de Inteligencia Artificial aplicada a la salud</span>
+      <h1 data-rv style="--i:1">Detección de patrones chagásicos en el ECG con inteligencia artificial</h1>
+      <div class="author" data-rv style="--i:2">
+        <span class="nm">Luna Saleth Gallego Martínez</span>
+        <span class="sub">Carrera de Ingeniería en Inteligencia Artificial · Universidad Privada Domingo Savio</span>
+      </div>
+      <div class="hintnav" data-rv style="--i:3"><span class="key">←</span><span class="key">→</span> para navegar · <span class="key">F</span> pantalla completa</div>
+    </div>
+  </section>
+
+  <!-- 2 Qué es -->
+  <section class="slide">
+    <div class="inner">
+      <span class="kicker" data-rv>01 · El problema</span>
+      <h2 data-rv style="--i:1">Una enfermedad silenciosa</h2>
+      <ul class="blist">
+        <li data-rv style="--i:2"><span class="dot"></span>La enfermedad de Chagas es causada por el parásito <b>Trypanosoma cruzi</b>, transmitido por la vinchuca (<i>Triatoma infestans</i>).</li>
+        <li data-rv style="--i:3"><span class="dot"></span>Tras una fase aguda casi siempre asintomática, puede permanecer oculta <b>años o décadas</b>.</li>
+        <li data-rv style="--i:4"><span class="dot"></span>Con el tiempo, hasta un tercio de los infectados desarrolla <b>daño cardíaco</b> (miocardiopatía chagásica).</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 3 Por qué Bolivia -->
+  <section class="slide">
+    <div class="inner">
+      <span class="kicker" data-rv>02 · Por qué Bolivia</span>
+      <h2 data-rv style="--i:1">Bolivia: el epicentro mundial del Chagas</h2>
+      <div class="stats">
+        <div class="stat" data-rv style="--i:2"><div class="v cr"><span data-count="6" data-suffix="%">0</span></div><div class="l">de la población boliviana se estima infectada: la <b>mayor prevalencia del mundo</b> (OPS).</div></div>
+        <div class="stat" data-rv style="--i:3"><div class="v">#<span data-count="1">0</span></div><div class="l">país con más Chagas a nivel mundial; es endémico en gran parte del territorio.</div></div>
+        <div class="stat" data-rv style="--i:4"><div class="v am"><span data-count="4">0</span></div><div class="l">regiones muy afectadas: Cochabamba, Santa Cruz, Tarija y Chuquisaca.</div></div>
+      </div>
+      <p class="lead big" data-rv style="--i:5">En zonas rurales el acceso a un cardiólogo que interprete el ECG es limitado. Por eso elegí esta patología: <b>alto impacto y una necesidad real de herramientas accesibles</b>.</p>
+    </div>
+  </section>
+
+  <!-- 4 Corazón -->
+  <section class="slide">
+    <div class="inner">
+      <span class="kicker" data-rv>03 · El corazón en riesgo</span>
+      <h2 data-rv style="--i:1">El ECG como ventana al daño</h2>
+      <p class="lead" data-rv style="--i:2">La afectación cardíaca deja huellas características en el electrocardiograma. Reconocerlas a tiempo permite estratificar el riesgo.</p>
+      <ul class="blist" data-rv style="--i:3">
+        <li><span class="dot"></span>Bloqueo de rama derecha y hemibloqueo anterior izquierdo (el patrón combinado es muy sugestivo).</li>
+        <li><span class="dot"></span>Bloqueos aurículo-ventriculares y arritmias ventriculares como marcadores de progresión.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 5 Solución -->
+  <section class="slide">
+    <div class="inner">
+      <span class="kicker" data-rv>04 · La idea</span>
+      <h2 data-rv style="--i:1">Inteligencia artificial accesible</h2>
+      <p class="lead big" data-rv style="--i:2">Un clasificador de imágenes entrenado en <b>Teachable Machine</b> que reconoce los patrones chagásicos en el ECG, funciona <b>en el navegador</b>, sin costo y <b>sin enviar datos</b> a ningún servidor.</p>
+      <div class="cards">
+        <div class="c" data-rv style="--i:3"><div class="tag">ACCESIBLE</div><div class="t">Sin programación</div><div class="d">Entrenado con una plataforma gratuita y visual.</div></div>
+        <div class="c" data-rv style="--i:4"><div class="tag">PRIVADO</div><div class="t">Corre local</div><div class="d">La imagen no sale del dispositivo.</div></div>
+        <div class="c" data-rv style="--i:5"><div class="tag">PORTÁTIL</div><div class="t">Un solo archivo</div><div class="d">Se abre en cualquier navegador.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 Proceso -->
+  <section class="slide">
+    <div class="inner">
+      <span class="kicker" data-rv>05 · El proceso</span>
+      <h2 data-rv style="--i:1">De la señal a la predicción</h2>
+      <div class="flow">
+        <div class="step" data-rv style="--i:2"><div class="n">PASO 1</div><div class="t">Señal ECG</div><div class="d">Registros de 12 derivaciones.</div></div>
+        <div class="arrow" data-rv style="--i:3">→</div>
+        <div class="step" data-rv style="--i:3"><div class="n">PASO 2</div><div class="t">Imagen</div><div class="d">Cada trazado se convierte en imagen.</div></div>
+        <div class="arrow" data-rv style="--i:4">→</div>
+        <div class="step" data-rv style="--i:4"><div class="n">PASO 3</div><div class="t">Balanceo</div><div class="d">Igualar clases para evitar sesgo.</div></div>
+        <div class="arrow" data-rv style="--i:5">→</div>
+        <div class="step" data-rv style="--i:5"><div class="n">PASO 4</div><div class="t">Teachable Machine</div><div class="d">Entrenamiento por transferencia.</div></div>
+        <div class="arrow" data-rv style="--i:6">→</div>
+        <div class="step" data-rv style="--i:6"><div class="n">PASO 5</div><div class="t">Interfaz</div><div class="d">Inferencia en el navegador.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 Datos -->
+  <section class="slide">
+    <div class="inner">
+      <span class="kicker" data-rv>06 · Los datos</span>
+      <h2 data-rv style="--i:1">Fuentes honestas y des-identificadas</h2>
+      <div class="cards">
+        <div class="c" data-rv style="--i:2"><div class="tag">PÚBLICO</div><div class="t">SaMi-Trop</div><div class="d">Cohorte brasileña de Chagas.</div></div>
+        <div class="c" data-rv style="--i:3"><div class="tag">PÚBLICO</div><div class="t">CODE-15%</div><div class="d">345.779 ECG con etiquetas.</div></div>
+        <div class="c" data-rv style="--i:4"><div class="tag">PÚBLICO</div><div class="t">PTB-XL</div><div class="d">21.837 ECG clínicos (SCP).</div></div>
+        <div class="c" data-rv style="--i:5"><div class="tag">PROPIO</div><div class="t">Práctica clínica</div><div class="d">ECG des-identificados (Santa Cruz).</div></div>
+      </div>
+      <p class="lead" data-rv style="--i:6">Los conjuntos públicos se usan bajo sus licencias y se citan; el conjunto propio fue anonimizado.</p>
+    </div>
+  </section>
+
+  <!-- 8 Modelo / clases -->
+  <section class="slide">
+    <div class="inner">
+      <span class="kicker" data-rv>07 · El modelo</span>
+      <h2 data-rv style="--i:1">Seis patrones reconocidos</h2>
+      <div class="cls" id="clsgrid"></div>
+    </div>
+  </section>
+
+  <!-- 9 Herramienta -->
+  <section class="slide">
+    <div class="inner">
+      <span class="kicker" data-rv>08 · La herramienta</span>
+      <h2 data-rv style="--i:1">Un asistente de lectura para el médico</h2>
+      <p class="lead big" data-rv style="--i:2">Se sube la imagen del ECG y el asistente devuelve el <b>patrón estimado</b> y su <b>confianza</b>, con un trazado tipo monitor. Pensado como apoyo a la docencia y al tamizaje.</p>
+      <a class="cta" href="https://claude.ai/artifact/7kzuJzNBVkvtuA195PpVy7" target="_blank" rel="noopener" data-rv style="--i:3">Abrir el asistente en vivo →</a>
+    </div>
+  </section>
+
+  <!-- 10 Resultados -->
+  <section class="slide">
+    <div class="inner">
+      <span class="kicker" data-rv>09 · Resultados</span>
+      <h2 data-rv style="--i:1">Lo que se logró</h2>
+      <ul class="blist">
+        <li data-rv style="--i:2"><span class="dot"></span>Un <b>sistema reproducible</b> de principio a fin: de los datos a la interfaz.</li>
+        <li data-rv style="--i:3"><span class="dot"></span>Un <b>modelo de 6 clases</b> entrenado en Teachable Machine.</li>
+        <li data-rv style="--i:4"><span class="dot"></span>Una <b>interfaz funcional</b> que clasifica en el navegador, de bajo costo.</li>
+      </ul>
+      <p class="foot-disc" data-rv style="--i:5">Demostración educativa: no es un dispositivo médico ni sustituye el juicio clínico.</p>
+    </div>
+  </section>
+
+  <!-- 11 Conclusiones -->
+  <section class="slide">
+    <div class="inner">
+      <span class="kicker" data-rv>10 · Conclusiones</span>
+      <h2 data-rv style="--i:1">Un apoyo accesible, con camino por delante</h2>
+      <p class="lead big" data-rv style="--i:2">Herramientas de IA accesibles pueden <b>complementar la formación y el tamizaje</b> del Chagas en contextos de recursos limitados como Bolivia, siempre como apoyo y nunca en reemplazo del especialista.</p>
+      <ul class="blist" data-rv style="--i:3">
+        <li><span class="dot"></span>A futuro: ampliar y validar el conjunto propio de datos.</li>
+        <li><span class="dot"></span>Entrenar con fotografías reales de ECG y evaluar con métricas clínicas.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 12 Gracias -->
+  <section class="slide">
+    <div class="inner" style="text-align:center">
+      <span class="kicker" data-rv>Gracias</span>
+      <h1 data-rv style="--i:1">Gracias</h1>
+      <p class="lead" data-rv style="--i:2;margin-left:auto;margin-right:auto">Luna Saleth Gallego Martínez · Ingeniería en Inteligencia Artificial<br>Universidad Privada Domingo Savio</p>
+      <div class="hintnav" data-rv style="--i:3">Apoyo educativo · no diagnóstico</div>
+    </div>
+  </section>
+
+  <div class="nav">
+    <div class="dots" id="dots"></div>
+    <div class="ctrls">
+      <button id="prev" aria-label="Anterior">‹</button>
+      <span class="counter" id="counter">1 / 12</span>
+      <button id="next" aria-label="Siguiente">›</button>
+      <button id="fs" aria-label="Pantalla completa">⛶</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var slides=Array.prototype.slice.call(document.querySelectorAll(".slide"));
+  var total=slides.length, idx=0;
+  var reduce=matchMedia("(prefers-reduced-motion:reduce)").matches;
+
+  // clases del modelo
+  var CLS=[
+    ["Normal","ECG normal","#2fe0b0"],["BRD","Bloqueo de rama derecha","#6ea0ff"],
+    ["HBAI","Hemibloqueo anterior izq.","#ffc24d"],["BRD+HBAI","Patrón chagásico clásico","#ff5a4d"],
+    ["BAV","Bloqueo aurículo-ventricular","#b78cff"],["EV","Extrasístole ventricular","#ff9254"]
+  ];
+  (function(){var g=document.getElementById("clsgrid");CLS.forEach(function(c,i){
+    var d=document.createElement("div");d.className="cl";d.setAttribute("data-rv","");d.style.setProperty("--i",i+2);
+    d.innerHTML='<div class="mk" style="background:'+c[2]+'"></div><div><div class="ab">'+c[0]+'</div><div class="d">'+c[1]+'</div></div>';
+    g.appendChild(d);});})();
+
+  // dots
+  var dots=document.getElementById("dots");
+  slides.forEach(function(_,i){var b=document.createElement("button");b.setAttribute("aria-label","Diapositiva "+(i+1));
+    b.addEventListener("click",function(){go(i);});dots.appendChild(b);});
+  var dotEls=Array.prototype.slice.call(dots.children);
+
+  function countUp(slide){
+    slide.querySelectorAll("[data-count]").forEach(function(el){
+      var target=parseFloat(el.getAttribute("data-count")),suf=el.getAttribute("data-suffix")||"";
+      if(reduce){el.textContent=target+suf;return;}
+      var t0=null,dur=900;
+      function step(ts){if(!t0)t0=ts;var p=Math.min(1,(ts-t0)/dur);
+        el.textContent=Math.round(target*(0.1+0.9*p*p*(3-2*p)))*1+suf;
+        if(p<1)requestAnimationFrame(step);else el.textContent=target+suf;}
+      el.textContent="0"+suf;requestAnimationFrame(step);
+    });
+  }
+
+  function go(n){
+    n=Math.max(0,Math.min(total-1,n));
+    slides.forEach(function(s,i){s.classList.remove("active","prev");if(i<n)s.classList.add("prev");});
+    slides[n].classList.add("active");
+    idx=n;
+    document.getElementById("progress").style.width=((n+1)/total*100)+"%";
+    document.getElementById("counter").textContent=(n+1)+" / "+total;
+    dotEls.forEach(function(d,i){d.classList.toggle("on",i===n);});
+    countUp(slides[n]);
+  }
+
+  document.getElementById("next").addEventListener("click",function(){go(idx+1);});
+  document.getElementById("prev").addEventListener("click",function(){go(idx-1);});
+  document.getElementById("fs").addEventListener("click",function(){
+    try{if(!document.fullscreenElement)document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();
+      else document.exitFullscreen&&document.exitFullscreen();}catch(e){}
+  });
+  document.addEventListener("keydown",function(e){
+    if(e.key==="ArrowRight"||e.key===" "||e.key==="PageDown"){e.preventDefault();go(idx+1);}
+    else if(e.key==="ArrowLeft"||e.key==="PageUp"){e.preventDefault();go(idx-1);}
+    else if(e.key==="Home"){go(0);}else if(e.key==="End"){go(total-1);}
+    else if(e.key==="f"||e.key==="F"){document.getElementById("fs").click();}
+  });
+  // swipe
+  var x0=null;
+  document.addEventListener("touchstart",function(e){x0=e.touches[0].clientX;},{passive:true});
+  document.addEventListener("touchend",function(e){if(x0===null)return;var dx=e.changedTouches[0].clientX-x0;
+    if(Math.abs(dx)>50)go(idx+(dx<0?1:-1));x0=null;},{passive:true});
+
+  // trazado de fondo animado
+  (function(){
+    var cv=document.getElementById("bgtrace"),ctx=cv.getContext("2d"),dpr=Math.min(window.devicePixelRatio||1,2),W,H,buf=[],ph=0;
+    function gauss(t,c,w,a){return a*Math.exp(-((t-c)*(t-c))/(2*w*w))}
+    function beat(t){return gauss(t,.15,.02,.1)+gauss(t,.31,.012,-.1)+gauss(t,.34,.012,1)+gauss(t,.37,.012,-.22)+gauss(t,.56,.045,.26)}
+    function resize(){W=cv.clientWidth;H=cv.clientHeight;cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
+      if(buf.length>W)buf=buf.slice(-W);while(buf.length<W)buf.push(H*0.5);}
+    resize();window.addEventListener("resize",resize);
+    function samp(){ph+=0.006;if(ph>=1)ph-=1;return H*0.5-beat(ph)*H*0.16;}
+    function paint(){ctx.clearRect(0,0,W,H);ctx.lineWidth=2;ctx.strokeStyle="rgba(47,224,176,.45)";
+      ctx.shadowColor="rgba(47,224,176,.55)";ctx.shadowBlur=8;ctx.beginPath();
+      for(var i=0;i<buf.length;i++){if(i===0)ctx.moveTo(i,buf[i]);else ctx.lineTo(i,buf[i]);}ctx.stroke();ctx.shadowBlur=0;}
+    if(reduce){for(var k=0;k<W;k++)buf[k]=samp();paint();}
+    else{(function loop(){for(var s=0;s<2;s++){buf.push(samp());if(buf.length>W)buf.shift();}paint();requestAnimationFrame(loop);})();}
+  })();
+
+  go(0);
+})();
+</script>

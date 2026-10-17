@@ -62,9 +62,13 @@ El catálogo completo de datasets públicos, con enlaces, licencias y notas, est
 │   ├── wfdb_to_images.py    # convierte señales ECG en imágenes PNG por clase
 │   ├── scp_class_map.py     # mapeo etiquetas (PTB-XL SCP / CODE-15%) -> clases
 │   ├── plan_balanced_set.py # distribución de clases + manifiesto balanceado
-│   └── synthesize_ecg.py    # ECG sintéticos por clase (validación del pipeline, sin datos)
+│   ├── synthesize_ecg.py    # ECG sintéticos por clase (validación del pipeline, sin datos)
+│   ├── generar_dataset_demo.py  # dataset sintético por clase para entrenar en Teachable Machine
+│   └── deidentify_images.py # des-identifica fotos de ECG (quita metadatos y tapa datos)
 ├── app/
-│   └── index.html           # interfaz web para clasificar ECG con el modelo entrenado
+│   ├── index.html           # interfaz: carga tu modelo exportado y clasifica
+│   ├── asistente.html       # asistente clínico con el modelo YA incorporado (1 archivo)
+│   └── presentacion.html    # presentación interactiva animada del proyecto
 ├── samples/                 # SVGs sintéticos de ejemplo, uno por clase
 ├── notebooks/
 │   └── 01_explorar_datos.ipynb  # flujo explorar -> balancear -> renderizar
@@ -101,17 +105,28 @@ python scripts/wfdb_to_images.py --input data/raw/ptbxl \
 # Alternativa guiada: notebooks/01_explorar_datos.ipynb hace los pasos 3-4 con gráficas.
 ```
 
-## Interfaz web (`app/index.html`)
+## Interfaces web (`app/`)
 
-Interfaz para **clasificar una imagen de ECG** con el modelo entrenado. Funciona sin
-instalar nada: ábrela en el navegador (doble clic en `app/index.html`).
+Todas funcionan en el navegador, sin instalar nada (doble clic en el archivo):
 
-- **Ejemplos integrados**: trae un trazado sintético por clase, así la demo funciona aunque
-  todavía no tengas el modelo.
-- **Tu modelo**: en Teachable Machine, *Exportar modelo → TensorFlow.js → Descargar*; sube los
-  tres archivos (`model.json`, `weights.bin`, `metadata.json`) y clasifica imágenes reales.
-  Todo corre en tu navegador; no se envía nada a ningún servidor.
-- Tema claro/oscuro, diseño responsive y aviso de uso educativo.
+- **`app/asistente.html`** — asistente clínico con el **modelo ya incorporado** (un solo
+  archivo). Recibe al médico, se sube la imagen del ECG y devuelve el patrón estimado y la
+  confianza por clase, con un trazado tipo monitor. Inferencia local; no envía datos.
+- **`app/index.html`** — versión genérica: carga tu modelo exportado de Teachable Machine
+  (*Exportar modelo → TensorFlow.js → Descargar* → sube `model.json`, `weights.bin`,
+  `metadata.json`) y clasifica imágenes. Trae ejemplos integrados.
+- **`app/presentacion.html`** — presentación interactiva animada del proyecto (por qué el
+  Chagas en Bolivia y todo el proceso). Navega con ← →.
+
+### Dataset de demostración para Teachable Machine
+
+```bash
+# multiclase (6 patrones) o binario (chagas / no_chagas)
+python scripts/generar_dataset_demo.py --modo multiclase --n 300 --out dataset_demo
+```
+
+Genera imágenes **sintéticas** por clase para entrenar un modelo de prueba en Teachable
+Machine. Son ilustrativas (no clínicas): sirven para demostrar el sistema, no para diagnóstico.
 
 Consulta [`docs/datasets.md`](docs/datasets.md) antes de descargar: SaMi-Trop y la mayoría de
 datos de PhysioNet requieren registro y aceptar los términos de uso.
