@@ -5,6 +5,11 @@ clasificador de patologías chagásicas. Para cada uno se indica: contenido, tam
 licencia/acceso y enlace. **Verifica siempre el enlace y la licencia antes de descargar** —
 los identificadores de Zenodo/PhysioNet pueden cambiar.
 
+> **Nota de transparencia.** Estos conjuntos son las fuentes previstas para el flujo con datos
+> reales (`scripts/`). El modelo incluido en `modelo/` se entrenó con imágenes **sintéticas**
+> (ver `scripts/generar_dataset_demo.py`); los datos públicos y los ECG de la Caja CORDES no se
+> incluyen en el repositorio.
+
 Leyenda de acceso:
 - 🟢 **Abierto**: descarga directa.
 - 🟡 **Registro**: requiere crear cuenta y aceptar términos (p. ej. PhysioNet credentialed).
@@ -17,7 +22,7 @@ Leyenda de acceso:
   Contiene ECG de 12 derivaciones con anotaciones clínicas. Es el dataset **específico de
   Chagas** por excelencia.
 - **Formato:** WFDB / HDF5 + tabla de metadatos (CSV).
-- **Acceso:** 🟡 Zenodo (registro para algunas versiones).
+- **Acceso:** consulta en Zenodo las condiciones y la licencia de la versión vigente.
 - **Enlace:** https://zenodo.org/record/4905618  ·  DOI: `10.5281/zenodo.4905618`
 - **Uso en este proyecto:** fuente principal de la clase *positiva de Chagas* y de sus
   patrones de conducción.
@@ -38,7 +43,7 @@ Leyenda de acceso:
 - **Qué es:** **21.837** ECG clínicos de 10 s / 12 derivaciones, de 18.885 pacientes, con
   diagnósticos codificados en SCP-ECG (incluye RBBB, LAFB, BAV, etc.).
 - **Formato:** WFDB (`.dat`/`.hea`) + `ptbxl_database.csv`, `scp_statements.csv`.
-- **Acceso:** 🟡 PhysioNet (registro).
+- **Acceso:** 🟢 PhysioNet (acceso abierto, licencia CC BY 4.0).
 - **Enlace:** https://physionet.org/content/ptb-xl/
 - **Uso en este proyecto:** clase **LAFB** y comparación / control con población no chagásica.
 

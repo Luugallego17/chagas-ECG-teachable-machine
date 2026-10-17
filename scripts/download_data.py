@@ -3,14 +3,14 @@
 
 Fuentes soportadas (ver docs/datasets.md para detalles y licencias):
 
-  samitrop   Cohorte de Chagas (Zenodo 4905618)      -> requiere registro en algunas versiones
-  code15     CODE-15%, 345.779 ECG (Zenodo 4916206)  -> abierto
-  ptbxl      PTB-XL, 21.837 ECG (PhysioNet)           -> requiere cuenta PhysioNet
-  challenge2025  PhysioNet Challenge 2025 (Chagas)     -> requiere cuenta PhysioNet
+  samitrop   Cohorte de Chagas (Zenodo 4905618)      -> revisa condiciones y licencia en Zenodo
+  code15     CODE-15%, 345.779 ECG (Zenodo 4916206)  -> revisa condiciones y licencia en Zenodo
+  ptbxl      PTB-XL, 21.837 ECG (PhysioNet)           -> acceso abierto (CC BY 4.0)
+  challenge2025  PhysioNet Challenge 2025 (Chagas)     -> revisa condiciones en PhysioNet
 
 Uso:
   python scripts/download_data.py --dataset code15 --dest data/raw
-  python scripts/download_data.py --dataset ptbxl  --dest data/raw   # pedirá login PhysioNet
+  python scripts/download_data.py --dataset ptbxl  --dest data/raw   # muestra el comando wget
 
 Nota: los datasets son grandes (varios GB). Descarga solo lo que necesites y respeta los
 términos de uso de cada fuente. Este script NO redistribuye datos: solo automatiza la
@@ -82,18 +82,20 @@ def download_zenodo(record: str, dest: Path) -> None:
 
 
 def download_physionet(path: str, dest: Path) -> None:
-    """PhysioNet requiere autenticación; se delega en la herramienta oficial `wget`.
+    """PhysioNet: se imprime el comando oficial `wget`; no se incrustan credenciales.
 
-    Se imprime el comando recomendado en lugar de incrustar credenciales.
+    Algunos conjuntos son de acceso abierto y otros exigen cuenta y aceptar un acuerdo de uso.
     """
     out = dest / path
-    cmd = (
+    cmd = f"wget -r -N -c -np https://physionet.org/files/{path}/ -P {dest}"
+    cmd_auth = (
         f"wget -r -N -c -np --user <TU_USUARIO_PHYSIONET> --ask-password "
         f"https://physionet.org/files/{path}/ -P {dest}"
     )
-    print("PhysioNet requiere cuenta y aceptar los términos de uso del dataset.")
-    print("1) Regístrate en https://physionet.org/ y acepta el DUA del dataset.")
-    print(f"2) Descarga con:\n\n    {cmd}\n")
+    print("Comprueba en la página del dataset si es de acceso abierto o si exige cuenta.")
+    print(f"1) Acceso abierto:\n\n    {cmd}\n")
+    print("2) Si exige cuenta: regístrate en https://physionet.org/, acepta el acuerdo de uso y usa:")
+    print(f"\n    {cmd_auth}\n")
     print(f"   Los ficheros quedarán en: {out}")
 
 

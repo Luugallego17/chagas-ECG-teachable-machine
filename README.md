@@ -1,152 +1,129 @@
 # Chagas ECG · Teachable Machine
 
-Proyecto para **identificar patologías cardíacas asociadas a la enfermedad de Chagas** a
-partir de electrocardiogramas (ECG), usando [Google Teachable Machine](https://teachablemachine.withgoogle.com/)
-como clasificador de imágenes.
+Clasificador de **patrones electrocardiográficos asociados a la enfermedad de Chagas**, hecho con
+[Google Teachable Machine](https://teachablemachine.withgoogle.com/) y una interfaz web que
+funciona por completo en el navegador.
+
+Proyecto de **Luna Saleth Gallego Martínez** · Ingeniería en Inteligencia Artificial ·
+Universidad Católica Boliviana «San Pablo».
 
 La enfermedad de Chagas (infección por *Trypanosoma cruzi*) produce una miocardiopatía cuyo
-sello electrocardiográfico son ciertas alteraciones de la conducción y del ritmo. La idea del
-proyecto es reunir ECG etiquetados, convertir cada trazado en una **imagen**, y entrenar un
-modelo de clasificación de imágenes en Teachable Machine.
+sello en el electrocardiograma son ciertas alteraciones de la conducción y del ritmo. Bolivia
+tiene la mayor prevalencia mundial, y en las zonas rurales faltan especialistas que lean el ECG.
+El proyecto convierte cada trazado en una **imagen** y entrena un clasificador de seis clases.
 
-> ⚠️ **Aviso médico.** Este proyecto es educativo / de investigación. No es un dispositivo
-> médico y no debe usarse para diagnóstico clínico.
-
----
-
-## ¿Por qué imágenes?
-
-Teachable Machine (modo *Image Project*) clasifica **imágenes**, no señales crudas. Por eso el
-flujo de trabajo es:
-
-```
-Señal ECG (WFDB/CSV)  ──►  Imagen del trazado (PNG)  ──►  Teachable Machine  ──►  modelo
-```
-
-Cada clase del modelo se corresponde con una carpeta dentro de `data/images/`.
-
-## Clases (patologías chagásicas típicas en ECG)
-
-| Carpeta                 | Clase                                             | Relevancia en Chagas |
-|-------------------------|---------------------------------------------------|----------------------|
-| `data/images/normal`    | ECG normal                                        | Control negativo |
-| `data/images/rbbb`      | Bloqueo completo de rama derecha (BRD / RBBB)     | Hallazgo más frecuente |
-| `data/images/lafb`      | Hemibloqueo anterior izquierdo (HBAI / LAFB)      | Muy frecuente |
-| `data/images/rbbb_lafb` | BRD + HBAI (patrón chagásico "clásico")           | Alta especificidad para Chagas |
-| `data/images/av_block`  | Bloqueo aurículo-ventricular (BAV)                | Marcador de progresión |
-| `data/images/pvc`       | Extrasístoles / arritmia ventricular              | Riesgo de muerte súbita |
-
-Puedes añadir o quitar clases creando/eliminando subcarpetas en `data/images/`.
+> ⚠️ **Aviso médico.** Proyecto educativo y de investigación. No es un dispositivo médico y no
+> debe usarse para diagnosticar a pacientes.
 
 ---
 
-## Datasets
+## Probarlo en un minuto
 
-El catálogo completo de datasets públicos, con enlaces, licencias y notas, está en
-[`docs/datasets.md`](docs/datasets.md). Los principales:
+Abre **`app/asistente.html`** con doble clic (el modelo ya viene incorporado en el archivo).
+Arrastra la imagen de un ECG y verás el patrón estimado y la confianza de cada clase. En
+`app/presentacion.html` está la presentación del proyecto (navega con ← →; `P` reproduce solo,
+`F` pantalla completa). Para que el botón «Abrir el asistente» de la presentación funcione,
+deja ambos archivos en la misma carpeta.
 
-- **SaMi-Trop** — cohorte brasileña de pacientes con Chagas (el dataset de referencia).
-- **CODE-15%** — 345.779 ECG de Brasil con etiquetas de anomalías de conducción.
-- **PTB-XL** — 21.837 ECG clínicos con diagnósticos SCP-ECG (control / comparación).
-- **PhysioNet Challenge 2025** — reto oficial de *detección de Chagas por ECG*.
+## Qué se usó realmente (transparencia)
+
+- **Modelo incluido:** seis clases, entrenado en Teachable Machine con **1.800 imágenes
+  sintéticas** (300 por clase) generadas con `scripts/generar_dataset_demo.py`. Es un modelo de
+  **demostración**: reconoce ese tipo de trazados y **no está validado con ECG reales**.
+- **Imágenes de prueba:** 120 imágenes nuevas (20 por clase), con semillas distintas a las del
+  entrenamiento y sin coincidencia con ellas (verificado por huella SHA-256). Se regeneran con:
+  `python scripts/generar_dataset_demo.py --n 0 --test 20 --semilla-base 700000 --out pruebas_nuevas`
+- **Fuentes de datos previstas para el flujo real:** SaMi-Trop, CODE-15 % y PTB-XL (bajo sus
+  licencias) y electrocardiogramas facilitados por la **Caja CORDES (sede Cochabamba)**,
+  des-identificados. Los datos de pacientes **no se incluyen** en este repositorio.
+- No se calcularon métricas de desempeño (exactitud, sensibilidad, especificidad).
+
+## Las seis clases
+
+| Clase                    | Etiqueta del modelo         | Carpeta del dataset demo   | Carpeta `data/images/` |
+|--------------------------|-----------------------------|----------------------------|------------------------|
+| ECG normal               | `ECG NORMAL`                | `normal`                   | `normal`               |
+| Bloqueo de rama derecha  | `BRD`                       | `brd`                      | `rbbb`                 |
+| Hemibloqueo ant. izq.    | `HBAI`                      | `hbai`                     | `lafb`                 |
+| BRD + HBAI (clásico)     | `BRD + HBAI`                | `brd_hbai`                 | `rbbb_lafb`            |
+| Bloqueo AV               | `Bloqueo AV`                | `bloqueo_av`               | `av_block`             |
+| Extrasístole ventricular | `Extrasistole ventricular`  | `extrasistole_ventricular` | `pvc`                  |
 
 ## Estructura del repositorio
 
 ```
 .
-├── README.md
-├── docs/
-│   └── datasets.md          # catálogo de datasets con enlaces y licencias
-├── scripts/
-│   ├── download_data.py     # descarga los datasets desde Zenodo / PhysioNet
-│   ├── wfdb_to_images.py    # convierte señales ECG en imágenes PNG por clase
-│   ├── scp_class_map.py     # mapeo etiquetas (PTB-XL SCP / CODE-15%) -> clases
-│   ├── plan_balanced_set.py # distribución de clases + manifiesto balanceado
-│   ├── synthesize_ecg.py    # ECG sintéticos por clase (validación del pipeline, sin datos)
-│   ├── generar_dataset_demo.py  # dataset sintético por clase para entrenar en Teachable Machine
-│   └── deidentify_images.py # des-identifica fotos de ECG (quita metadatos y tapa datos)
 ├── app/
-│   ├── index.html           # interfaz: carga tu modelo exportado y clasifica
-│   ├── asistente.html       # asistente clínico con el modelo YA incorporado (1 archivo)
-│   └── presentacion.html    # presentación interactiva animada del proyecto
-├── samples/                 # SVGs sintéticos de ejemplo, uno por clase
-├── notebooks/
-│   └── 01_explorar_datos.ipynb  # flujo explorar -> balancear -> renderizar
-├── data/
-│   ├── raw/                 # datasets descargados (ignorado por git)
-│   └── images/              # imágenes listas para Teachable Machine, una carpeta por clase
-├── notebooks/
+│   ├── asistente.html        # asistente clínico con el modelo YA incorporado (un solo archivo)
+│   ├── index.html            # versión genérica: carga un modelo exportado de Teachable Machine
+│   └── presentacion.html     # presentación interactiva del proyecto
+├── modelo/                   # modelo exportado (TensorFlow.js): model.json, weights.bin, metadata.json
+├── informe/                  # artículo científico (formato Revista 3i): .docx y .pdf imprimible
+├── scripts/
+│   ├── generar_dataset_demo.py  # imágenes sintéticas por clase (multiclase o binario)
+│   ├── synthesize_ecg.py     # trazados sintéticos en SVG (validación del flujo)
+│   ├── download_data.py      # descarga datasets desde Zenodo / indicaciones de PhysioNet
+│   ├── wfdb_to_images.py     # señales ECG (WFDB / HDF5) -> imágenes PNG por clase
+│   ├── scp_class_map.py      # mapeo de etiquetas (PTB-XL SCP / CODE-15 %) -> clases
+│   ├── plan_balanced_set.py  # distribución de clases + manifiesto balanceado
+│   └── deidentify_images.py  # des-identifica fotos de ECG (quita metadatos y tapa datos)
+├── docs/                     # catálogo de datasets y mapeo de etiquetas PTB-XL
+├── notebooks/01_explorar_datos.ipynb  # explorar -> balancear -> renderizar
+├── samples/                  # SVGs de ejemplo, uno por clase
+├── data/                     # datos locales (ignorados por git)
 ├── requirements.txt
 └── .gitignore
 ```
 
-## Puesta en marcha
+## Flujo con datos reales
 
 ```bash
-# 1. Dependencias
 pip install -r requirements.txt
 
-# 2. Descargar datasets (ver docs/datasets.md para credenciales/PhysioNet)
-python scripts/download_data.py --dataset samitrop --dest data/raw
+# 1. Descargar datasets (revisa acceso y licencia en docs/datasets.md)
+python scripts/download_data.py --dataset code15 --dest data/raw
 
-# 3. Ver distribución de clases y generar un manifiesto balanceado
-python scripts/plan_balanced_set.py \
-    --labels data/raw/ptbxl/ptbxl_database.csv \
-    --id-col filename_hr --label-col scp_codes \
-    --out data/manifest.csv --per-class 300
+# 2. Ver la distribución de clases y generar un manifiesto balanceado
+python scripts/plan_balanced_set.py --labels data/raw/ptbxl/ptbxl_database.csv \
+    --id-col filename_hr --label-col scp_codes --out data/manifest.csv --per-class 300
 
-# 4. Convertir a imágenes por clase (solo los registros del manifiesto balanceado)
-python scripts/wfdb_to_images.py --input data/raw/ptbxl \
-    --manifest data/manifest.csv --out data/images
+# 3. Convertir a imágenes por clase (solo los registros del manifiesto)
+python scripts/wfdb_to_images.py --input data/raw/ptbxl --manifest data/manifest.csv --out data/images
 
-# 5. Subir data/images/ a https://teachablemachine.withgoogle.com/ (Image Project)
-#    y entrenar arrastrando cada carpeta como una clase.
-#
-# Alternativa guiada: notebooks/01_explorar_datos.ipynb hace los pasos 3-4 con gráficas.
+# 4. Subir cada carpeta como una clase en Teachable Machine, entrenar y exportar (TensorFlow.js)
 ```
 
-## Interfaces web (`app/`)
+Si usas fotos de ECG de pacientes, **des-identifícalas primero** con
+`scripts/deidentify_images.py` (modo `--grid` para ubicar las zonas a tapar) y no las subas al
+repositorio: las carpetas `fotos/`, `fotos_anon/`, `previews/`, `anon/` están en `.gitignore`.
 
-Todas funcionan en el navegador, sin instalar nada (doble clic en el archivo):
-
-- **`app/asistente.html`** — asistente clínico con el **modelo ya incorporado** (un solo
-  archivo). Recibe al médico, se sube la imagen del ECG y devuelve el patrón estimado y la
-  confianza por clase, con un trazado tipo monitor. Inferencia local; no envía datos.
-- **`app/index.html`** — versión genérica: carga tu modelo exportado de Teachable Machine
-  (*Exportar modelo → TensorFlow.js → Descargar* → sube `model.json`, `weights.bin`,
-  `metadata.json`) y clasifica imágenes. Trae ejemplos integrados.
-- **`app/presentacion.html`** — presentación interactiva animada del proyecto (por qué el
-  Chagas en Bolivia y todo el proceso). Navega con ← →.
-
-### Dataset de demostración para Teachable Machine
+## Dataset de demostración
 
 ```bash
-# multiclase (6 patrones) o binario (chagas / no_chagas)
-python scripts/generar_dataset_demo.py --modo multiclase --n 300 --out dataset_demo
+python scripts/generar_dataset_demo.py --modo multiclase --n 300 --out dataset_demo   # 6 clases
+python scripts/generar_dataset_demo.py --modo binario   --n 300 --out dataset_demo    # chagas / no_chagas
 ```
 
-Genera imágenes **sintéticas** por clase para entrenar un modelo de prueba en Teachable
-Machine. Son ilustrativas (no clínicas): sirven para demostrar el sistema, no para diagnóstico.
+Solo usa la librería estándar de Python. Las imágenes son **sintéticas** y sirven para demostrar
+el sistema, no para diagnóstico.
 
-Consulta [`docs/datasets.md`](docs/datasets.md) antes de descargar: SaMi-Trop y la mayoría de
-datos de PhysioNet requieren registro y aceptar los términos de uso.
-
-### Validar el pipeline sin descargar datos
-
-Antes de tocar datos reales puedes comprobar la taxonomía y el render con ECG **sintéticos**
-(solo librería estándar, no instala nada):
+## Verificación rápida
 
 ```bash
-python scripts/synthesize_ecg.py --out samples
+python -m py_compile scripts/*.py        # los scripts compilan
+python scripts/scp_class_map.py          # autocomprobación del mapeo de etiquetas (7 casos)
+python scripts/synthesize_ecg.py --out /tmp/samples
+python scripts/generar_dataset_demo.py --n 2 --test 1 --out /tmp/demo
 ```
 
-Genera un trazado ilustrativo por clase en `samples/` (ver `samples/todas_las_clases.svg`).
-Son solo para validación visual — **no deben usarse para entrenar**.
+## Informe
 
-El mapeo de etiquetas de cada dataset a las clases del proyecto vive en
-[`scripts/scp_class_map.py`](scripts/scp_class_map.py) (detalles de PTB-XL en
-[`docs/ptbxl_scp_mapping.md`](docs/ptbxl_scp_mapping.md)); trae autocomprobación:
+`informe/Articulo_ECG_Chagas_Revista3i.docx` sigue la plantilla de la Revista 3i (Arial, interlineado
+1,5, normas APA 7.ª edición) e incluye el resumen en español, el *abstract* en inglés y el *resumo*
+en portugués. `informe/Articulo_ECG_Chagas_Revista3i.pdf` es la versión imprimible.
 
-```bash
-python scripts/scp_class_map.py
-```
+## Créditos
+
+Se agradece a la **Caja CORDES (sede Cochabamba)** y a su director por facilitar los
+electrocardiogramas. Los conjuntos públicos (SaMi-Trop, CODE-15 %, PTB-XL) se usan bajo sus
+licencias y deben citarse según sus términos.

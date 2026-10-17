@@ -15,6 +15,7 @@
   color-scheme:dark;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html,body{height:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased}
 
@@ -25,8 +26,8 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);over
   background:radial-gradient(rgba(0,188,235,.16) 1px,transparent 1.2px) 0 0/28px 28px;opacity:.5;
   mask-image:radial-gradient(90% 80% at 50% 40%,#000 30%,transparent 85%);-webkit-mask-image:radial-gradient(90% 80% at 50% 40%,#000 30%,transparent 85%)}
 .glow{position:absolute;border-radius:50%;filter:blur(90px);opacity:.28;mix-blend-mode:screen}
-.g1{width:46vw;height:46vw;right:-10vw;top:-14vw;background:radial-gradient(circle,#00bceb,transparent 62%);animation:d1 22s ease-in-out infinite alternate}
-.g2{width:40vw;height:40vw;left:-12vw;bottom:-14vw;background:radial-gradient(circle,#2f7bff,transparent 62%);animation:d2 26s ease-in-out infinite alternate}
+.glow-a{width:46vw;height:46vw;right:-10vw;top:-14vw;background:radial-gradient(circle,#00bceb,transparent 62%);animation:d1 22s ease-in-out infinite alternate}
+.glow-b{width:40vw;height:40vw;left:-12vw;bottom:-14vw;background:radial-gradient(circle,#2f7bff,transparent 62%);animation:d2 26s ease-in-out infinite alternate}
 @keyframes d1{to{transform:translate(-8vw,8vh) scale(1.12)}} @keyframes d2{to{transform:translate(8vw,-6vh) scale(1.15)}}
 
 /* encabezado + franja ECG */
@@ -72,7 +73,9 @@ b{color:#fff;font-weight:600}
 .slide.active [data-rv]{opacity:1;transform:none;transition-delay:calc(var(--i,0)*80ms + 130ms)}
 
 /* rejillas */
-.g2{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(18px,3vw,44px);align-items:center}
+.g2{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:clamp(18px,3vw,44px);align-items:center}
+.g2>*{min-width:0}
+.ttl{font-size:clamp(1.9rem,4.1vw,3.3rem)}
 .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
 .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
 .g2b{display:grid;grid-template-columns:1fr 1fr;gap:18px}
@@ -191,13 +194,31 @@ canvas.mini{display:block;width:100%;height:auto;border-radius:10px;background:r
 .ctrls button:hover{border-color:var(--cyan)}
 .counter{font-family:var(--mono);font-size:.8rem;color:var(--dim);min-width:56px;text-align:center}
 
+/* pantallas bajas (portátiles 1366×768, proyectores 1280×720): compacta para evitar scroll */
+@media (max-height:820px){
+  :root{--hh:50px;--strip:44px;--navh:52px}
+  .slide{padding-top:calc(var(--hh) + var(--strip) + 12px);padding-bottom:calc(var(--navh) + 10px)}
+  h2{font-size:clamp(1.4rem,2.8vw,2.1rem)}
+  .lead{margin-top:.5em;font-size:clamp(.92rem,1.5vw,1.05rem)}
+  .card:not(.pcard){padding:14px}
+  .mt{margin-top:14px}
+  .chk{gap:8px;margin-top:10px}
+  .chk li{font-size:.92rem}
+  .wm{display:none}
+  .pcard .pb{gap:7px;padding:8px 16px 12px}
+  .pcard .pv{padding-top:8px}
+  .tl{margin-top:16px}
+  .bars{margin-top:8px;gap:8px}
+  #anat{width:auto!important;max-width:100%;max-height:190px;margin:0 auto;display:block}
+  .note{margin-top:10px}
+}
 @media (prefers-reduced-motion:reduce){
   .slide{transition:opacity .25s}.slide,[data-rv]{transform:none;filter:none}[data-rv]{transition:opacity .25s}
   .glow,.pipe::before,.farrow,.cta{animation:none} canvas.mini{clip-path:none;transition:none} .bfill{transition:none}
 }
 </style>
 
-<div class="bg" aria-hidden="true"><div class="glow g1"></div><div class="glow g2"></div></div>
+<div class="bg" aria-hidden="true"><div class="glow glow-a"></div><div class="glow glow-b"></div></div>
 <div class="progress" id="progress"></div>
 
 <header class="topbar">
@@ -217,7 +238,7 @@ canvas.mini{display:block;width:100%;height:auto;border-radius:10px;background:r
     <div class="g2">
       <div>
         <span class="kicker" data-rv style="--i:0">Defensa de proyecto · Inteligencia Artificial</span>
-        <h1 data-rv style="--i:1">Detección de patrones <span class="grad">chagásicos</span> en el electrocardiograma con IA</h1>
+        <h1 class="ttl" data-rv style="--i:1">Detección de patrones <span class="grad">chagásicos</span> en el electrocardiograma con IA</h1>
         <div class="author" data-rv style="--i:2"><span class="nm">Luna Saleth Gallego Martínez</span><span class="sub">Carrera de Ingeniería en Inteligencia Artificial<br>Universidad Católica Boliviana «San Pablo»</span></div>
         <div class="hintnav" data-rv style="--i:3"><span class="key">←</span><span class="key">→</span> navegar · <span class="key">P</span> auto · <span class="key">F</span> pantalla completa</div>
       </div>
@@ -402,6 +423,7 @@ canvas.mini{display:block;width:100%;height:auto;border-radius:10px;background:r
       <div class="card" data-rv style="--i:4"><div class="tag">Público</div><div class="t">PTB-XL</div><div class="d">21.837 ECG clínicos con diagnósticos.</div></div>
       <div class="card" data-rv style="--i:5"><div class="tag">Propio</div><div class="t">Caja CORDES</div><div class="d">ECG facilitados por la sede Cochabamba y su director.</div></div>
     </div>
+    <p class="note" data-rv style="--i:6">Estas son las fuentes que alimentan el flujo de datos. El modelo de esta demostración se entrenó con <b>1.800 imágenes sintéticas</b> (300 por clase); incorporar los registros reales es la siguiente etapa.</p>
     <div class="g2b mt">
       <div class="card" data-rv style="--i:6"><div class="tag">Anonimización del conjunto propio</div>
         <ul class="chk"><li>Se tapó el nombre y el número de historia clínica.</li><li>Se eliminaron los metadatos de la imagen (fecha, ubicación).</li><li>Solo se conserva el trazado del ECG.</li></ul></div>
@@ -449,7 +471,7 @@ canvas.mini{display:block;width:100%;height:auto;border-radius:10px;background:r
     <div class="flowd mt">
       <div class="fbox" data-rv style="--i:3"><div class="tag">Entrada</div><div class="t">Imagen 224 × 224</div><div class="d">Cada imagen se redimensiona al tamaño que espera la red.</div></div>
       <div class="farrow" data-rv style="--i:4">→</div>
-      <div class="fbox" data-rv style="--i:4"><div class="tag">Red base</div><div class="t">MobileNet</div><div class="d">Preentrenada con millones de imágenes; sus capas se conservan y extraen características.</div></div>
+      <div class="fbox" data-rv style="--i:4"><div class="tag">Red base</div><div class="t">MobileNetV2</div><div class="d">Preentrenada con millones de imágenes; sus capas se conservan y extraen características.</div></div>
       <div class="farrow" data-rv style="--i:5">→</div>
       <div class="fbox hl" data-rv style="--i:5"><div class="tag">Se entrena aquí</div><div class="t">Capas nuevas</div><div class="d">Aprenden a separar los 6 patrones a partir de tus imágenes.</div></div>
       <div class="farrow" data-rv style="--i:6">→</div>
@@ -478,7 +500,7 @@ canvas.mini{display:block;width:100%;height:auto;border-radius:10px;background:r
     <div class="g2 mt">
       <ul class="chk" data-rv style="--i:2">
         <li><span><b>1.</b> La imagen del ECG se redimensiona a <b>224 × 224 px</b>.</span></li>
-        <li><span><b>2.</b> MobileNet extrae sus <b>características visuales</b>: formas, anchuras, picos.</span></li>
+        <li><span><b>2.</b> MobileNetV2 extrae sus <b>características visuales</b>: formas, anchuras, picos.</span></li>
         <li><span><b>3.</b> Las capas entrenadas asignan una <b>probabilidad a cada clase</b>.</span></li>
         <li><span><b>4.</b> La interfaz muestra la clase más probable y el porcentaje de todas.</span></li>
       </ul>
@@ -495,7 +517,7 @@ canvas.mini{display:block;width:100%;height:auto;border-radius:10px;background:r
       <div class="card stat" data-rv style="--i:3"><div class="v"><span data-count="6">0</span></div><div class="l">patrones reconocidos por el modelo entrenado en Teachable Machine.</div></div>
       <div class="card stat" data-rv style="--i:4"><div class="v am"><span data-count="1">0</span></div><div class="l">archivo: un asistente que clasifica la imagen directamente en el navegador.</div></div>
     </div>
-    <a class="cta" href="https://claude.ai/artifact/7kzuJzNBVkvtuA195PpVy7" target="_blank" rel="noopener" data-rv style="--i:5">Abrir el asistente en vivo →</a>
+    <a class="cta" href="asistente.html" target="_blank" rel="noopener" data-rv style="--i:5">Abrir el asistente →</a>
   </div></section>
 
   <!-- 17 Limitaciones -->

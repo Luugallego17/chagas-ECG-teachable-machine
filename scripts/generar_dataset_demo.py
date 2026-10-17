@@ -100,6 +100,8 @@ def main() -> int:
     p.add_argument("--n", type=int, default=300, help="imágenes por clase (entrenamiento)")
     p.add_argument("--test", type=int, default=10, help="imágenes por clase para pruebas/")
     p.add_argument("--out", default="dataset_demo", help="carpeta de salida")
+    p.add_argument("--semilla-base", type=int, default=1000,
+                   help="semilla inicial; usa otra (p. ej. 700000) para obtener imágenes que el modelo no vio")
     args = p.parse_args()
 
     if os.path.isdir(args.out): shutil.rmtree(args.out)
@@ -107,10 +109,11 @@ def main() -> int:
         folders = {k: [v] for k, v in MULTICLASE.items()}
     else:
         folders = {"no_chagas": ["normal"], "chagas": CHAGAS_KINDS}
-    for f in folders: os.makedirs(os.path.join(args.out, f))
+    if args.n > 0:
+        for f in folders: os.makedirs(os.path.join(args.out, f))
     os.makedirs(os.path.join(args.out, "pruebas"))
 
-    sid = 1000
+    sid = args.semilla_base
     for folder, kinds in folders.items():
         for i in range(args.n):
             render(os.path.join(args.out, folder, f"{folder}_{i:03d}.png"), kinds[i % len(kinds)], sid); sid += 1
