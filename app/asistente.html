@@ -326,8 +326,7 @@ h1,h2,h3{margin:0;text-wrap:balance}
           mdf=new File([md],"metadata.json",{type:"application/json"}),
           wf=new File([b64ToBytes(b64)],"weights.bin",{type:"application/octet-stream"});
       tmImage.loadFromFiles(mf,wf,mdf).then(function(m){
-        model=m;setStatus("ok","Modelo activo · "+m.getTotalClasses()+" patrones");
-        var ex=document.querySelectorAll(".ex");if(ex.length)selectExample(exLabels[3],ex[3]);
+        model=m;setStatus("ok","Modelo activo · "+m.getTotalClasses()+" patrones · listo para leer");
       }).catch(function(e){console.error(e);setStatus("err","No se pudo cargar el modelo");});
     }catch(e){console.error(e);setStatus("err","No se pudo preparar el modelo");}
   }
