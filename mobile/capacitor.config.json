@@ -1,0 +1,11 @@
+{
+  "appId": "bo.ucb.chagas.ecg",
+  "appName": "Chagas ECG",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false
+  },
+  "server": {
+    "androidScheme": "https"
+  }
+}

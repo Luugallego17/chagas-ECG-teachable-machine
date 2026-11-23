@@ -1,0 +1,17 @@
+{
+  "name": "chagas-ecg",
+  "private": true,
+  "description": "Aplicación Android del asistente de ECG y fonocardiograma.",
+  "scripts": {
+    "www": "sh empaquetar.sh",
+    "sync": "sh empaquetar.sh && npx cap sync android",
+    "apk": "sh empaquetar.sh && npx cap sync android && cd android && ./gradlew assembleDebug"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.6.2",
+    "@capacitor/core": "8.6.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.6.2"
+  }
+}
