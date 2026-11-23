@@ -1,0 +1,3 @@
+# Solo para entrenar el fonocardiograma. La preparación del WAV usa numpy,
+# que ya está en requirements.txt.
+tensorflow>=2.16
