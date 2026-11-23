@@ -1,0 +1,49 @@
+{
+  "labels": [
+    "normal",
+    "soplo"
+  ],
+  "etiquetasApp": {
+    "normal": "Sonido cardíaco sin soplo",
+    "soplo": "Soplo cardíaco (anomalía general)",
+    "incierto": "Incierto"
+  },
+  "umbralSoplo": 0.5,
+  "umbralConfianzaBaja": 0.6,
+  "entrada": {
+    "mel": 64,
+    "tiempo": 155,
+    "canales": 1
+  },
+  "preproceso": {
+    "sampleRate": 4000,
+    "durationS": 5,
+    "samples": 20000,
+    "frameLength": 256,
+    "frameStep": 128,
+    "fftLength": 256,
+    "nMels": 64,
+    "fmin": 20.0,
+    "fmax": 800.0,
+    "ventana": "hann periodica",
+    "mel": "HTK triangular, sin normalizar el área",
+    "normalizacion": "z-score del recorte, desviación con divisor n",
+    "recorte": "primeros 5 s"
+  },
+  "fuente": "The CirCor DigiScope Phonocardiogram Dataset, versión 1.0.3",
+  "enlace": "https://physionet.org/content/circor-heart-sound/1.0.3/",
+  "doi": "https://doi.org/10.13026/tshs-mw03",
+  "licencia": "Open Data Commons Attribution License v1.0",
+  "herramienta": "Keras / TensorFlow, exportado a TensorFlow.js por scripts/exportar_tfjs.py",
+  "motivoAlternativa": "Teachable Machine Audio no se puede automatizar y trabaja con ventanas de cerca de 1 s pensadas para voz o sonidos ambientales. El fonocardiograma es más largo y de frecuencia baja, así que se entrenó una CNN pequeña sobre el log-mel.",
+  "fecha": "2026-11-23",
+  "entrenadoConDatosReales": true,
+  "esDemostracion": false,
+  "noDiagnosticaChagas": true,
+  "poblacion": "Pediátrica (CirCor, 0 a 21 años). No equivale a la miocardiopatía chagásica del adulto.",
+  "clasesEntrenadas": [
+    "normal",
+    "soplo"
+  ],
+  "incierto": "No es una clase entrenada. La aplicación la muestra si el audio dura menos de 5 s, no se puede leer o está en silencio."
+}

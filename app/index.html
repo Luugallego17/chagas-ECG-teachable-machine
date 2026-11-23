@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <title>ECG Chagas</title>
 <meta name="description" content="Clasificador de patologías chagásicas en ECG con Teachable Machine">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -151,6 +152,10 @@ input[type=file]::file-selector-button{font-family:var(--mono);font-size:.72rem;
 .foot{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);font-size:.82rem;color:var(--muted);
   display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 @media (prefers-reduced-motion:reduce){.heart path{animation:none;stroke-dashoffset:0}.fill{transition:none}}
+.audio-modulo{margin-top:28px}
+.audio-aviso{font-size:.92rem;color:var(--muted)}
+.audio-controles{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:12px 0}
+.audio-error{color:var(--accent)}
 </style>
 
 <div class="page">
@@ -256,6 +261,21 @@ input[type=file]::file-selector-button{font-family:var(--mono);font-size:.72rem;
     </section>
   </div>
 
+  <section id="audio" class="card card-pad audio-modulo" data-modelo="../modelo/audio/">
+    <h2>Fonocardiograma</h2>
+    <p class="audio-aviso">El audio estima un soplo o una anomalía <b>general</b>. <b>No diagnostica Chagas.</b> No hay un dataset público de soplos de Chagas. CirCor es pediátrico (0 a 21 años) y no equivale al electrocardiograma.</p>
+    <div class="audio-controles">
+      <label class="hint">Archivo .wav <input type="file" id="audio-archivo" accept=".wav,audio/wav,audio/wave,audio/*"></label>
+    </div>
+    <p class="hint" id="audio-estado"></p>
+    <p class="audio-error" id="audio-error" hidden></p>
+    <div id="audio-resultado" hidden>
+      <p>Clase: <b id="audio-clase"></b></p>
+      <p>Confianza: <b id="audio-confianza"></b></p>
+      <p class="audio-aviso">Resultado orientativo. No es un diagnóstico de Chagas ni sustituye la auscultación de un médico.</p>
+    </div>
+  </section>
+
   <footer class="foot">
     <span>Proyecto ECG Chagas · Teachable Machine</span>
     <span class="mono" id="year"></span>
@@ -264,6 +284,8 @@ input[type=file]::file-selector-button{font-family:var(--mono);font-size:.72rem;
 
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8.5/dist/teachablemachine-image.min.js"></script>
+<script src="audio_preprocess.js"></script>
+<script src="audio_ui.js"></script>
 <script>
 (function(){
   "use strict";

@@ -13,7 +13,9 @@ tiene la mayor prevalencia mundial, y en las zonas rurales faltan especialistas 
 El proyecto convierte cada trazado en una **imagen** y entrena un clasificador de seis clases.
 
 > ⚠️ **Aviso médico.** Proyecto educativo y de investigación. No es un dispositivo médico y no
-> debe usarse para diagnosticar a pacientes.
+> debe usarse para diagnosticar a pacientes. El electrocardiograma y el fonocardiograma son
+> módulos distintos. **No existe un dataset público de soplos de Chagas** y el audio **no**
+> tiene una clase `chagas`: estima un soplo o una anomalía general (ver más abajo).
 
 ---
 
@@ -37,6 +39,37 @@ deja ambos archivos en la misma carpeta.
   licencias) y electrocardiogramas facilitados por la **Caja CORDES (sede Cochabamba)**,
   des-identificados. Los datos de pacientes **no se incluyen** en este repositorio.
 - No se calcularon métricas de desempeño (exactitud, sensibilidad, especificidad).
+
+## Fonocardiograma
+
+El sonido del corazón no diagnostica Chagas. La fuente de audio es el **CirCor DigiScope
+Phonocardiogram Dataset v1.0.3** (PhysioNet, ODC-By 1.0, acceso abierto, población de 0 a 21
+años). El PhysioNet/CinC Challenge 2016 no se usa para entrenar: su clase «anormal» no es un
+soplo. La ficha, la cita y esa decisión están en `docs/datasets.md`.
+
+Los WAV crudos no se suben al repositorio. La descarga y la preparación están en
+`docs/datasets.md`. Las clases son `normal`, `soplo` e `incierto` (esta última no se
+entrena); el mapa está en `docs/audio_class_map.md`. Ninguna se llama `chagas`.
+
+El modelo de audio está en `modelo/audio/` (TensorFlow.js). No es Teachable Machine:
+se entrenó con Keras sobre el log-mel de ventanas reales de CirCor y se exportó para
+el navegador. En el conjunto de prueba, separado por sujeto (171 sujetos; semilla 42),
+la exactitud por sujeto fue 0,8421, la sensibilidad para soplo 0,8485 y la
+especificidad 0,8406. La matriz [[tn, fp], [fn, tp]] fue [[116, 22], [5, 28]].
+Predecir siempre la clase mayoritaria (`normal`) acertaría 0,807. El detalle y la
+cifra por ventana están en `modelo/audio/metricas.json`. No es una validación clínica.
+
+Para probar el módulo hay que servir el repositorio (el modelo de audio no va incrustado,
+a diferencia del de ECG):
+
+```bash
+python -m http.server 8765
+```
+
+Abra `http://127.0.0.1:8765/app/asistente.html`. En «Sonido cardíaco» se sube un
+`.wav` de al menos 5 s. Si el audio es más largo, se usan los primeros 5 s. Un
+archivo ilegible o demasiado corto muestra un error y la clase `Incierto`, sin
+inventar una probabilidad. El electrocardiograma de la misma página sigue igual.
 
 ## Las seis clases
 

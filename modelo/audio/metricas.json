@@ -1,0 +1,63 @@
+{
+  "unidad_principal": "sujeto",
+  "umbral": 0.5,
+  "positivo": "soplo",
+  "orden_matriz": "filas = real [normal, soplo]; columnas = predicho [normal, soplo]; valores [[tn, fp], [fn, tp]]",
+  "sujeto_umbral_0_5": {
+    "n": 171,
+    "tp": 28,
+    "tn": 116,
+    "fp": 22,
+    "fn": 5,
+    "matriz": [
+      [
+        116,
+        22
+      ],
+      [
+        5,
+        28
+      ]
+    ],
+    "exactitud": 0.8421,
+    "sensibilidad_soplo": 0.8485,
+    "especificidad_soplo": 0.8406
+  },
+  "clip_umbral_0_5": {
+    "n": 1892,
+    "tp": 254,
+    "tn": 1207,
+    "fp": 391,
+    "fn": 40,
+    "matriz": [
+      [
+        1207,
+        391
+      ],
+      [
+        40,
+        254
+      ]
+    ],
+    "exactitud": 0.7722,
+    "sensibilidad_soplo": 0.8639,
+    "especificidad_soplo": 0.7553
+  },
+  "linea_base_sujeto": {
+    "clase": "normal",
+    "exactitud": 0.807,
+    "n": 171
+  },
+  "n_clips_train_ajuste": 6756,
+  "n_clips_validacion_interna": 1251,
+  "n_sujetos_validacion_interna": 103,
+  "sensibilidad_soplo_validacion_interna": 0.8571,
+  "youden_validacion_interna": 0.7352,
+  "equilibrio_ajuste": "En el ajuste se repiten ventanas reales de soplo hasta igualar el número de ventanas normales. No se sintetiza audio. Validación y test quedan como están.",
+  "epocas_mejor_youden": 5,
+  "epocas_corridas": 8,
+  "semilla_split_manifest": 42,
+  "semilla_validacion_interna": 43,
+  "no_es_validacion_clinica": true,
+  "no_diagnostica_chagas": true
+}

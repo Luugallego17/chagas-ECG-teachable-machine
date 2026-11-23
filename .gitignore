@@ -1,5 +1,10 @@
 # Datos de pacientes: NUNCA se versionan
 data/raw/
+
+# Fonocardiograma crudo y ventanas WAV. El manifiesto sí se versiona.
+data/audio/raw/
+data/audio/processed/
+data/audio/cache/
 data/images/**/*.png
 data/images/**/*.jpg
 *.hdf5
