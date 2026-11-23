@@ -1,0 +1,121 @@
+archivo,clase_real,clase_predicha,prob_max,ECG NORMAL,BRD,HBAI,BRD + HBAI,Bloqueo AV,Extrasistole ventricular
+bloqueo_av/bloqueo_av_nueva_01.png,Bloqueo AV,Bloqueo AV,0.9939,0.0004,0.0,0.0053,0.0004,0.9939,0.0
+bloqueo_av/bloqueo_av_nueva_02.png,Bloqueo AV,Bloqueo AV,0.6573,0.2716,0.0,0.071,0.0,0.6573,0.0
+bloqueo_av/bloqueo_av_nueva_03.png,Bloqueo AV,Bloqueo AV,1.0,0.0,0.0,0.0,0.0,1.0,0.0
+bloqueo_av/bloqueo_av_nueva_04.png,Bloqueo AV,ECG NORMAL,0.922,0.922,0.0173,0.0077,0.0,0.053,0.0
+bloqueo_av/bloqueo_av_nueva_05.png,Bloqueo AV,Bloqueo AV,0.9989,0.0,0.0,0.0011,0.0,0.9989,0.0
+bloqueo_av/bloqueo_av_nueva_06.png,Bloqueo AV,Bloqueo AV,0.494,0.2796,0.0003,0.2262,0.0,0.494,0.0
+bloqueo_av/bloqueo_av_nueva_07.png,Bloqueo AV,Bloqueo AV,1.0,0.0,0.0,0.0,0.0,1.0,0.0
+bloqueo_av/bloqueo_av_nueva_08.png,Bloqueo AV,ECG NORMAL,0.3427,0.3427,0.0007,0.3167,0.0,0.3399,0.0
+bloqueo_av/bloqueo_av_nueva_09.png,Bloqueo AV,Bloqueo AV,1.0,0.0,0.0,0.0,0.0,1.0,0.0
+bloqueo_av/bloqueo_av_nueva_10.png,Bloqueo AV,Bloqueo AV,0.9973,0.001,0.0,0.0017,0.0,0.9973,0.0
+bloqueo_av/bloqueo_av_nueva_11.png,Bloqueo AV,Bloqueo AV,0.9998,0.0,0.0,0.0001,0.0,0.9998,0.0
+bloqueo_av/bloqueo_av_nueva_12.png,Bloqueo AV,ECG NORMAL,0.8236,0.8236,0.0074,0.0659,0.0,0.1031,0.0
+bloqueo_av/bloqueo_av_nueva_13.png,Bloqueo AV,Bloqueo AV,0.9981,0.0018,0.0001,0.0001,0.0,0.9981,0.0
+bloqueo_av/bloqueo_av_nueva_14.png,Bloqueo AV,Bloqueo AV,0.9827,0.006,0.0,0.0114,0.0,0.9827,0.0
+bloqueo_av/bloqueo_av_nueva_15.png,Bloqueo AV,Bloqueo AV,0.964,0.0028,0.0,0.0332,0.0,0.964,0.0
+bloqueo_av/bloqueo_av_nueva_16.png,Bloqueo AV,Bloqueo AV,0.9926,0.0044,0.0,0.003,0.0,0.9926,0.0
+bloqueo_av/bloqueo_av_nueva_17.png,Bloqueo AV,Bloqueo AV,0.6346,0.2628,0.0,0.1018,0.0006,0.6346,0.0003
+bloqueo_av/bloqueo_av_nueva_18.png,Bloqueo AV,Bloqueo AV,1,0.0,0.0,0.0,0.0,1,0.0
+bloqueo_av/bloqueo_av_nueva_19.png,Bloqueo AV,Bloqueo AV,0.9605,0.0337,0.0,0.0057,0.0,0.9605,0.0
+bloqueo_av/bloqueo_av_nueva_20.png,Bloqueo AV,ECG NORMAL,0.6726,0.6726,0.0002,0.2952,0.0,0.032,0.0
+brd/brd_nueva_01.png,BRD,BRD,1.0,0.0,1.0,0.0,0.0,0.0,0.0
+brd/brd_nueva_02.png,BRD,BRD,0.9917,0.0,0.9917,0.0,0.0083,0.0,0.0
+brd/brd_nueva_03.png,BRD,BRD,0.965,0.0001,0.965,0.0,0.0347,0.0,0.0001
+brd/brd_nueva_04.png,BRD,BRD,0.9851,0.0,0.9851,0.0,0.0149,0.0,0.0
+brd/brd_nueva_05.png,BRD,BRD,0.9468,0.0,0.9468,0.0,0.0532,0.0,0.0
+brd/brd_nueva_06.png,BRD,BRD,1.0,0.0,1.0,0.0,0.0,0.0,0.0
+brd/brd_nueva_07.png,BRD,BRD,0.7071,0.077,0.7071,0.002,0.2139,0.0,0.0001
+brd/brd_nueva_08.png,BRD,BRD,0.9902,0.0,0.9902,0.0,0.0098,0.0,0.0
+brd/brd_nueva_09.png,BRD,BRD,0.9909,0.0,0.9909,0.0,0.0091,0.0,0.0
+brd/brd_nueva_10.png,BRD,BRD,0.8186,0.0,0.8186,0.0,0.18,0.0014,0.0
+brd/brd_nueva_11.png,BRD,BRD + HBAI,0.8533,0.0073,0.1394,0.0001,0.8533,0.0,0.0
+brd/brd_nueva_12.png,BRD,BRD,0.998,0.0,0.998,0.0,0.002,0.0,0.0
+brd/brd_nueva_13.png,BRD,BRD,0.9999,0.0,0.9999,0.0,0.0001,0.0,0.0
+brd/brd_nueva_14.png,BRD,BRD,0.9976,0.0024,0.9976,0.0,0.0,0.0,0.0
+brd/brd_nueva_15.png,BRD,BRD,0.7763,0.0009,0.7763,0.0001,0.2227,0.0,0.0
+brd/brd_nueva_16.png,BRD,BRD,0.9997,0.0001,0.9997,0.0,0.0002,0.0,0.0
+brd/brd_nueva_17.png,BRD,BRD,0.9999,0.0,0.9999,0.0,0.0001,0.0,0.0
+brd/brd_nueva_18.png,BRD,BRD,0.996,0.0,0.996,0.0,0.004,0.0,0.0
+brd/brd_nueva_19.png,BRD,BRD,0.5494,0.0,0.5494,0.0,0.4506,0.0,0.0
+brd/brd_nueva_20.png,BRD,BRD,0.9979,0.0,0.9979,0.0,0.0021,0.0,0.0
+brd_hbai/brd_hbai_nueva_01.png,BRD + HBAI,BRD + HBAI,0.9992,0.0,0.0007,0.0,0.9992,0.0,0.0
+brd_hbai/brd_hbai_nueva_02.png,BRD + HBAI,BRD + HBAI,0.9999,0.0,0.0001,0.0,0.9999,0.0,0.0
+brd_hbai/brd_hbai_nueva_03.png,BRD + HBAI,BRD + HBAI,1.0,0.0,0.0,0.0,1.0,0.0,0.0
+brd_hbai/brd_hbai_nueva_04.png,BRD + HBAI,BRD + HBAI,0.9997,0.0,0.0003,0.0,0.9997,0.0,0.0
+brd_hbai/brd_hbai_nueva_05.png,BRD + HBAI,BRD + HBAI,0.9121,0.0,0.0879,0.0,0.9121,0.0,0.0
+brd_hbai/brd_hbai_nueva_06.png,BRD + HBAI,BRD,0.9341,0.0,0.9341,0.0,0.0659,0.0,0.0
+brd_hbai/brd_hbai_nueva_07.png,BRD + HBAI,BRD + HBAI,0.9062,0.0,0.0938,0.0,0.9062,0.0,0.0
+brd_hbai/brd_hbai_nueva_08.png,BRD + HBAI,BRD + HBAI,0.9881,0.0,0.0119,0.0,0.9881,0.0,0.0
+brd_hbai/brd_hbai_nueva_09.png,BRD + HBAI,BRD,0.6609,0.0001,0.6609,0.0,0.339,0.0,0.0
+brd_hbai/brd_hbai_nueva_10.png,BRD + HBAI,BRD,0.9484,0.0516,0.9484,0.0,0.0,0.0,0.0
+brd_hbai/brd_hbai_nueva_11.png,BRD + HBAI,BRD + HBAI,0.9974,0.0,0.0026,0.0,0.9974,0.0,0.0
+brd_hbai/brd_hbai_nueva_12.png,BRD + HBAI,BRD + HBAI,0.9839,0.0,0.0161,0.0,0.9839,0.0,0.0
+brd_hbai/brd_hbai_nueva_13.png,BRD + HBAI,BRD + HBAI,1.0,0.0,0.0,0.0,1.0,0.0,0.0
+brd_hbai/brd_hbai_nueva_14.png,BRD + HBAI,BRD + HBAI,0.9984,0.0,0.0016,0.0,0.9984,0.0,0.0
+brd_hbai/brd_hbai_nueva_15.png,BRD + HBAI,BRD + HBAI,0.9449,0.0,0.0551,0.0,0.9449,0.0,0.0
+brd_hbai/brd_hbai_nueva_16.png,BRD + HBAI,BRD,0.9232,0.0,0.9232,0.0,0.0768,0.0,0.0
+brd_hbai/brd_hbai_nueva_17.png,BRD + HBAI,BRD,0.9398,0.0,0.9398,0.0,0.0601,0.0,0.0
+brd_hbai/brd_hbai_nueva_18.png,BRD + HBAI,BRD + HBAI,0.9044,0.0,0.0956,0.0,0.9044,0.0,0.0
+brd_hbai/brd_hbai_nueva_19.png,BRD + HBAI,BRD + HBAI,0.9953,0.0,0.0047,0.0,0.9953,0.0,0.0
+brd_hbai/brd_hbai_nueva_20.png,BRD + HBAI,BRD,0.8318,0.0027,0.8318,0.0001,0.1653,0.0,0.0
+extrasistole_ventricular/extrasistole_ventricular_nueva_01.png,Extrasistole ventricular,Extrasistole ventricular,1.0,0.0,0.0,0.0,0.0,0.0,1.0
+extrasistole_ventricular/extrasistole_ventricular_nueva_02.png,Extrasistole ventricular,Extrasistole ventricular,1.0,0.0,0.0,0.0,0.0,0.0,1.0
+extrasistole_ventricular/extrasistole_ventricular_nueva_03.png,Extrasistole ventricular,Extrasistole ventricular,1.0,0.0,0.0,0.0,0.0,0.0,1.0
+extrasistole_ventricular/extrasistole_ventricular_nueva_04.png,Extrasistole ventricular,Extrasistole ventricular,1.0,0.0,0.0,0.0,0.0,0.0,1.0
+extrasistole_ventricular/extrasistole_ventricular_nueva_05.png,Extrasistole ventricular,Extrasistole ventricular,0.9999,0.0,0.0,0.0,0.0,0.0,0.9999
+extrasistole_ventricular/extrasistole_ventricular_nueva_06.png,Extrasistole ventricular,Extrasistole ventricular,0.9996,0.0003,0.0,0.0001,0.0,0.0,0.9996
+extrasistole_ventricular/extrasistole_ventricular_nueva_07.png,Extrasistole ventricular,Extrasistole ventricular,1.0,0.0,0.0,0.0,0.0,0.0,1.0
+extrasistole_ventricular/extrasistole_ventricular_nueva_08.png,Extrasistole ventricular,Extrasistole ventricular,1.0,0.0,0.0,0.0,0.0,0.0,1.0
+extrasistole_ventricular/extrasistole_ventricular_nueva_09.png,Extrasistole ventricular,Extrasistole ventricular,1.0,0.0,0.0,0.0,0.0,0.0,1.0
+extrasistole_ventricular/extrasistole_ventricular_nueva_10.png,Extrasistole ventricular,Extrasistole ventricular,1.0,0.0,0.0,0.0,0.0,0.0,1.0
+extrasistole_ventricular/extrasistole_ventricular_nueva_11.png,Extrasistole ventricular,Extrasistole ventricular,1.0,0.0,0.0,0.0,0.0,0.0,1.0
+extrasistole_ventricular/extrasistole_ventricular_nueva_12.png,Extrasistole ventricular,Extrasistole ventricular,1.0,0.0,0.0,0.0,0.0,0.0,1.0
+extrasistole_ventricular/extrasistole_ventricular_nueva_13.png,Extrasistole ventricular,Extrasistole ventricular,0.9998,0.0,0.0,0.0002,0.0,0.0,0.9998
+extrasistole_ventricular/extrasistole_ventricular_nueva_14.png,Extrasistole ventricular,Extrasistole ventricular,1.0,0.0,0.0,0.0,0.0,0.0,1.0
+extrasistole_ventricular/extrasistole_ventricular_nueva_15.png,Extrasistole ventricular,Extrasistole ventricular,1.0,0.0,0.0,0.0,0.0,0.0,1.0
+extrasistole_ventricular/extrasistole_ventricular_nueva_16.png,Extrasistole ventricular,Extrasistole ventricular,1.0,0.0,0.0,0.0,0.0,0.0,1.0
+extrasistole_ventricular/extrasistole_ventricular_nueva_17.png,Extrasistole ventricular,Extrasistole ventricular,0.9983,0.0008,0.0,0.001,0.0,0.0,0.9983
+extrasistole_ventricular/extrasistole_ventricular_nueva_18.png,Extrasistole ventricular,Extrasistole ventricular,1,0.0,0.0,0.0,0.0,0.0,1
+extrasistole_ventricular/extrasistole_ventricular_nueva_19.png,Extrasistole ventricular,Extrasistole ventricular,1.0,0.0,0.0,0.0,0.0,0.0,1.0
+extrasistole_ventricular/extrasistole_ventricular_nueva_20.png,Extrasistole ventricular,Extrasistole ventricular,1.0,0.0,0.0,0.0,0.0,0.0,1.0
+hbai/hbai_nueva_01.png,HBAI,ECG NORMAL,0.6899,0.6899,0.0,0.31,0.0,0.0001,0.0
+hbai/hbai_nueva_02.png,HBAI,HBAI,0.9534,0.0466,0.0,0.9534,0.0,0.0,0.0
+hbai/hbai_nueva_03.png,HBAI,ECG NORMAL,0.627,0.627,0.0,0.373,0.0,0.0,0.0
+hbai/hbai_nueva_04.png,HBAI,HBAI,0.9531,0.0469,0.0,0.9531,0.0,0.0,0.0
+hbai/hbai_nueva_05.png,HBAI,ECG NORMAL,0.9022,0.9022,0.0,0.0975,0.0,0.0003,0.0
+hbai/hbai_nueva_06.png,HBAI,HBAI,0.935,0.065,0.0,0.935,0.0,0.0,0.0
+hbai/hbai_nueva_07.png,HBAI,HBAI,0.6434,0.3566,0.0,0.6434,0.0,0.0,0.0
+hbai/hbai_nueva_08.png,HBAI,ECG NORMAL,0.6752,0.6752,0.0,0.3237,0.0,0.0011,0.0
+hbai/hbai_nueva_09.png,HBAI,HBAI,0.9456,0.0544,0.0,0.9456,0.0,0.0,0.0
+hbai/hbai_nueva_10.png,HBAI,HBAI,0.6909,0.3091,0.0,0.6909,0.0,0.0,0.0
+hbai/hbai_nueva_11.png,HBAI,ECG NORMAL,0.88,0.88,0.0,0.12,0.0,0.0,0.0
+hbai/hbai_nueva_12.png,HBAI,HBAI,0.8723,0.1277,0.0,0.8723,0.0,0.0,0.0
+hbai/hbai_nueva_13.png,HBAI,ECG NORMAL,0.9234,0.9234,0.0015,0.0746,0.0,0.0004,0.0
+hbai/hbai_nueva_14.png,HBAI,ECG NORMAL,0.7797,0.7797,0.0,0.2203,0.0,0.0001,0.0
+hbai/hbai_nueva_15.png,HBAI,HBAI,0.9733,0.0267,0.0,0.9733,0.0,0.0,0.0
+hbai/hbai_nueva_16.png,HBAI,ECG NORMAL,0.9015,0.9015,0.0,0.0985,0.0,0.0,0.0
+hbai/hbai_nueva_17.png,HBAI,ECG NORMAL,0.6498,0.6498,0.0,0.3499,0.0,0.0003,0.0
+hbai/hbai_nueva_18.png,HBAI,ECG NORMAL,0.505,0.505,0.0,0.495,0.0,0.0,0.0
+hbai/hbai_nueva_19.png,HBAI,ECG NORMAL,0.9545,0.9545,0.0,0.0455,0.0,0.0,0.0
+hbai/hbai_nueva_20.png,HBAI,HBAI,0.9845,0.0155,0.0,0.9845,0.0,0.0,0.0
+normal/normal_nueva_01.png,ECG NORMAL,ECG NORMAL,0.7149,0.7149,0.0,0.2851,0.0,0.0,0.0
+normal/normal_nueva_02.png,ECG NORMAL,ECG NORMAL,0.8533,0.8533,0.0,0.1467,0.0,0.0,0.0
+normal/normal_nueva_03.png,ECG NORMAL,HBAI,0.8989,0.1011,0.0,0.8989,0.0,0.0,0.0
+normal/normal_nueva_04.png,ECG NORMAL,ECG NORMAL,0.7983,0.7983,0.0,0.2017,0.0,0.0,0.0
+normal/normal_nueva_05.png,ECG NORMAL,ECG NORMAL,0.6402,0.6402,0.0,0.3598,0.0,0.0,0.0
+normal/normal_nueva_06.png,ECG NORMAL,ECG NORMAL,0.6753,0.6753,0.0,0.3247,0.0,0.0,0.0
+normal/normal_nueva_07.png,ECG NORMAL,ECG NORMAL,0.9543,0.9543,0.0,0.0456,0.0,0.0,0.0
+normal/normal_nueva_08.png,ECG NORMAL,HBAI,0.805,0.195,0.0,0.805,0.0,0.0,0.0
+normal/normal_nueva_09.png,ECG NORMAL,ECG NORMAL,0.9868,0.9868,0.0,0.0132,0.0,0.0,0.0
+normal/normal_nueva_10.png,ECG NORMAL,HBAI,0.5191,0.4809,0.0,0.5191,0.0,0.0,0.0
+normal/normal_nueva_11.png,ECG NORMAL,HBAI,0.8862,0.1138,0.0,0.8862,0.0,0.0,0.0
+normal/normal_nueva_12.png,ECG NORMAL,HBAI,0.5647,0.4353,0.0,0.5647,0.0,0.0,0.0
+normal/normal_nueva_13.png,ECG NORMAL,HBAI,0.5683,0.4317,0.0,0.5683,0.0,0.0,0.0
+normal/normal_nueva_14.png,ECG NORMAL,HBAI,0.6201,0.3799,0.0,0.6201,0.0,0.0,0.0
+normal/normal_nueva_15.png,ECG NORMAL,ECG NORMAL,0.9772,0.9772,0.0,0.0228,0.0,0.0,0.0
+normal/normal_nueva_16.png,ECG NORMAL,ECG NORMAL,0.5727,0.5727,0.0,0.4273,0.0,0.0,0.0
+normal/normal_nueva_17.png,ECG NORMAL,ECG NORMAL,0.8768,0.8768,0.0,0.1232,0.0,0.0,0.0
+normal/normal_nueva_18.png,ECG NORMAL,HBAI,0.9193,0.0807,0.0,0.9193,0.0,0.0,0.0
+normal/normal_nueva_19.png,ECG NORMAL,ECG NORMAL,0.6734,0.6734,0.0,0.3266,0.0,0.0,0.0
+normal/normal_nueva_20.png,ECG NORMAL,ECG NORMAL,0.7064,0.7064,0.0,0.2933,0.0,0.0,0.0003

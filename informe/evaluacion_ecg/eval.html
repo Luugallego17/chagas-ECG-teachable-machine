@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Evaluación del modelo de ECG (120 imágenes sintéticas)</title>
+</head>
+<body>
+  <p>Evalúa el modelo de Teachable Machine sobre las 120 imágenes sintéticas de
+  <code>datasets/pruebas_nuevas/por_clase/</code>. Hay que servir el repositorio
+  desde la raíz, por ejemplo: <code>python -m http.server 8765</code>, y abrir
+  <code>http://127.0.0.1:8765/informe/evaluacion_ecg/eval.html</code>.</p>
+  <pre id="out">PENDIENTE</pre>
+  <script src="../../app/vendor/tf.min.js"></script>
+  <script src="../../app/vendor/teachablemachine-image.min.js"></script>
+  <script>
+  (async () => {
+    const out = document.getElementById('out');
+    const UMBRAL_BAJA = 0.7;
+    const ETIQUETA = {
+      normal: 'ECG NORMAL',
+      brd: 'BRD',
+      hbai: 'HBAI',
+      brd_hbai: 'BRD + HBAI',
+      bloqueo_av: 'Bloqueo AV',
+      extrasistole_ventricular: 'Extrasistole ventricular',
+    };
+    try {
+      const model = await tmImage.load('../../modelo/model.json', '../../modelo/metadata.json');
+      const lista = await (await fetch('lista.json')).json();
+      const res = [];
+      for (const [carpeta, archivo] of lista) {
+        const img = new Image();
+        img.src = '../../datasets/pruebas_nuevas/por_clase/' + carpeta + '/' + archivo;
+        await img.decode();
+        const cv = document.createElement('canvas');
+        cv.width = img.naturalWidth;
+        cv.height = img.naturalHeight;
+        cv.getContext('2d').drawImage(img, 0, 0);
+        const p = await model.predict(cv);
+        res.push({ carpeta, archivo, probs: p.map(x => [x.className, x.probability]) });
+      }
+
+      const labels = Object.values(ETIQUETA);
+      const idx = Object.fromEntries(labels.map((e, i) => [e, i]));
+      const cm = labels.map(() => labels.map(() => 0));
+      let aciertos = 0;
+      let baja = 0;
+      const lineas = [['archivo', 'clase_real', 'clase_predicha', 'prob_max', ...labels]];
+      for (const item of res) {
+        const probs = Object.fromEntries(item.probs);
+        const predicha = item.probs.reduce((a, b) => (b[1] > a[1] ? b : a))[0];
+        const real = ETIQUETA[item.carpeta];
+        const probMax = probs[predicha];
+        cm[idx[real]][idx[predicha]] += 1;
+        if (real === predicha) aciertos += 1;
+        if (probMax < UMBRAL_BAJA) baja += 1;
+        lineas.push([
+          item.carpeta + '/' + item.archivo,
+          real,
+          predicha,
+          probMax,
+          ...labels.map(e => probs[e]),
+        ]);
+      }
+      const metricas = {
+        labels,
+        cm,
+        acc: aciertos / res.length,
+        n: res.length,
+        low: baja,
+      };
+      out.textContent =
+        'RESULTADO\n' +
+        JSON.stringify(metricas, null, 2) +
+        '\n\n' +
+        lineas.map(r => r.join(',')).join('\n') +
+        '\n\npredicciones_raw.json:\n' +
+        JSON.stringify(res);
+    } catch (e) {
+      out.textContent = 'ERROR ' + e + ' ' + (e && e.stack ? e.stack : '');
+    }
+  })();
+  </script>
+</body>
+</html>
