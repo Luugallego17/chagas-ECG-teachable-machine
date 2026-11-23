@@ -22,7 +22,7 @@ El proyecto convierte cada trazado en una **imagen** y entrena un clasificador d
 ## Probarlo en un minuto
 
 Abre **`app/asistente.html`** con doble clic (el modelo ya viene incorporado en el archivo).
-Arrastra la imagen de un ECG y verás el patrón estimado y la confianza de cada clase. En
+Toma una foto o elige una imagen de la galería y verás el patrón estimado y la confianza de cada clase. En
 `app/presentacion.html` está la presentación del proyecto (navega con ← →; `P` reproduce solo,
 `F` pantalla completa). Para que el botón «Abrir el asistente» de la presentación funcione,
 deja ambos archivos en la misma carpeta.

@@ -1,6 +1,11 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Chagas IA · Presentación</title>
 <meta name="description" content="Presentación del proyecto: detección de patrones chagásicos en el ECG con inteligencia artificial">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2300bceb'/%3E%3Cpath d='M3 18h7l2-6 3 10 2-7h12' fill='none' stroke='white' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
@@ -12,7 +17,7 @@
   --ink:#f2f8fc; --dim:#b3c9d8; --faint:#7894a8;
   --cyan:#00bceb; --blue:#2f7bff; --teal:#2fe0b0; --crimson:#ff5a6a; --amber:#ffc24d; --violet:#a98bff; --orange:#ff9254;
   --u:clamp(12.5px,min(1.05vw,1.9vh),26px);
-  --hh:clamp(46px,5.6vh,66px); --strip:clamp(40px,7vh,80px); --navh:clamp(46px,5.4vh,62px);
+  --hh:clamp(46px,5.6vh,66px); --strip:clamp(40px,7vh,80px); --navh:clamp(56px,6.4vh,76px);
   --head:"Sora",system-ui,sans-serif; --sans:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
   color-scheme:dark;
 }
@@ -107,7 +112,7 @@ b{color:#fff;font-weight:600}
 .c12{grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr)}
 .rows2{grid-template-rows:1fr 1fr} .rows21{grid-template-rows:1.5fr 1fr} .rows12{grid-template-rows:1fr 1.5fr}
 @media (max-width:980px){.c2,.c3,.c12{grid-template-columns:1fr}.c4{grid-template-columns:1fr 1fr}.rows2,.rows21,.rows12{grid-template-rows:none}}
-@media (max-width:560px){.c4{grid-template-columns:1fr}.seclabel{display:none}}
+@media (max-width:560px){.c4{grid-template-columns:1fr}.seclabel{display:none}.nav{height:auto;min-height:var(--navh);flex-wrap:wrap;padding-top:8px;padding-bottom:calc(8px + env(safe-area-inset-bottom))}.slide{padding-bottom:calc(var(--navh) + 5.2em)}.fin h1{font-size:3.4em}}
 
 /* portada */
 .hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:3em;align-items:center;flex:1}
@@ -254,8 +259,11 @@ canvas.live{display:block;width:100%;height:auto;border-radius:.7em;background:r
 .dots button{width:8px;height:8px;border-radius:50%;border:0;background:rgba(0,188,235,.25);cursor:pointer;padding:0;transition:transform .2s,background .2s}
 .dots button.on{background:var(--cyan);box-shadow:0 0 10px var(--cyan);transform:scale(1.5)}
 .ctrls{display:flex;align-items:center;gap:8px}
-.ctrls button{background:var(--card);border:1px solid var(--line);color:var(--ink);border-radius:10px;width:40px;height:34px;font-size:1rem;cursor:pointer}
+.ctrls button{background:var(--card);border:1px solid var(--line);color:var(--ink);border-radius:10px;width:44px;height:44px;font-size:1.05rem;cursor:pointer}
 .ctrls button:hover{border-color:var(--cyan)}
+:focus-visible{outline:3px solid #fff;outline-offset:2px}
+.dots button{position:relative}
+.dots button::before{content:"";position:absolute;left:50%;top:50%;width:28px;height:28px;transform:translate(-50%,-50%)}
 .counter{font-family:var(--mono);font-size:.82rem;color:var(--dim);min-width:56px;text-align:center}
 
 @media (max-width:980px){.hero{grid-template-columns:1fr}.rings{display:none}.tl{grid-template-columns:1fr 1fr}.tl::before,.tl::after{display:none}.tl .dotn{position:static;margin:0 0 .5em}.tl{padding-top:0}.solflow{flex-direction:column}.solflow .ar{transform:rotate(90deg)}.flowd{flex-direction:column}.farrow{transform:rotate(90deg);animation:none}.hp{grid-template-columns:1fr 1fr}}
@@ -264,7 +272,22 @@ canvas.live{display:block;width:100%;height:auto;border-radius:.7em;background:r
   .glow,.farrow,.cta,.rings i,.sweep,.tl::after,.pipe::after,.slide.active .tl .card,.card::after,.solflow .ar{animation:none!important}
   .bfill,.ring .rf{transition:none}.pop i{transform:none;animation:none!important}.wm{transform:none}
 }
+@media (max-width:560px){
+  .brand small{display:none}
+  h1{font-size:2.15em}
+  h2{font-size:1.7em}
+  h1,h2,.lead,.hintnav,.card .d{overflow-wrap:break-word}
+  .hero,.monitor,.tiles,.tile,.inner,.card{min-width:0}
+  .monitor .mh{flex-wrap:wrap;row-gap:2px}
+  .tiles{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .tile{padding:.45em .25em}
+  .tile b{font-size:1.15em}
+  .tile span{font-size:.68em;line-height:1.25}
+  .hintnav{max-width:100%}
+}
 </style>
+</head>
+<body>
 
 <div class="bg" aria-hidden="true"><div class="bgl"><div class="glow glow-a"></div><div class="glow glow-b"></div><div class="glow glow-c"></div></div><canvas id="net"></canvas></div>
 <div class="sweep" id="sweep" aria-hidden="true"></div>
@@ -829,3 +852,5 @@ canvas.live{display:block;width:100%;height:auto;border-radius:.7em;background:r
   go(0);
 })();
 </script>
+</body>
+</html>
