@@ -9,10 +9,6 @@
   var base = new URL(seccion.getAttribute("data-modelo") || "../modelo/audio/", window.location.href);
   var modelo = null;
   var meta = null;
-  var grabacion = null;
-  var flujo = null;
-  var trozos = [];
-  var tope = null;
 
   function estado(texto) {
     $("audio-estado").textContent = texto;
@@ -24,9 +20,6 @@
       return "La señal dura " + seg + " s. Hacen falta 5 segundos completos, así que no se asigna una clase.";
     }
     if (motivo === "silencio") return "La señal está en silencio. No se asigna una clase.";
-    if (motivo === "permiso") {
-      return "No se pudo usar el micrófono. Si negó el permiso, puede subir un archivo .wav. El electrocardiograma sigue disponible.";
-    }
     return "No se pudo leer el audio. Use un archivo .wav de al menos 5 segundos.";
   }
 
@@ -145,45 +138,6 @@
       return;
     }
     decodificar(archivo);
-  });
-
-  $("audio-grabar").addEventListener("click", function () {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      mostrarIncierto("permiso");
-      return;
-    }
-    navigator.mediaDevices.getUserMedia({ audio: true }).then(function (s) {
-      flujo = s;
-      trozos = [];
-      grabacion = new MediaRecorder(s);
-      grabacion.ondataavailable = function (e) {
-        if (e.data && e.data.size) trozos.push(e.data);
-      };
-      grabacion.onstop = function () {
-        if (tope) clearTimeout(tope);
-        flujo.getTracks().forEach(function (pista) { pista.stop(); });
-        $("audio-grabar").hidden = false;
-        $("audio-detener").hidden = true;
-        if (!trozos.length) {
-          mostrarIncierto("corto", 0);
-          return;
-        }
-        decodificar(new Blob(trozos, { type: grabacion.mimeType || "audio/webm" }));
-      };
-      grabacion.start();
-      $("audio-grabar").hidden = true;
-      $("audio-detener").hidden = false;
-      estado("Grabando. Detenga cuando pase de 5 segundos (se corta solo a los 8).");
-      tope = setTimeout(function () {
-        if (grabacion && grabacion.state === "recording") grabacion.stop();
-      }, 8000);
-    }).catch(function () {
-      mostrarIncierto("permiso");
-    });
-  });
-
-  $("audio-detener").addEventListener("click", function () {
-    if (grabacion && grabacion.state === "recording") grabacion.stop();
   });
 
   cargar();

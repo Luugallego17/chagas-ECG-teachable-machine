@@ -21,10 +21,9 @@ calidad). Son pocos frente a Absent y Present, y la clase no es un soplo ni un c
 normal: meterlos en el modelo le pondría una etiqueta que el propio anotador no dio.
 La app usa `incierto` solo cuando no hay una predicción honesta:
 
-- la grabación dura menos de 5 s (el modelo siempre ve 5 s);
+- el archivo dura menos de 5 s (el modelo siempre ve 5 s);
 - el archivo no se puede decodificar;
-- la señal está en silencio (RMS por debajo de 0,0001);
-- el usuario niega el micrófono o detiene la toma antes de tiempo.
+- la señal está en silencio (RMS por debajo de 0,0001).
 
 Si el audio sí se clasifica pero la probabilidad máxima queda por debajo del umbral
 guardado en `modelo/audio/metadata.json`, la app muestra la clase y la confianza y añade

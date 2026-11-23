@@ -436,7 +436,7 @@ def magnitud_stft(onda: np.ndarray) -> np.ndarray:
 def log_mel(onda: np.ndarray) -> np.ndarray:
     """Log-mel con z-score del propio recorte. Forma (n_mels, n_frames), float32.
 
-    El z-score por recorte absorbe la ganancia del micrófono o del estetoscopio.
+    El z-score por recorte absorbe la ganancia del archivo o del estetoscopio.
     numpy.std usa ddof=0; el JS tiene que hacer lo mismo.
     """
     mag = magnitud_stft(onda).astype(np.float64)  # (tiempo, bins)

@@ -66,11 +66,10 @@ a diferencia del de ECG):
 python -m http.server 8765
 ```
 
-Abra `http://127.0.0.1:8765/app/asistente.html`. En «Sonido cardíaco» se graba con el
-micrófono o se sube un `.wav` de al menos 5 s. Si el audio es más largo, se usan los
-primeros 5 s. Un archivo ilegible o demasiado corto muestra un error y la clase
-`Incierto`, sin inventar una probabilidad. El electrocardiograma de la misma página
-sigue igual.
+Abra `http://127.0.0.1:8765/app/asistente.html`. En «Sonido cardíaco» se sube un
+`.wav` de al menos 5 s. Si el audio es más largo, se usan los primeros 5 s. Un
+archivo ilegible o demasiado corto muestra un error y la clase `Incierto`, sin
+inventar una probabilidad. El electrocardiograma de la misma página sigue igual.
 
 ## Las seis clases
 
