@@ -145,7 +145,18 @@ wget -r -N -c -np https://physionet.org/files/circor-heart-sound/1.0.3/
 ```
 
 El ZIP único está en `https://physionet.org/content/circor-heart-sound/get-zip/1.0.3/`.
-El manifiesto liviano, cuando se genere, sí puede versionarse; los WAV procesados, no.
+El manifiesto liviano sí se versiona; los WAV procesados, no.
+
+```bash
+python scripts/download_audio.py --dest data/audio/raw
+python scripts/prepare_audio.py --raw data/audio/raw --out data/audio
+```
+
+`prepare_audio.py` deja ventanas mono de 5 s a 4 000 Hz (como mucho cuatro por
+grabación, desde el inicio), `data/audio/manifest.csv` con las columnas de la
+issue de formatos, y `docs/audio_conteo.md` con el conteo de esa corrida.
+El reparto `train`/`test` usa la semilla 42 y el 20 % de los **sujetos**, no de
+los archivos. Quien comparte `Additional ID` viaja junto.
 
 ### Clases (contrato)
 
