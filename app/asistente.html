@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <title>Asistente ECG Chagas</title>
 <meta name="description" content="Asistente de lectura de electrocardiogramas para reconocer patrones asociados a la enfermedad de Chagas">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -158,6 +159,13 @@ h1 em{font-style:italic;color:var(--accent)}
 .acard .d{font-size:.82rem;color:var(--muted);margin-top:4px}
 .foot{margin-top:40px;padding-top:14px;border-top:2px solid var(--ink);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font-size:.78rem;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){.ruler .mark,.ruler .fillbar,.ofill{transition:none}.led i{animation:none}}
+
+.audio-modulo{margin-top:34px}
+.audio-modulo h2{font-family:var(--display);font-weight:400;font-size:2rem;margin-top:6px}
+.audio-aviso{font-size:.92rem;color:var(--muted);margin-top:8px}
+.audio-controles{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:12px}
+.audio-controles button{font-family:var(--mono);font-size:.74rem;background:transparent;border:1px solid var(--ink);padding:7px 12px;cursor:pointer}
+.audio-error{color:var(--accent);margin-top:8px}
 </style>
 
 <div class="wrap">
@@ -231,6 +239,25 @@ h1 em{font-style:italic;color:var(--accent)}
     <div class="agrid" id="agrid"></div>
   </section>
 
+
+  <section id="audio" class="audio-modulo" data-modelo="../modelo/audio/">
+    <span class="tiny">Fonocardiograma · módulo aparte</span>
+    <h2>Sonido cardíaco</h2>
+    <p class="audio-aviso">El audio estima un soplo o una anomalía <b>general</b>. <b>No diagnostica Chagas.</b> No hay un dataset público de soplos de Chagas. CirCor es pediátrico (0 a 21 años) y no sustituye la lectura del electrocardiograma.</p>
+    <div class="audio-controles">
+      <button type="button" id="audio-grabar">Grabar</button>
+      <button type="button" id="audio-detener" hidden>Detener</button>
+      <label>Archivo .wav <input type="file" id="audio-archivo" accept=".wav,audio/wav,audio/wave,audio/*"></label>
+    </div>
+    <p id="audio-estado"></p>
+    <p class="audio-error" id="audio-error" hidden></p>
+    <div id="audio-resultado" hidden>
+      <p>Clase: <b id="audio-clase"></b></p>
+      <p>Confianza: <b id="audio-confianza"></b></p>
+      <p class="audio-aviso">Resultado orientativo. No es un diagnóstico de Chagas ni sustituye la auscultación de un médico.</p>
+    </div>
+  </section>
+
   <footer class="foot">
     <span>Asistente ECG · Chagas — modelo entrenado en Teachable Machine</span>
     <span class="mono" id="year"></span>
@@ -243,6 +270,8 @@ h1 em{font-style:italic;color:var(--accent)}
 
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8.5/dist/teachablemachine-image.min.js"></script>
+<script src="audio_preprocess.js"></script>
+<script src="audio_ui.js"></script>
 <script>
 (function(){
   "use strict";
