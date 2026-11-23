@@ -48,6 +48,8 @@ años). El PhysioNet/CinC Challenge 2016 no se usa para entrenar: su clase «ano
 soplo. La ficha, la cita y esa decisión están en `docs/datasets.md`.
 
 Los WAV crudos no se suben al repositorio. La descarga está descrita en `docs/datasets.md`.
+Las clases son `normal`, `soplo` e `incierto` (esta última no se entrena); el mapa está en
+`docs/audio_class_map.md`. Ninguna se llama `chagas`.
 
 ## Las seis clases
 

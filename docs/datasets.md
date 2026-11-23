@@ -146,4 +146,17 @@ wget -r -N -c -np https://physionet.org/files/circor-heart-sound/1.0.3/
 
 El ZIP único está en `https://physionet.org/content/circor-heart-sound/get-zip/1.0.3/`.
 El manifiesto liviano, cuando se genere, sí puede versionarse; los WAV procesados, no.
-Las clases y el recorte se fijan en los issues siguientes: no se adelanta aquí una tabla de clases.
+
+### Clases (contrato)
+
+La tabla y las reglas de exclusión están en `docs/audio_class_map.md`. Resumen:
+
+| Clase | Etiqueta en la app | Campo `Murmur` de CirCor | Entrenamiento |
+|---|---|---|---|
+| `normal` | Sonido cardíaco sin soplo | Absent | Sí, todos los focos |
+| `soplo` | Soplo cardíaco (anomalía general) | Present | Sí, solo los focos de `Murmur locations` |
+| `incierto` | Calidad insuficiente o soplo no determinable | Unknown, o audio que la app no puede leer | No |
+
+No existe la clase `chagas`. `Outcome` (Normal/Abnormal) no se usa como etiqueta de soplo.
+Los sujetos con `Additional ID` son la misma persona: si las dos fichas no coinciden en
+`Murmur`, el grupo entero se deja fuera. El conteo, cuando exista, va en `docs/audio_conteo.md`.
