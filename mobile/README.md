@@ -43,43 +43,70 @@ export ANDROID_HOME="$HOME/android-sdk"
 export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
 ```
 
-## Generar el APK de depuración
+## Firma de la versión que se instala
+
+El APK para el teléfono es de **release**, no el de depuración. El de depuración
+solo llevaba la firma v2 y `minSdk` 24; varios teléfonos lo rechazan al
+instalarlo a mano.
+
+`minSdk` queda en 24 (Android 7.0). Capacitor 8 arrastra
+`org.apache.cordova:framework:14.0.1`, y ese manifiesto no acepta un mínimo
+menor: el empaquetado falla si se pone 23. Un teléfono con Android 6 no puede
+instalar la app. La firma de release activa los esquemas v1, v2 y v3, y el
+paquete no lleva `android:testOnly` ni `android:debuggable`.
+
+La clave no está en git. Se crea una vez y se guarda fuera del repositorio.
+Alias: `chagas-ecg`. Algoritmo: RSA 2048. Validez: 10000 días.
+El archivo de contraseñas tampoco se escribe aquí.
+
+```bash
+keytool -genkeypair -v \
+  -keystore chagas-ecg-release.keystore \
+  -alias chagas-ecg -keyalg RSA -keysize 2048 -validity 10000
+```
+
+En `mobile/android/keystore.properties` (también ignorado por git):
+
+```properties
+storeFile=/ruta/absoluta/chagas-ecg-release.keystore
+storePassword=...
+keyAlias=chagas-ecg
+keyPassword=...
+```
+
+## Generar el APK
 
 Desde la raíz del repositorio:
 
 ```bash
 cd mobile
 npm install
-npm run apk
+sh empaquetar.sh
+npx cap sync android
+cd android && ./gradlew assembleRelease
 ```
-
-`npm run apk` copia `app/` y `modelo/` a `mobile/www`, sincroniza Capacitor y
-ejecuta `./gradlew assembleDebug`. Gradle firma ese APK con la clave de
-depuración de Android (`~/.android/debug.keystore`), que se crea sola la
-primera vez.
 
 El archivo queda en:
 
 ```text
-mobile/android/app/build/outputs/apk/debug/app-debug.apk
+mobile/android/app/build/outputs/apk/release/app-release.apk
 ```
 
-Ese binario no se sube a git. Para publicarlo como borrador:
+Ese binario no se sube a git. Si hay que reinstalar encima de un APK de
+depuración, primero se desinstala la copia anterior: la firma no coincide.
+
+`npm run apk` sigue generando el APK de depuración, firmado solo con la clave
+debug de Android. No es el que conviene pasar a un teléfono.
+
+Para instalarlo en un teléfono con depuración USB:
 
 ```bash
-gh release create v1.0.0-beta mobile/android/app/build/outputs/apk/debug/app-debug.apk \
-  --title "v1.0.0-beta" \
-  --notes "APK de depuración, firmado con la clave debug. No es un dispositivo médico."
-```
-
-Para instalarlo en un emulador o un teléfono con depuración USB:
-
-```bash
-adb install -r mobile/android/app/build/outputs/apk/debug/app-debug.apk
+adb install -r mobile/android/app/build/outputs/apk/release/app-release.apk
 ```
 
 ## Carpetas que no se versionan
 
-`node_modules/`, `www/` (se regenera), `android/app/build/`, `.gradle/` y los `.apk`.
+`node_modules/`, `www/` (se regenera), `android/app/build/`, `.gradle/`,
+`android/keystore.properties`, los `.keystore` y los `.apk`.
 Sí se versionan `package.json`, `capacitor.config.json`, este archivo y el
 proyecto `android/` sin los productos de compilación.

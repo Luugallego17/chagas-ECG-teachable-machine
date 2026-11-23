@@ -1,4 +1,5 @@
 ext {
+    // 24: org.apache.cordova:framework:14.0.1, que trae Capacitor 8, no acepta menos.
     minSdkVersion = 24
     compileSdkVersion = 36
     targetSdkVersion = 36
