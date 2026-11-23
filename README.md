@@ -13,7 +13,9 @@ tiene la mayor prevalencia mundial, y en las zonas rurales faltan especialistas 
 El proyecto convierte cada trazado en una **imagen** y entrena un clasificador de seis clases.
 
 > ⚠️ **Aviso médico.** Proyecto educativo y de investigación. No es un dispositivo médico y no
-> debe usarse para diagnosticar a pacientes.
+> debe usarse para diagnosticar a pacientes. El electrocardiograma y el fonocardiograma son
+> módulos distintos. **No existe un dataset público de soplos de Chagas** y el audio **no**
+> tiene una clase `chagas`: estima un soplo o una anomalía general (ver más abajo).
 
 ---
 
@@ -37,6 +39,15 @@ deja ambos archivos en la misma carpeta.
   licencias) y electrocardiogramas facilitados por la **Caja CORDES (sede Cochabamba)**,
   des-identificados. Los datos de pacientes **no se incluyen** en este repositorio.
 - No se calcularon métricas de desempeño (exactitud, sensibilidad, especificidad).
+
+## Fonocardiograma
+
+El sonido del corazón no diagnostica Chagas. La fuente de audio es el **CirCor DigiScope
+Phonocardiogram Dataset v1.0.3** (PhysioNet, ODC-By 1.0, acceso abierto, población de 0 a 21
+años). El PhysioNet/CinC Challenge 2016 no se usa para entrenar: su clase «anormal» no es un
+soplo. La ficha, la cita y esa decisión están en `docs/datasets.md`.
+
+Los WAV crudos no se suben al repositorio. La descarga está descrita en `docs/datasets.md`.
 
 ## Las seis clases
 
