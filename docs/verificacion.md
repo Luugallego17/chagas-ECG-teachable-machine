@@ -29,9 +29,9 @@ Son las del test interno por sujeto, umbral 0,5, ya publicadas en
 | | |
 |---|---|
 | Sujetos | 171 |
-| Exactitud | 0,842 |
-| Sensibilidad del soplo | 0,848 |
-| Especificidad del soplo | 0,841 |
+| Exactitud | 0,8421 |
+| Sensibilidad del soplo | 0,8485 |
+| Especificidad del soplo | 0,8406 |
 | Matriz [[tn, fp], [fn, tp]] | [[116, 22], [5, 28]] |
 
 No es una validación clínica. CirCor es pediátrico (0 a 21 años). El audio
