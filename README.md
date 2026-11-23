@@ -52,7 +52,8 @@ La verificación conjunta está en [`docs/verificacion.md`](docs/verificacion.md
 - **Fuentes de datos previstas para el flujo real:** SaMi-Trop, CODE-15 % y PTB-XL (bajo sus
   licencias) y electrocardiogramas facilitados por la **Caja CORDES (sede Cochabamba)**,
   des-identificados. Los datos de pacientes **no se incluyen** en este repositorio.
-- No se calcularon métricas de desempeño (exactitud, sensibilidad, especificidad).
+- En las 120 imágenes sintéticas de prueba la exactitud fue del 75 % (90 de 120).
+  El detalle está en [`informe/evaluacion_ecg/`](informe/evaluacion_ecg/) y en el informe de Revista 3i.
 
 ## Fonocardiograma
 
@@ -101,7 +102,8 @@ la misma página no se toca: sigue siendo el módulo de los seis patrones.
 ├── mobile/                   # proyecto Capacitor; cómo generar el APK
 ├── modelo/                   # ECG exportado de Teachable Machine
 │   └── audio/                # fonocardiograma (CNN sobre log-mel) y sus métricas
-├── informe/                  # artículo científico (formato Revista 3i): .docx y .pdf imprimible
+├── informe/                  # informes en formato Revista 3i (.docx y .pdf)
+│   └── evaluacion_ecg/       # métricas del ECG en 120 imágenes sintéticas
 ├── scripts/
 │   ├── generar_dataset_demo.py  # imágenes sintéticas por clase (multiclase o binario)
 │   ├── generar_pruebas_nuevas.py # imágenes de prueba nuevas + clave a ciegas
@@ -167,9 +169,17 @@ python scripts/generar_dataset_demo.py --n 2 --test 1 --out /tmp/demo
 
 ## Informe
 
-`informe/Articulo_ECG_Chagas_Revista3i.docx` sigue la plantilla de la Revista 3i (Arial, interlineado
-1,5, normas APA 7.ª edición) e incluye el resumen en español, el *abstract* en inglés y el *resumo*
-en portugués. `informe/Articulo_ECG_Chagas_Revista3i.pdf` es la versión imprimible.
+El informe en formato Revista 3i está en
+[`informe/Informe_Chagas_ECG_Audio_Revista3i.docx`](informe/Informe_Chagas_ECG_Audio_Revista3i.docx)
+(versión imprimible:
+[`informe/Informe_Chagas_ECG_Audio_Revista3i.pdf`](informe/Informe_Chagas_ECG_Audio_Revista3i.pdf)).
+Cubre el clasificador de ECG, el fonocardiograma y la aplicación Android.
+Las métricas del ECG (75 % de exactitud en 120 imágenes sintéticas) se reproducen con
+[`informe/evaluacion_ecg/`](informe/evaluacion_ecg/).
+
+El artículo anterior, centrado solo en el ECG, se conserva en
+`informe/Articulo_ECG_Chagas_Revista3i.docx` y
+`informe/Articulo_ECG_Chagas_Revista3i.pdf`.
 
 ## Créditos
 
