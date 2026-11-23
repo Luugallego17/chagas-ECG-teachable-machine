@@ -10,6 +10,25 @@ se lee de `modelo/audio/`.
 
 No se usa el micrófono. La galería y los archivos los abre el selector del sistema.
 
+## Permisos
+
+El manifiesto declara solo `android.permission.CAMERA`. No hay `RECORD_AUDIO`,
+ni permiso de lectura de fotos o de almacenamiento.
+
+- **Cámara.** Se pide en el momento de pulsar «Tomar foto». El WebView avisa
+  a Capacitor (`onPermissionRequest` con `VIDEO_CAPTURE`) y ahí aparece el
+  diálogo del sistema. Si la persona lo niega, la página lo explica y sigue
+  con la galería.
+- **Galería y archivo de audio.** Los abre el selector del sistema
+  (`input type="file"`). En Android reciente ese selector no exige
+  `READ_MEDIA_IMAGES` ni `READ_MEDIA_AUDIO`.
+- **Red.** No se declara `INTERNET`. Los modelos y las librerías van dentro
+  del APK. La recarga en vivo de Capacitor, que sí usa red, no forma parte
+  de este paquete.
+
+La cámara no es obligatoria (`android:required="false"`): un aparato sin
+cámara puede instalar la app y usar la galería.
+
 ## Qué hace falta
 
 - Node.js 20 o superior
