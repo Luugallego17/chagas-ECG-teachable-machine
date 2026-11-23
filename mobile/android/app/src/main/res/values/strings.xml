@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Chagas ECG</string>
+    <string name="title_activity_main">Chagas ECG</string>
+    <string name="package_name">bo.ucb.chagas.ecg</string>
+    <string name="custom_url_scheme">bo.ucb.chagas.ecg</string>
+</resources>
