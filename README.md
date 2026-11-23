@@ -28,6 +28,8 @@ está en `app/vendor/`, así que esa lectura no pide red. En el teléfono hay do
 En `app/presentacion.html` está la presentación (← →, `P` reproduce, `F` pantalla
 completa). Deja ambos archivos en la misma carpeta para que «Abrir el asistente» funcione.
 
+La presentación de defensa está en https://luugallego17.github.io/chagas-ECG-teachable-machine/presentacion/.
+
 El fonocardiograma sí necesita un servidor local, porque su modelo está en `modelo/audio/`:
 
 ```bash
