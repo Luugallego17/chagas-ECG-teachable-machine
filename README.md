@@ -21,11 +21,23 @@ El proyecto convierte cada trazado en una **imagen** y entrena un clasificador d
 
 ## Probarlo en un minuto
 
-Abre **`app/asistente.html`** con doble clic (el modelo ya viene incorporado en el archivo).
-Toma una foto o elige una imagen de la galería y verás el patrón estimado y la confianza de cada clase. En
-`app/presentacion.html` está la presentación del proyecto (navega con ← →; `P` reproduce solo,
-`F` pantalla completa). Para que el botón «Abrir el asistente» de la presentación funcione,
-deja ambos archivos en la misma carpeta.
+Abre **`app/asistente.html`**. El modelo de ECG ya viene incorporado y TensorFlow.js
+está en `app/vendor/`, así que esa lectura no pide red. En el teléfono hay dos botones:
+**Tomar foto** y **Galería**. No hay arrastrar y soltar.
+
+En `app/presentacion.html` está la presentación (← →, `P` reproduce, `F` pantalla
+completa). Deja ambos archivos en la misma carpeta para que «Abrir el asistente» funcione.
+
+El fonocardiograma sí necesita un servidor local, porque su modelo está en `modelo/audio/`:
+
+```bash
+python -m http.server 8765
+```
+
+Abra `http://127.0.0.1:8765/app/asistente.html`, pestaña **Sonido cardíaco**, y pulse
+**Elegir archivo** (`audio/wav` o `audio/*`). Hace falta un `.wav` de al menos 5 s.
+No hay grabación con el micrófono. El APK se genera como dice [`mobile/README.md`](mobile/README.md).
+La verificación conjunta está en [`docs/verificacion.md`](docs/verificacion.md).
 
 ## Qué se usó realmente (transparencia)
 
@@ -59,17 +71,10 @@ especificidad 0,8406. La matriz [[tn, fp], [fn, tp]] fue [[116, 22], [5, 28]].
 Predecir siempre la clase mayoritaria (`normal`) acertaría 0,807. El detalle y la
 cifra por ventana están en `modelo/audio/metricas.json`. No es una validación clínica.
 
-Para probar el módulo hay que servir el repositorio (el modelo de audio no va incrustado,
-a diferencia del de ECG):
-
-```bash
-python -m http.server 8765
-```
-
-Abra `http://127.0.0.1:8765/app/asistente.html`. En «Sonido cardíaco» se sube un
-`.wav` de al menos 5 s. Si el audio es más largo, se usan los primeros 5 s. Un
-archivo ilegible o demasiado corto muestra un error y la clase `Incierto`, sin
-inventar una probabilidad. El electrocardiograma de la misma página sigue igual.
+En la pestaña «Sonido cardíaco» solo hay **Elegir archivo**. Si el audio dura menos
+de 5 s, no se puede leer o está en silencio, la clase es `Incierto` y no se inventa
+una probabilidad. Si dura más, se usan los primeros 5 s. El electrocardiograma de
+la misma página no se toca: sigue siendo el módulo de los seis patrones.
 
 ## Las seis clases
 
@@ -87,10 +92,13 @@ inventar una probabilidad. El electrocardiograma de la misma página sigue igual
 ```
 .
 ├── app/
-│   ├── asistente.html        # asistente clínico con el modelo YA incorporado (un solo archivo)
+│   ├── asistente.html        # asistente: ECG incorporado y fonocardiograma
+│   ├── vendor/               # TensorFlow.js y Teachable Machine, sin red
 │   ├── index.html            # versión genérica: carga un modelo exportado de Teachable Machine
 │   └── presentacion.html     # presentación interactiva del proyecto
-├── modelo/                   # modelo exportado (TensorFlow.js): model.json, weights.bin, metadata.json
+├── mobile/                   # proyecto Capacitor; cómo generar el APK
+├── modelo/                   # ECG exportado de Teachable Machine
+│   └── audio/                # fonocardiograma (CNN sobre log-mel) y sus métricas
 ├── informe/                  # artículo científico (formato Revista 3i): .docx y .pdf imprimible
 ├── scripts/
 │   ├── generar_dataset_demo.py  # imágenes sintéticas por clase (multiclase o binario)
@@ -102,13 +110,17 @@ inventar una probabilidad. El electrocardiograma de la misma página sigue igual
 │   ├── plan_balanced_set.py  # distribución de clases + manifiesto balanceado
 │   └── deidentify_images.py  # des-identifica fotos de ECG (quita metadatos y tapa datos)
 ├── datasets/                 # imágenes sintéticas: entrenamiento (6 clases), pruebas nuevas, binarios
-├── docs/                     # catálogo de datasets y mapeo de etiquetas PTB-XL
+├── docs/                     # datasets, clases de audio y verificación
 ├── notebooks/01_explorar_datos.ipynb  # explorar -> balancear -> renderizar
 ├── samples/                  # SVGs de ejemplo, uno por clase
 ├── data/                     # datos locales (ignorados por git)
 ├── requirements.txt
 └── .gitignore
 ```
+
+Los scripts de audio (`scripts/download_audio.py`, `scripts/prepare_audio.py`,
+`scripts/entrenar_audio.py`) y el manifiesto `data/audio/manifest.csv` acompañan
+al modelo. Los wav crudos y los procesados no se versionan.
 
 ## Flujo con datos reales
 

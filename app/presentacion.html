@@ -610,8 +610,19 @@ canvas.live{display:block;width:100%;height:auto;border-radius:.7em;background:r
         <div class="card stat" data-rv="r" style="--i:4"><div class="v am"><span data-count="1">0</span></div><div class="l">archivo: un asistente que clasifica la imagen directamente en el navegador.</div></div>
       </div>
       <div class="card" data-rv style="--i:5"><div class="tag">Entregables en el repositorio</div>
-        <div class="files" style="margin-top:.7em"><span class="file">app/asistente.html</span><span class="file">app/presentacion.html</span><span class="file">modelo/ (model.json · weights.bin · metadata.json)</span><span class="file">scripts/ (Python)</span><span class="file">informe/ (artículo, formato Revista 3i)</span></div></div>
+        <div class="files" style="margin-top:.7em"><span class="file">app/asistente.html</span><span class="file">modelo/audio/</span><span class="file">mobile/ (APK con Capacitor)</span><span class="file">docs/verificacion.md</span><span class="file">informe/</span></div></div>
       <div data-rv="z" style="--i:6"><a class="cta" href="asistente.html" target="_blank" rel="noopener">Abrir el asistente →</a></div>
+    </div>
+  </div></section>
+
+  <!-- En el teléfono -->
+  <section class="slide" data-sec="En el teléfono"><div class="inner"><span class="wm">05</span>
+    <div class="head"><span class="kicker" data-rv>05 · Uso</span><h2 data-rv style="--i:1">Pensado para un teléfono</h2>
+    <p class="lead" data-rv style="--i:2">Dos entradas distintas. Ninguna sustituye al médico.</p></div>
+    <div class="body c3">
+      <div class="card" data-rv="l" style="--i:3"><div class="tag">Electrocardiograma</div><div class="t">Foto o galería</div><div class="d">Dos botones. Seis patrones de conducción. El modelo de esta demostración se entrenó con imágenes sintéticas.</div></div>
+      <div class="card" data-rv="z" style="--i:4"><div class="tag">Sonido cardíaco</div><div class="t">Solo un archivo</div><div class="d">No usa el micrófono. Estima un soplo general con datos pediátricos de CirCor. <b>No diagnostica Chagas.</b></div></div>
+      <div class="card" data-rv="r" style="--i:5"><div class="tag">Aplicación Android</div><div class="t">Sin red</div><div class="d">Capacitor empaqueta la misma interfaz. El único permiso es la cámara, y se pide al tomar la foto.</div></div>
     </div>
   </div></section>
 
@@ -622,7 +633,7 @@ canvas.live{display:block;width:100%;height:auto;border-radius:.7em;background:r
       <div class="body c3" style="margin-top:0">
         <div class="card" data-rv="l" style="--i:2"><div class="tag" style="color:var(--amber)">Datos de demostración</div><div class="d" style="font-size:1.1em">El modelo mostrado se entrenó con imágenes <b>sintéticas</b>. Reconoce ese tipo de trazados; no es un modelo clínico.</div></div>
         <div class="card" data-rv="z" style="--i:3"><div class="tag" style="color:var(--amber)">Brecha de dominio</div><div class="d" style="font-size:1.1em">Una foto de ECG en papel (cuadrícula, sombras, dedos) difiere de las imágenes de entrenamiento y puede bajar el acierto.</div></div>
-        <div class="card" data-rv="r" style="--i:4"><div class="tag" style="color:var(--amber)">Sin validación clínica</div><div class="d" style="font-size:1.1em">No se midieron sensibilidad ni especificidad frente a especialistas. Es una demostración educativa.</div></div>
+        <div class="card" data-rv="r" style="--i:4"><div class="tag" style="color:var(--amber)">Sin validación clínica</div><div class="d" style="font-size:1.1em">El ECG no tiene sensibilidad ni especificidad frente a especialistas. El audio publica un corte interno por sujeto, no un estudio clínico, y <b>no diagnostica Chagas</b>.</div></div>
       </div>
       <div class="card hl" data-rv style="--i:5"><div class="quote">Por eso se presenta como <span class="grad">herramienta educativa de apoyo</span>, no como diagnóstico.</div></div>
     </div>
@@ -636,7 +647,7 @@ canvas.live{display:block;width:100%;height:auto;border-radius:.7em;background:r
         <div class="card" data-rv="l" style="--i:2"><div class="tag">Conclusiones</div>
           <ul class="chk"><li>Es <b>viable</b> construir con recursos accesibles un apoyo para reconocer patrones chagásicos en el ECG.</li><li>Puede aportar a la <b>docencia y al tamizaje</b> en contextos como Bolivia, siempre como apoyo al especialista.</li></ul></div>
         <div class="card" data-rv="r" style="--i:3"><div class="tag">Trabajo futuro</div>
-          <ul class="chk warn"><li>Ampliar y validar el conjunto propio de datos.</li><li>Entrenar con fotografías reales de ECG.</li><li>Evaluar con métricas clínicas frente a especialistas.</li></ul></div>
+          <ul class="chk warn"><li>Ampliar y validar el conjunto propio de ECG.</li><li>Entrenar con fotografías reales, no solo con trazados sintéticos.</li><li>Evaluar ECG y audio con métricas clínicas frente a especialistas.</li></ul></div>
       </div>
       <div class="card hl" data-rv="z" style="--i:4"><div class="quote">Un apoyo accesible para que el médico <span class="grad">reconozca antes</span> los patrones del Chagas.</div></div>
     </div>

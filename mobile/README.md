@@ -104,6 +104,14 @@ Para instalarlo en un teléfono con depuración USB:
 adb install -r mobile/android/app/build/outputs/apk/release/app-release.apk
 ```
 
+En un equipo con aceleración KVM se puede probar antes en el emulador:
+
+```bash
+avdmanager create avd -n chagas -k "system-images;android-36;google_apis;x86_64" -d pixel_6
+emulator -avd chagas
+adb install -r mobile/android/app/build/outputs/apk/release/app-release.apk
+```
+
 ## Carpetas que no se versionan
 
 `node_modules/`, `www/` (se regenera), `android/app/build/`, `.gradle/`,
